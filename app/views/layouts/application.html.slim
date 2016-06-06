@@ -1,0 +1,16 @@
+doctype html
+html
+head
+  title Приемная кампания 2016
+  = stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true
+  = javascript_include_tag 'application', 'data-turbolinks-track' => true
+  = javascript_include_tag 'main'
+  = csrf_meta_tags
+body
+  .container
+    .nav.navbar.navbar-default
+      ul.nav.navbar-nav
+        li= link_to "Новый запрос", new_request_path
+        li= link_to "Архив запросов", requests_path
+    .row
+      = yield

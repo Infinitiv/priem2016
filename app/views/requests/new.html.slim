@@ -1,0 +1,40 @@
+h1 Отправить запрос
+= form_for @request, html: {class: 'form-horizontal'} do |f|
+  .form-group
+    = f.label 'Запрос', class: 'control-label col-sm-1'
+    .col-sm-3
+      = f.select :query, option_for_select = @queries, {include_blank: ''}, class: 'form-control'
+    .col-sm-3.dictionary-number.hidden
+      = select_tag :dictionary_number, options_for_select(@dictionaries), include_blank: true, class: 'form-control'
+    .col-sm-3.application-number.hidden
+      = select_tag :application_number, options_for_select([]), include_blank: true, class: 'form-control'
+  .form-group
+    .col-sm-4
+      = f.label '', class: 'checkbox-inline'
+        = check_box_tag :campaign_info
+        = label_tag 'сведения о приемной кампании'
+  .form-group
+    .col-sm-4
+      = f.label '', class: 'checkbox-inline'
+        = check_box_tag :admission_info
+        = label_tag 'сведения об объеме приема'
+  .form-group
+    .col-sm-4
+      = f.label '', class: 'checkbox-inline'
+        = check_box_tag :institution_achievements
+        = label_tag 'сведения об индивидуальных достижениях'
+  .form-group
+    .col-sm-4
+      = f.label '', class: 'checkbox-inline'
+        = check_box_tag :applications
+        = label_tag 'сведения о заявлениях'
+  .form-group
+    .col-sm-4
+      = f.label '', class: 'checkbox-inline'
+        = check_box_tag :orders_of_admission
+        = label_tag 'сведения о приказах'
+  .form-group
+    = f.label 'Пользовательский запрос', class: 'control-label'
+    = text_area_tag :custom_request, nil, rows: 10, class: 'form-control'
+  .form-group
+    = f.submit 'Отправить', class: 'btn btn-primary'

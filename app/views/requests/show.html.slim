@@ -1,0 +1,5 @@
+dl
+  dt
+    pre= @request.input
+  dd
+    pre= Nokogiri::XML(@request.output).to_xml(encoding: 'UTF-8')

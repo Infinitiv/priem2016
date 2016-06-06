@@ -1,0 +1,4 @@
+h1 Архив запросов
+ul
+  - @requests.each do |request|
+    li= link_to "#{request.query} от #{request.created_at.strftime("%d.%m.%Y %H:%M:%S")}", request
