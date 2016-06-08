@@ -12,6 +12,7 @@ class RequestsController < ApplicationController
   
   def new
     @request = Request.new
+    @campaigns = Campaign.order(:name)
   end
   
   def create

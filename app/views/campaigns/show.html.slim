@@ -1,0 +1,11 @@
+h1= @campaign.name
+dl
+  dt Год начала
+  dd= @campaign.year_start
+  dt Год окончания
+  dd= @campaign.year_end
+  dt Статус
+  dd= @campaign.status_id
+  dt Тип
+  dd= @campaign.campaign_type_id
+= link_to "К списку приемных кампаний", campaigns_path, class: 'btn btn-primary'

@@ -41,7 +41,6 @@ class Request < ActiveRecord::Base
 	  admission_info(pd, params) if params[:admission_info]
           institution_achievements(pd, params) if params[:institution_achievements]
 	  applications(pd, params) if params[:applications]
-          recommended_lists(pd, params) if params[:recommended_lists]
           orders_of_admission(pd, params) if params[:orders_of_admission]
         end
       end
@@ -54,7 +53,6 @@ class Request < ActiveRecord::Base
 	  admission_info(pd, params) if params[:admission_info]
           institution_achievements(pd, params) if params[:institution_achievements]
 	  applications(pd, params) if params[:applications]
-          recommended_lists(pd, params) if params[:recommended_lists]
           orders_of_admission(pd, params) if params[:orders_of_admission]
         end
       end
@@ -74,6 +72,39 @@ class Request < ActiveRecord::Base
     root.AuthData do |ad|
       ad.Login ENV['LOGIN']
       ad.Pass ENV['PASSWORD']
+    end
+  end
+  
+  def self.campaign_info(pd, params)
+    pd.CampaignInfo do |ci|
+      ci.Campaigns do |cs|
+        cs.Campaign do |c|
+          campaign = Campaign.find params[:campaign_id]
+          c.UID campaign.id
+          c.Name campaign.name
+          c.YearStart campaign.year_start
+          c.YearEnd campaign.year_end
+          c.EducationForms do |edfs|
+            case campaign.campaign_type_id
+            when 1
+              edfs.EducationFormID 11
+            when 4
+              edfs.EducationFormID 10
+              edfs.EducationFormID 11
+            end
+          end
+          c.StatusID campaign.status_id
+          c.EducationLevels do |edls|
+            case campaign.campaign_type_id
+            when 1
+              edls.EducationLevelID 5
+            when 4
+              edls.EducationLevelID 18
+            end
+          end
+          c.CampaignTypeID campaign.campaign_type_id
+        end
+      end
     end
   end
 end

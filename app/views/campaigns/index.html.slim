@@ -1,0 +1,9 @@
+h1 Приемные кампании
+= link_to 'Добавить', new_campaign_path, class: 'btn btn-primary'
+ul
+  - @campaigns.each do |campaign|
+    li
+      = link_to campaign.name, campaign
+      = link_to 'Удалить', campaign, method: 'delete', class: 'pull-right'
+      span.pull-right &nbsp;|&nbsp;
+      = link_to 'Редактировать', edit_campaign_path(campaign), class: 'pull-right'
