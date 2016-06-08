@@ -1,5 +1,5 @@
 class CampaignsController < ApplicationController
-  before_action :set_select, only: [:new, :edit]
+  before_action :set_select, only: [:new, :edit, :update]
   before_action :campaign_params, only: [:create]
   before_action :set_campaign, only: [:show, :edit, :update, :destroy]
   
@@ -26,7 +26,7 @@ class CampaignsController < ApplicationController
   
   def update
     if @campaign.update(campaign_params)
-      redirect_to campaign
+      redirect_to @campaign
     else
       render action: 'edit'
     end
@@ -42,15 +42,20 @@ class CampaignsController < ApplicationController
     @statuses = {'Набор не начался' => 0,
                  'Идет набор' => 1,
                  'Завершена' => 2
-      }
+                }
     @campaign_types = {'Прием на обучение на бакалавриат/специалитет' => 1,
                        'Прием на подготовку кадров высшей квалификации' => 4,
                        'Прием иностранцев по направлениям Минобрнауки' => 5
-      }
+                      }
+    @education_levels = {'Специалитет' => 5,
+                        'Кадры высшей квалификации' => 18
+                       }
+    @education_forms = {'Заочная форма' => 10,
+                        'Очная форма' => 11}
   end
   
   def campaign_params
-    params.require(:campaign).permit(:name, :year_start, :year_end, :status_id, :campaign_type_id)
+    params.require(:campaign).permit(:name, :year_start, :year_end, :status_id, :campaign_type_id, education_forms: [], education_levels: [])
   end
   
   def set_campaign

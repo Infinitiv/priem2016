@@ -85,21 +85,14 @@ class Request < ActiveRecord::Base
           c.YearStart campaign.year_start
           c.YearEnd campaign.year_end
           c.EducationForms do |edfs|
-            case campaign.campaign_type_id
-            when 1
-              edfs.EducationFormID 11
-            when 4
-              edfs.EducationFormID 10
-              edfs.EducationFormID 11
+            campaign.education_forms.each do |ef|
+              edfs.EducationFormID ef
             end
           end
           c.StatusID campaign.status_id
           c.EducationLevels do |edls|
-            case campaign.campaign_type_id
-            when 1
-              edls.EducationLevelID 5
-            when 4
-              edls.EducationLevelID 18
+            campaign.education_levels.each do |el|
+              edls.EducationLevelID el
             end
           end
           c.CampaignTypeID campaign.campaign_type_id

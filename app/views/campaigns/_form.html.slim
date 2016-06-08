@@ -11,6 +11,20 @@
     = f.label :year_end, 'Год окончания', class: 'label-control col-sm-2'
     .col-sm-4
       = f.number_field :year_end, value: Time.now.strftime("%Y"), in: 2016..2020, class: 'form-control'
+  = f.label :education_forms, 'Формы обучения'
+  - @education_forms.each do |k, v|
+    .form-group
+      .col-sm-2
+        = f.label '', class: 'checkbox-inline'
+          = f.check_box :education_forms, {:multiple => true}, v, nil
+          = f.label k
+  = f.label :education_levels, 'Уровни обучения'
+  - @education_levels.each do |k, v|
+    .form-group
+      .col-sm-2
+        = f.label '', class: 'checkbox-inline'
+          = f.check_box :education_levels, {:multiple => true}, v, nil
+          = f.label k
   .form-group
     = f.label :status_id, 'Статус', class: 'label-control col-sm-2'
     .col-sm-4
