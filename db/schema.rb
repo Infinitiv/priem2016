@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160608091022) do
+ActiveRecord::Schema.define(version: 20160609154040) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -96,9 +96,6 @@ ActiveRecord::Schema.define(version: 20160608091022) do
     t.integer  "number_budget_o",     default: 0
     t.integer  "number_budget_oz",    default: 0
     t.integer  "number_budget_z",     default: 0
-    t.integer  "number_paid_o",       default: 0
-    t.integer  "number_paid_oz",      default: 0
-    t.integer  "number_paid_z",       default: 0
     t.integer  "number_target_o",     default: 0
     t.integer  "number_target_oz",    default: 0
     t.integer  "number_target_z",     default: 0

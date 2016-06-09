@@ -102,10 +102,11 @@ class Request < ActiveRecord::Base
   end
   
   def self.admission_info(pd, params)
+    campaign = Campaign.find(params[:campaign_id])
     pd.AdmissionInfo do |ai|
+      admission_volumes = campaign.admission_volumes
       ai.AdmissionVolume do |av|
-        items = AdmissionVolume.where(campaign_id: params[:campaign_id])
-        items.each do |item|
+        admission_volumes.each do |item|
           av.Item do |i|
             i.UID item.id
             i.CampaignUID item.campaign.id
@@ -117,6 +118,24 @@ class Request < ActiveRecord::Base
             i.NumberPaidO item.number_paid_o if item.number_paid_o > 0
             i.NumberPaidOZ item.number_paid_oz if item.number_paid_oz > 0
             i.NumberPaidZ item.number_paid_z if item.number_paid_z > 0
+            i.NumberTargetO item.number_target_o if item.number_target_o > 0
+            i.NumberTargetOZ item.number_target_oz if item.number_target_oz > 0
+            i.NumberTargetZ item.number_target_z if item.number_target_z > 0
+            i.NumberQuotaO item.number_quota_o if item.number_quota_o > 0
+            i.NumberQuotaOZ item.number_quota_oz if item.number_quota_oz > 0
+            i.NumberQuotaZ item.number_quota_z if item.number_quota_z > 0
+          end
+        end
+      end
+      distributed_admission_volumes = campaign.distributed_admission_volumes
+      ai.DistributedAdmissionVolume do |dav|
+        distributed_admission_volumes.each do |item|
+          dav.Item do |i|
+            i.AdmissionVolumeUID item.admission_volume_id
+            i.LevelBudget item.level_budget_id
+            i.NumberBudgetO item.number_budget_o if item.number_budget_o > 0
+            i.NumberBudgetOZ item.number_budget_oz if item.number_budget_oz > 0
+            i.NumberBudgetZ item.number_budget_z if item.number_budget_z > 0
             i.NumberTargetO item.number_target_o if item.number_target_o > 0
             i.NumberTargetOZ item.number_target_oz if item.number_target_oz > 0
             i.NumberTargetZ item.number_target_z if item.number_target_z > 0

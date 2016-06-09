@@ -1,5 +1,5 @@
 class AdmissionVolumesController < ApplicationController
-  before_action :set_admissino_volume, only: [:show, :edit, :update, :destroy]
+  before_action :set_admission_volume, only: [:show, :edit, :update, :destroy]
   before_action :admission_volume_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :create, :edit, :update]
   def index
@@ -42,7 +42,7 @@ class AdmissionVolumesController < ApplicationController
   
   private
   
-  def set_admissino_volume
+  def set_admission_volume
     @admission_volume = AdmissionVolume.find(params[:id])
   end
   

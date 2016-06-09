@@ -1,0 +1,39 @@
+h1= "#{@distributed_admission_volume.admission_volume.campaign.name} #{@distributed_admission_volume.admission_volume.campaign.year_start} #{@distributed_admission_volume.admission_volume.direction_id}"
+table.table
+  thead
+    tr
+      th Название конкурса
+      th Количество мест
+  tfoot
+    tr
+      td Всего мест
+      td= [@distributed_admission_volume.number_budget_o, @distributed_admission_volume.number_budget_oz, @distributed_admission_volume.number_budget_z,  @distributed_admission_volume.number_target_o, @distributed_admission_volume.number_target_oz, @distributed_admission_volume.number_target_z, @distributed_admission_volume.number_quota_o, @distributed_admission_volume.number_quota_oz, @distributed_admission_volume.number_quota_z].sum
+  tbody
+    tr
+      td Количество очных бюджетных мест на общий конкурс
+      td= @distributed_admission_volume.number_budget_o if @distributed_admission_volume.number_budget_o > 0
+    tr
+      td Количество очно-заочных бюджетных мест на общий конкурс
+      td= @distributed_admission_volume.number_budget_oz if @distributed_admission_volume.number_budget_oz > 0
+    tr
+      td Количество заочных бюджетных мест на общий конкурс
+      td= @distributed_admission_volume.number_budget_z if @distributed_admission_volume.number_budget_z > 0
+    tr
+      td Количество очных целевых мест
+      td= @distributed_admission_volume.number_target_o if @distributed_admission_volume.number_target_o > 0
+    tr
+      td Количество очно-заочных целевых мест
+      td= @distributed_admission_volume.number_target_oz if @distributed_admission_volume.number_target_oz > 0
+    tr
+      td Количество заочных целевых мест
+      td= @distributed_admission_volume.number_target_z if @distributed_admission_volume.number_target_z > 0
+    tr
+      td Количество очных мест по квоте особого права
+      td= @distributed_admission_volume.number_quota_o if @distributed_admission_volume.number_quota_o > 0
+    tr
+      td Количество очно-заочных мест по квоте особого права
+      td= @distributed_admission_volume.number_quota_oz if @distributed_admission_volume.number_quota_oz > 0
+    tr
+      td Количество заочных мест по квоте особого права
+      td= @distributed_admission_volume.number_quota_z if @distributed_admission_volume.number_quota_z > 0
+= link_to 'К списку объемов приема', distributed_admission_volumes_path

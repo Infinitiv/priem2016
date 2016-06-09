@@ -1,0 +1,48 @@
+.notice
+= form_for @distributed_admission_volume, html: {class: 'form-horizontal'} do |f|
+  .form-group
+    = f.label :admission_volume_id, 'Объем приема', class: 'label-control col-sm-3'
+    .col-sm-4
+      = f.select :admission_volume_id, option_for_select = @admission_volumes.collect{|av| ["#{av.campaign.name} #{av.campaign.year_start} #{av.direction_id}", av.id]}, {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :level_budget_id, 'Уровень финансирования', class: 'label-control col-sm-3'
+    .col-sm-4
+      = f.select :level_budget_id, options_for_select(@levels_budgets), {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :number_budget_o, 'Количество очных бюджетных мест на общий конкурс', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_budget_o, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_budget_oz, 'Количество очно-заочных бюджетных мест на общий конкурс', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_budget_oz, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_budget_z, 'Количество заочных бюджетных мест на общий конкурс', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_budget_z, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_target_o, 'Количество очных целевых мест ', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_target_o, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_target_oz, 'Количество очно-заочных целевых мест', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_target_oz, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_target_z, 'Количество заочных целевых мест', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_target_z, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_quota_o, 'Количество очных мест по квоте особого права', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_quota_o, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_quota_oz, 'Количество очно-заочных мест по квоте особого права', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_quota_oz, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_quota_z, 'Количество заочных мест по квоте особого права', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_quota_z, min: 0, class: 'form-control'
+  .form-group
+    = f.submit 'Отправить', class: 'btn btn-primary'

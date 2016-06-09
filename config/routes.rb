@@ -10,6 +10,11 @@ Rails.application.routes.draw do
   resources :requests, only: [:index, :show, :new, :create, :destroy]
   resources :campaigns
   resources :admission_volumes
+  resources :distributed_admission_volumes do
+    member do
+      get 'admission_volume_to_json'
+    end
+  end
   
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
