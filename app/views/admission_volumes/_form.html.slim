@@ -1,0 +1,63 @@
+= form_for @admission_volume, html: {class: 'form-horizontal'} do |f|
+  .form-group
+    = f.label :campaign_id, 'Приемная кампания', class: 'label-control col-sm-3'
+    .col-sm-4
+      = f.select :campaign_id, option_for_select = @campaigns.collect{|c| ["#{c.name} #{c.year_start}", c.id]}, {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :education_level_id, 'Уровень образования', class: 'label-control col-sm-3'
+    .col-sm-4
+      = f.select :education_level_id, options_for_select(@education_levels), {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :direction_id, 'Направление подготовки', class: 'label-control col-sm-3'
+    .col-sm-4
+      = f.select :direction_id, options_for_select(@directions), {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :number_budget_o, 'Количество очных бюджетных мест на общий конкурс', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_budget_o, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_budget_oz, 'Количество очно-заочных бюджетных мест на общий конкурс', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_budget_oz, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_budget_z, 'Количество заочных бюджетных мест на общий конкурс', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_budget_z, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_paid_o, 'Количество очных внебюджетных мест на общий конкурс', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_paid_o, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_paid_oz, 'Количество очно-заочных внебюджетных мест на общий конкурс', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_paid_oz, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_paid_z, 'Количество заочных внебюджетных мест на общий конкурс', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_paid_z, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_target_o, 'Количество очных целевых мест ', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_target_o, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_target_oz, 'Количество очно-заочных целевых мест', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_target_oz, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_target_z, 'Количество заочных целевых мест', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_target_z, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_quota_o, 'Количество очных мест по квоте особого права', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_quota_o, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_quota_oz, 'Количество очно-заочных мест по квоте особого права', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_quota_oz, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_quota_z, 'Количество заочных мест по квоте особого права', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_quota_z, min: 0, class: 'form-control'
+  .form-group
+    = f.submit 'Отправить', class: 'btn btn-primary'

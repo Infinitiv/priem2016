@@ -100,4 +100,32 @@ class Request < ActiveRecord::Base
       end
     end
   end
+  
+  def self.admission_info(pd, params)
+    pd.AdmissionInfo do |ai|
+      ai.AdmissionVolume do |av|
+        items = AdmissionVolume.where(campaign_id: params[:campaign_id])
+        items.each do |item|
+          av.Item do |i|
+            i.UID item.id
+            i.CampaignUID item.campaign.id
+            i.EducationLevelID item.education_level_id
+            i.DirectionID item.direction_id
+            i.NumberBudgetO item.number_budget_o if item.number_budget_o > 0
+            i.NumberBudgetOZ item.number_budget_oz if item.number_budget_oz > 0
+            i.NumberBudgetZ item.number_budget_z if item.number_budget_z > 0
+            i.NumberPaidO item.number_paid_o if item.number_paid_o > 0
+            i.NumberPaidOZ item.number_paid_oz if item.number_paid_oz > 0
+            i.NumberPaidZ item.number_paid_z if item.number_paid_z > 0
+            i.NumberTargetO item.number_target_o if item.number_target_o > 0
+            i.NumberTargetOZ item.number_target_oz if item.number_target_oz > 0
+            i.NumberTargetZ item.number_target_z if item.number_target_z > 0
+            i.NumberQuotaO item.number_quota_o if item.number_quota_o > 0
+            i.NumberQuotaOZ item.number_quota_oz if item.number_quota_oz > 0
+            i.NumberQuotaZ item.number_quota_z if item.number_quota_z > 0
+          end
+        end
+      end
+    end
+  end
 end

@@ -1,0 +1,9 @@
+h1 Объемы приема
+= link_to 'Добавить', new_admission_volume_path, class: 'btn btn-primary'
+ul
+  - @admission_volumes.each do |admission_volume|
+    li
+      = link_to "#{admission_volume.campaign.name} #{admission_volume.direction_id}", admission_volume
+      = link_to 'Удалить', admission_volume, method: 'delete', class: 'pull-right'
+      span.pull-right &nbsp;|&nbsp;
+      = link_to 'Редактировать', edit_admission_volume_path(admission_volume), class: 'pull-right'

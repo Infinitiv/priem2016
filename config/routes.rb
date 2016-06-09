@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   
   resources :requests, only: [:index, :show, :new, :create, :destroy]
   resources :campaigns
+  resources :admission_volumes
   
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
