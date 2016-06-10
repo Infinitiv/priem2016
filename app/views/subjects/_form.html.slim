@@ -1,0 +1,11 @@
+= form_for @subject, html: {class: 'form-horizontal'} do |f|
+  .form-group
+    = f.label :subject_id, 'Код', class: 'label-control col-sm-1'
+    .col-sm-2
+      = f.text_field :subject_id, class: 'form-control'
+  .form-group
+    = f.label :subject_name, 'Название', class: 'label-control col-sm-1'
+    .col-sm-2
+      = f.text_field :subject_name, class: 'form-control'
+  .form-group
+    = f.submit 'Отправить', class: 'btn btn-primary'

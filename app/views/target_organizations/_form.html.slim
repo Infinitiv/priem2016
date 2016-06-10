@@ -1,0 +1,7 @@
+= form_for @target_organization, html: {class: 'form-horizontal'} do |f|
+  .form-group
+    = f.label :target_organization_name, 'Название', class: 'label-control col-sm-1'
+    .col-sm-5
+      = f.text_field :target_organization_name, class: 'form-control'
+  .form-group
+    = f.submit 'Отправить', class: 'btn btn-primary'

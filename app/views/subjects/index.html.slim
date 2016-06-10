@@ -1,0 +1,9 @@
+h1 Предметы
+= link_to 'Добавить', new_subject_url, class: 'btn btn-primary'
+ul
+  - @subjects.each do |subject|
+    li
+      = "#{subject.subject_id} #{subject.subject_name}"
+      = link_to 'Удалить', subject, method: 'delete', class: 'pull-right'
+      span.pull-right &nbsp;|&nbsp;
+      = link_to 'Редактировать', edit_subject_path(subject), class: 'pull-right'

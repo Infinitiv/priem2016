@@ -3,17 +3,35 @@ html
 head
   title Приемная кампания 2016
   = stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true
-  = javascript_include_tag 'application', 'data-turbolinks-track' => true
+  = javascript_include_tag 'application', 'data-turbolinks-track' => true, 'data-turbolinks-eval': false
   = javascript_include_tag 'main'
   = csrf_meta_tags
 body
   .container
     .nav.navbar.navbar-default
       ul.nav.navbar-nav
-        li= link_to "Новый запрос", new_request_path
-        li= link_to "Архив запросов", requests_path
+        li.dropdown
+          = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
+            span Запросы
+            span.caret
+          ul.dropdown-menu
+            li= link_to "Новый запрос", new_request_path
+            li= link_to "Архив запросов", requests_path
         li= link_to 'Приемные кампании', campaigns_path
-        li= link_to 'Объем приема', admission_volumes_path
-        li= link_to 'Распределенный объем приема', distributed_admission_volumes_path
+        li.dropdown
+          = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
+            span Цифры приема
+            span.caret
+          ul.dropdown-menu
+              li= link_to 'Объем приема', admission_volumes_path
+              li= link_to 'Распределенный объем приема', distributed_admission_volumes_path
+        li.dropdown
+          = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
+            span Справочники
+            span.caret
+          ul.dropdown-menu
+            li= link_to 'Образовательные программы', edu_programs_path
+            li= link_to 'Организации целевого приема', target_organizations_url
+            li= link_to 'Предметы', subjects_url
     .row
       = yield

@@ -1,0 +1,11 @@
+= form_for @edu_program, html: {class: 'form-horizontal'} do |f|
+  .form-group
+    = f.label :code, 'Код', class: 'label-control col-sm-1'
+    .col-sm-2
+      = f.text_field :code, class: 'form-control'
+  .form-group
+    = f.label :name, 'Название', class: 'label-control col-sm-1'
+    .col-sm-2
+      = f.text_field :name, class: 'form-control'
+  .form-group
+    = f.submit 'Отправить', class: 'btn btn-primary'

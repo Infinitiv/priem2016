@@ -16,6 +16,11 @@ Rails.application.routes.draw do
     end
   end
   
+  resources :edu_programs
+  resources :target_organizations
+  resources :competitve_groups
+  resources :subjects
+  
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 

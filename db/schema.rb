@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160609154040) do
+ActiveRecord::Schema.define(version: 20160610094620) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -44,10 +44,10 @@ ActiveRecord::Schema.define(version: 20160609154040) do
     t.integer  "year_end"
     t.integer  "status_id",        default: 1
     t.integer  "campaign_type_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.integer  "education_forms",               array: true
     t.integer  "education_levels",              array: true
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "competitive_group_items", force: :cascade do |t|
@@ -90,6 +90,11 @@ ActiveRecord::Schema.define(version: 20160609154040) do
     t.integer "edu_program_id",       null: false
   end
 
+  create_table "competitive_groups_entrance_test_items", id: false, force: :cascade do |t|
+    t.integer "competitive_group_id",  null: false
+    t.integer "entrance_test_item_id", null: false
+  end
+
   create_table "distributed_admission_volumes", force: :cascade do |t|
     t.integer  "admission_volume_id"
     t.integer  "level_budget_id"
@@ -116,12 +121,10 @@ ActiveRecord::Schema.define(version: 20160609154040) do
   end
 
   create_table "entrance_test_items", force: :cascade do |t|
-    t.integer  "competitive_group_id"
     t.integer  "entrance_test_type_id",  default: 1
     t.integer  "min_score"
     t.integer  "entrance_test_priority"
     t.integer  "subject_id"
-    t.string   "subject_name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -133,6 +136,13 @@ ActiveRecord::Schema.define(version: 20160609154040) do
     t.string   "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "subjects", force: :cascade do |t|
+    t.integer  "subject_id"
+    t.string   "subject_name"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
   end
 
   create_table "target_numbers", force: :cascade do |t|

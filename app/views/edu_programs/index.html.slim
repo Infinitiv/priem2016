@@ -1,0 +1,9 @@
+h1 Образовательные программы
+= link_to 'Добавить', new_edu_program_url, class: 'btn btn-primary'
+ul
+  - @edu_programs.each do |edu_program|
+    li
+      = "#{edu_program.code} #{edu_program.name}"
+      = link_to 'Удалить', edu_program, method: 'delete', class: 'pull-right'
+      span.pull-right &nbsp;|&nbsp;
+      = link_to 'Редактировать', edit_edu_program_path(edu_program), class: 'pull-right'

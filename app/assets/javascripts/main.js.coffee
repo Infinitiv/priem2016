@@ -1,4 +1,4 @@
-ready = ->
+$ ->
   $('#request_query').change -> 
     if $('#request_query').val() == 'dictionarydetails'
       $('.dictionary-number').removeClass('hidden')
@@ -20,6 +20,3 @@ ready = ->
       $('#distributed_admission_volume_number_quota_o').val(parseInt(data.number_quota_o))
       $('#distributed_admission_volume_number_quota_oz').val(parseInt(data.number_quota_oz))
       $('#distributed_admission_volume_number_quota_z').val(parseInt(data.number_quota_z))
-      
-$(document).ready(ready)
-$(document).on('page:load', ready)

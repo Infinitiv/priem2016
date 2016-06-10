@@ -6,9 +6,6 @@ class CreateDistributedAdmissionVolumes < ActiveRecord::Migration
       t.integer :number_budget_o, default: 0
       t.integer :number_budget_oz, default: 0
       t.integer :number_budget_z, default: 0
-      t.integer :number_paid_o, default: 0
-      t.integer :number_paid_oz, default: 0
-      t.integer :number_paid_z, default: 0
       t.integer :number_target_o, default: 0
       t.integer :number_target_oz, default: 0
       t.integer :number_target_z, default: 0
