@@ -1,0 +1,23 @@
+= form_for @target_number, html: {class: 'form-horizontal'} do |f|
+  .form-group
+    = f.label :competitive_group_id_id, 'Конкурсная группа', class: 'label-control col-sm-3'
+    .col-sm-4
+      = f.select :competitive_group_id, option_for_select = @competitive_groups.collect{|cg| [cg.name, cg.id]}, {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :target_organization_id, 'Заказчик', class: 'label-control col-sm-3'
+    .col-sm-4
+      = f.select :target_organization_id, option_for_select = @target_organizations.collect{|to| [to.target_organization_name, to.id]}, {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :number_target_o, 'Количество очных целевых мест ', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_target_o, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_target_oz, 'Количество очно-заочных целевых мест', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_target_oz, min: 0, class: 'form-control'
+  .form-group
+    = f.label :number_target_z, 'Количество заочных целевых мест', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :number_target_z, min: 0, class: 'form-control'
+  .form-group
+    = f.submit 'Отправить', class: 'btn btn-primary'

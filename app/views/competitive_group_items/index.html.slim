@@ -1,0 +1,9 @@
+h1 Распределенные объемы приема
+= link_to 'Добавить', new_distributed_admission_volume_path, class: 'btn btn-primary'
+ul
+  - @distributed_admission_volumes.each do |distributed_admission_volume|
+    li
+      = link_to "#{distributed_admission_volume.admission_volume.campaign.name} #{distributed_admission_volume.admission_volume.direction_id}", distributed_admission_volume
+      = link_to 'Удалить', distributed_admission_volume, method: 'delete', class: 'pull-right'
+      span.pull-right &nbsp;|&nbsp;
+      = link_to 'Редактировать', edit_distributed_admission_volume_path(distributed_admission_volume), class: 'pull-right'

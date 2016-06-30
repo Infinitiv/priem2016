@@ -1,0 +1,11 @@
+h1= "#{@entrance_test_item.competitive_group.name} #{@entrance_test_item.competitive_group.campaign.year_start}"
+dl
+  dt Тип вступительного испытания
+  dd= @entrance_test_item.entrance_test_type_id
+  dt Минимальный балл
+  dd= @entrance_test_item.min_score
+  dt  Приоритет
+  dd= @entrance_test_item.entrance_test_priority
+  dt Предмет
+  dd= @entrance_test_item.subject.name
+= link_to 'К списку конкурсных испытаний', entrance_test_items_path

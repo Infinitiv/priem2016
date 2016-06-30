@@ -1,0 +1,37 @@
+= form_for @competitive_group, html: {class: 'form-horizontal'} do |f|
+  .form-group
+    = f.label :name, 'Название', class: 'label-control col-sm-2'
+    .col-sm-4
+      = f.text_field :name, class: 'form-control'
+  .form-group
+    = f.label :campaign_id, 'Приемная кампания', class: 'label-control col-sm-2'
+    .col-sm-4
+      = f.select :campaign_id, option_for_select = @campaigns.collect{|c| ["#{c.name} #{c.year_start}", c.id]}, {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :education_form_id, 'Форма обучения', class: 'label-control col-sm-2'
+    .col-sm-4
+      = f.select :education_form_id, options_for_select(@education_forms), {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :education_level_id, 'Уровень обучения', class: 'label-control col-sm-2'
+    .col-sm-4
+      = f.select :education_level_id, options_for_select(@education_levels), {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :education_source_id, 'Источник финансирования', class: 'label-control col-sm-2'
+    .col-sm-4
+          = f.select :education_source_id, options_for_select(@education_sources), {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :direction_id, 'Направление подготовки', class: 'label-control col-sm-2'
+    .col-sm-4
+          = f.select :direction_id, options_for_select(@directions), {include_blank: true}, class: 'form-control'
+  .form-group
+    .col-sm-2
+      = f.label :is_for_krym, '', class: 'checkbox-inline'
+        = f.check_box :is_for_krym
+        = f.label 'Места для Крыма'
+  .form-group
+    .col-sm-2
+      = f.label :is_additional, '', class: 'checkbox-inline'
+        = f.check_box :is_additional
+        = f.label 'Дополнительный набор'
+  .form-group
+    = f.submit 'Добавить', class: 'btn btn-primary'

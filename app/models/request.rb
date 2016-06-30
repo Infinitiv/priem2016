@@ -145,6 +145,77 @@ class Request < ActiveRecord::Base
           end
         end
       end
+      competitive_groups = campaign.competitive_groups
+      ai.CompetitiveGroups do |cgs|
+        competitive_groups.each do |item|
+          cgs.CompetitiveGroup do |cg|
+            cg.UID item.id
+            cg.CampaignUID item.campaign_id
+            cg.Name item.name
+            cg.EducationLevelID item.education_level_id
+            cg.EducationSourceID item.education_source_id
+            cg.EducationFormID item.education_form_id
+            cg.DirectionID item.direction_id
+            edu_programs = item.edu_programs
+            cg.EduPrograms do |eps|
+              edu_programs.each do |sub_item|
+                eps.EduProgram do |ep|
+                  ep.UID sub_item.id
+                  ep.Name sub_item.name
+                  ep.Code sub_item.code
+                end
+              end
+            end
+            cg.IsForKrym true if item.is_for_krym
+            cg.IsAdditional true if item.is_additional
+            competitive_group_item = item.competitive_group_item
+            cg.CompetitiveGroupItem do |cgi|
+              cgi.NumberBudgetO competitive_group_item.number_budget_o if competitive_group_item.number_budget_o > 0
+              cgi.NumberBudgetOZ competitive_group_item.number_budget_oz if competitive_group_item.number_budget_oz > 0
+              cgi.NumberBudgetZ competitive_group_item.number_budget_z if competitive_group_item.number_budget_z > 0
+              cgi.NumberPaidO competitive_group_item.number_paid_o if competitive_group_item.number_paid_o > 0
+              cgi.NumberPaidOZ competitive_group_item.number_paid_oz if competitive_group_item.number_paid_oz > 0
+              cgi.NumberPaidZ competitive_group_item.number_paid_z if competitive_group_item.number_paid_z > 0
+              cgi.NumberTargetO competitive_group_item.number_target_o if competitive_group_item.number_target_o > 0
+              cgi.NumberTargetOZ competitive_group_item.number_target_oz if competitive_group_item.number_target_oz > 0
+              cgi.NumberTargetZ competitive_group_item.number_target_z if competitive_group_item.number_target_z > 0
+              cgi.NumberQuotaO competitive_group_item.number_quota_o if competitive_group_item.number_quota_o > 0
+              cgi.NumberQuotaOZ competitive_group_item.number_quota_oz if competitive_group_item.number_quota_oz > 0
+              cgi.NumberQuotaZ competitive_group_item.number_quota_z if competitive_group_item.number_quota_z > 0
+            end
+            target_numbers = item.target_numbers
+            unless target_numbers.empty?
+              cg.TargetOrganizations do |tos|
+                target_numbers.each do |sub_item|
+                  tos.TargetOrganization do |to|
+                    to.UID sub_item.target_organization_id
+                    to.CompetitiveGroupTargetItem do |cgti|
+                      cgti.NumberTargetO sub_item.number_target_o if sub_item.number_target_o > 0
+                      cgti.NumberTargetOZ sub_item.number_target_oz if sub_item.number_target_oz > 0
+                      cgti.NumberTargetZ sub_item.number_target_z if sub_item.number_target_z > 0
+                    end
+                  end
+                end
+              end
+            end
+            entrance_test_items = item.entrance_test_items
+            cg.EntranceTestItems do |etis|
+              entrance_test_items.each do |sub_item|
+                etis.EntranceTestItem do |eti|
+                  eti.UID sub_item.id
+                  eti.EntranceTestTypeID sub_item.entrance_test_type_id
+                  eti.MinScore sub_item.min_score
+                  eti.EntranceTestPriority sub_item.entrance_test_priority
+                  subject = sub_item.subject
+                  eti.EntranceTestSubject do |ets|
+                    ets.SubjectID subject.subject_id
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
     end
   end
 end

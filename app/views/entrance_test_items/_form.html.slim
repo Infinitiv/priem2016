@@ -1,0 +1,19 @@
+= form_for @entrance_test_item, html: {class: 'form-horizontal'} do |f|
+  .form-group
+    = f.label :entrance_test_type_id, 'Тип конкурса', class: 'label-control col-sm-3'
+    .col-sm-4
+      = f.select :entrance_test_type_id, options_for_select(@entrance_test_types), {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :subject_id, 'Предмет', class: 'label-control col-sm-3'
+    .col-sm-4
+      = f.select :subject_id, option_for_select = @subjects.collect{|s| [s.subject_name, s.id]}, {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :min_score, 'Минимальный балл ', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :min_score, min: 0, class: 'form-control'
+  .form-group
+    = f.label :entrance_test_priority, 'Приоритет', class: 'label-control col-sm-3'
+    .col-sm-1
+      = f.number_field :entrance_test_priority, min: 0, class: 'form-control'
+  .form-group
+    = f.submit 'Отправить', class: 'btn btn-primary'

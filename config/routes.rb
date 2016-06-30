@@ -18,8 +18,18 @@ Rails.application.routes.draw do
   
   resources :edu_programs
   resources :target_organizations
-  resources :competitve_groups
+  resources :competitive_groups do
+    member do
+      get 'add_education_program'
+      get 'remove_education_program'
+      get 'add_entrance_test_item'
+      get 'remove_entrance_test_item'
+    end
+  end
+  resources :competitive_group_items
   resources :subjects
+  resources :target_numbers
+  resources :entrance_test_items
   
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

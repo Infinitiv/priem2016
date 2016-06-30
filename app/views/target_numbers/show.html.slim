@@ -1,0 +1,17 @@
+h1= "#{@target_number.competitive_group.name} #{@target_number.competitive_group.campaign.year_start}"
+table.table
+  thead
+    tr
+      th Название конкурса
+      th Количество мест
+  tbody
+    tr
+      td Количество очных целевых мест
+      td= @target_number.number_target_o if @target_number.number_target_o > 0
+    tr
+      td Количество очно-заочных целевых мест
+      td= @target_number.number_target_oz if @target_number.number_target_oz > 0
+    tr
+      td Количество заочных целевых мест
+      td= @target_number.number_target_z if @target_number.number_target_z > 0
+= link_to 'К списку целевых мест', target_numbers_path

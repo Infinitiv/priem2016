@@ -1,0 +1,9 @@
+h1 Целевые места
+= link_to 'Добавить', new_target_number_path, class: 'btn btn-primary'
+ul
+  - @target_numbers.each do |target_number|
+    li
+      = link_to "#{target_number.competitive_group.campaign.name} #{target_number.competitive_group.direction_id}", target_number
+      = link_to 'Удалить', target_number, method: 'delete', class: 'pull-right'
+      span.pull-right &nbsp;|&nbsp;
+      = link_to 'Редактировать', edit_target_number_path(target_number), class: 'pull-right'

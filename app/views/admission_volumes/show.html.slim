@@ -7,45 +7,59 @@ dl
       tr
         th Название конкурса
         th Количество мест
+        th Распределено мест
     tfoot
       tr
         td Всего мест
         td= [@admission_volume.number_budget_o, @admission_volume.number_budget_oz, @admission_volume.number_budget_z, @admission_volume.number_paid_o, @admission_volume.number_paid_oz, @admission_volume.number_paid_z, @admission_volume.number_target_o, @admission_volume.number_target_oz, @admission_volume.number_target_z, @admission_volume.number_quota_o, @admission_volume.number_quota_oz, @admission_volume.number_quota_z].sum
+        td
     tbody
       tr
         td Количество очных бюджетных мест на общий конкурс
         td= @admission_volume.number_budget_o if @admission_volume.number_budget_o > 0
+        td= @admission_volume.distributed_admission_volumes.map(&:number_budget_o).sum if @admission_volume.distributed_admission_volumes.map(&:number_budget_o).sum
       tr
         td Количество очно-заочных бюджетных мест на общий конкурс
         td= @admission_volume.number_budget_oz if @admission_volume.number_budget_oz > 0
+        td= @admission_volume.distributed_admission_volumes.map(&:number_budget_oz).sum if @admission_volume.distributed_admission_volumes.map(&:number_budget_oz).sum > 0
       tr
         td Количество заочных бюджетных мест на общий конкурс
         td= @admission_volume.number_budget_z if @admission_volume.number_budget_z > 0
+        td= @admission_volume.distributed_admission_volumes.map(&:number_budget_z).sum if @admission_volume.distributed_admission_volumes.map(&:number_budget_z).sum > 0
       tr
         td Количество очных внебюджетных мест на общий конкурс
         td= @admission_volume.number_paid_o if @admission_volume.number_paid_o > 0
+        td
       tr
         td Количество очно-заочных внебюджетных мест на общий конкурс
         td= @admission_volume.number_paid_oz if @admission_volume.number_paid_oz > 0
+        td
       tr
         td Количество заочных внебюджетных мест на общий конкурс
         td= @admission_volume.number_paid_z if @admission_volume.number_paid_z > 0
+        td
       tr
         td Количество очных целевых мест
         td= @admission_volume.number_target_o if @admission_volume.number_target_o > 0
+        td= @admission_volume.distributed_admission_volumes.map(&:number_target_o).sum if @admission_volume.distributed_admission_volumes.map(&:number_target_o).sum > 0
       tr
         td Количество очно-заочных целевых мест
         td= @admission_volume.number_target_oz if @admission_volume.number_target_oz > 0
+        td= @admission_volume.distributed_admission_volumes.map(&:number_target_oz).sum if @admission_volume.distributed_admission_volumes.map(&:number_target_oz).sum > 0
       tr
         td Количество заочных целевых мест
         td= @admission_volume.number_target_z if @admission_volume.number_target_z > 0
+        td= @admission_volume.distributed_admission_volumes.map(&:number_target_z).sum if @admission_volume.distributed_admission_volumes.map(&:number_target_z).sum > 0
       tr
         td Количество очных мест по квоте особого права
         td= @admission_volume.number_quota_o if @admission_volume.number_quota_o > 0
+        td= @admission_volume.distributed_admission_volumes.map(&:number_quota_o).sum if @admission_volume.distributed_admission_volumes.map(&:number_quota_o).sum > 0
       tr
         td Количество очно-заочных мест по квоте особого права
         td= @admission_volume.number_quota_oz if @admission_volume.number_quota_oz > 0
+        td= @admission_volume.distributed_admission_volumes.map(&:number_quota_oz).sum if @admission_volume.distributed_admission_volumes.map(&:number_quota_oz).sum > 0
       tr
         td Количество заочных мест по квоте особого права
         td= @admission_volume.number_quota_z if @admission_volume.number_quota_z > 0
+        td= @admission_volume.distributed_admission_volumes.map(&:number_quota_z).sum if @admission_volume.distributed_admission_volumes.map(&:number_quota_z).sum > 0
 = link_to 'К списку объемов приема', admission_volumes_path

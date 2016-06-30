@@ -25,6 +25,8 @@ body
           ul.dropdown-menu
               li= link_to 'Объем приема', admission_volumes_path
               li= link_to 'Распределенный объем приема', distributed_admission_volumes_path
+              li= link_to 'Конкурсы', competitive_groups_url
+              li= link_to 'Испытания', entrance_test_items_url
         li.dropdown
           = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
             span Справочники

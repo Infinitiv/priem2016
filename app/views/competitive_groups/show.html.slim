@@ -1,0 +1,43 @@
+h1= @competitive_group.name
+dl
+  dt Приемная кампания
+  dd= "#{@competitive_group.campaign.name} #{@competitive_group.campaign.year_start}"
+  dt Уровень обучения
+  dd= @competitive_group.education_level_id
+  dt Источник финансирования
+  dd= @competitive_group.education_source_id
+  dt Фома обучения
+  dd= @competitive_group.education_form_id
+  dt Направление подготовки
+  dd= @competitive_group.direction_id
+  dt Места для крыма
+  dd= @competitive_group.is_for_krym ? 'да' : 'нет'
+  dt Дополнительный набор
+  dd= @competitive_group.is_additional ? 'да' : 'нет'
+  dt Испытания
+  dd
+    ul
+      - @competitive_group.entrance_test_items.each do |entrance_test_item|
+        li= link_to "#{entrance_test_item.entrance_test_type_id} #{entrance_test_item.subject.subject_name}", remove_entrance_test_item_competitive_group_path(@competitive_group) + "?entrance_test_item_id=#{entrance_test_item.id}"
+    . Добавить испытание
+    ul
+      - @entrance_test_items.each do |entrance_test_item|
+        li= link_to "#{entrance_test_item.entrance_test_type_id} #{entrance_test_item.subject.subject_name}", add_entrance_test_item_competitive_group_path(@competitive_group) + "?entrance_test_item_id=#{entrance_test_item.id}"
+  dt Образовательные программы
+  dd
+    ul
+      - @competitive_group.edu_programs.each do |edu_program|
+        li= link_to "#{edu_program.code} #{edu_program.name}", remove_education_program_competitive_group_path(@competitive_group) + "?edu_program_id=#{edu_program.id}"
+    . Добавить образовательную программу
+    ul
+      - @edu_programs.each do |edu_program|
+        li= link_to "#{edu_program.code} #{edu_program.name}", add_education_program_competitive_group_path(@competitive_group) + "?edu_program_id=#{edu_program.id}"
+  - if @competitive_group.education_source_id == 16
+    dt Целевые места
+    dd
+      table.table
+        - @competitive_group.target_numbers.each do |target_number|
+          tr
+            td= target_number.target_organization.target_organization_name
+            td= "#{[target_number.number_target_o, target_number.number_target_oz, target_number.number_target_z].sum}"
+= link_to "К списку конкурсов", competitive_groups_path, class: 'btn btn-primary'

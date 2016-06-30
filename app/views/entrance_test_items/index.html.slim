@@ -1,0 +1,9 @@
+h1 Конкурсные испытания
+= link_to 'Добавить', new_entrance_test_item_path, class: 'btn btn-primary'
+ul
+  - @entrance_test_items.each do |entrance_test_item|
+    li
+      = link_to "#{entrance_test_item.entrance_test_type_id} #{entrance_test_item.subject.subject_name}", entrance_test_item
+      = link_to 'Удалить', entrance_test_item, method: 'delete', class: 'pull-right'
+      span.pull-right &nbsp;|&nbsp;
+      = link_to 'Редактировать', edit_entrance_test_item_path(entrance_test_item), class: 'pull-right'
