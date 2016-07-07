@@ -1,0 +1,9 @@
+h1 Предметы
+= link_to 'Добавить', new_institution_achievement_url, class: 'btn btn-primary'
+ul
+  - @institution_achievements.each do |institution_achievement|
+    li
+      = "#{institution_achievement.name} #{institution_achievement.max_value}"
+      = link_to 'Удалить', institution_achievement, method: 'delete', class: 'pull-right'
+      span.pull-right &nbsp;|&nbsp;
+      = link_to 'Редактировать', edit_institution_achievement_path(institution_achievement), class: 'pull-right'

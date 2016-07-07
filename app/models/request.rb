@@ -40,6 +40,7 @@ class Request < ActiveRecord::Base
           campaign_info(pd, params) if params[:campaign_info]
 	  admission_info(pd, params) if params[:admission_info]
           institution_achievements(pd, params) if params[:institution_achievements]
+          target_organizations(pd, params) if params[:target_organizations]
 	  applications(pd, params) if params[:applications]
           orders_of_admission(pd, params) if params[:orders_of_admission]
         end
@@ -52,6 +53,7 @@ class Request < ActiveRecord::Base
           campaign_info(pd, params) if params[:campaign_info]
 	  admission_info(pd, params) if params[:admission_info]
           institution_achievements(pd, params) if params[:institution_achievements]
+          target_organizations(pd, params) if params[:target_organizations]
 	  applications(pd, params) if params[:applications]
           orders_of_admission(pd, params) if params[:orders_of_admission]
         end
@@ -104,111 +106,117 @@ class Request < ActiveRecord::Base
   def self.admission_info(pd, params)
     campaign = Campaign.find(params[:campaign_id])
     pd.AdmissionInfo do |ai|
-      admission_volumes = campaign.admission_volumes
-      ai.AdmissionVolume do |av|
-        admission_volumes.each do |item|
-          av.Item do |i|
-            i.UID item.id
-            i.CampaignUID item.campaign.id
-            i.EducationLevelID item.education_level_id
-            i.DirectionID item.direction_id
-            i.NumberBudgetO item.number_budget_o if item.number_budget_o > 0
-            i.NumberBudgetOZ item.number_budget_oz if item.number_budget_oz > 0
-            i.NumberBudgetZ item.number_budget_z if item.number_budget_z > 0
-            i.NumberPaidO item.number_paid_o if item.number_paid_o > 0
-            i.NumberPaidOZ item.number_paid_oz if item.number_paid_oz > 0
-            i.NumberPaidZ item.number_paid_z if item.number_paid_z > 0
-            i.NumberTargetO item.number_target_o if item.number_target_o > 0
-            i.NumberTargetOZ item.number_target_oz if item.number_target_oz > 0
-            i.NumberTargetZ item.number_target_z if item.number_target_z > 0
-            i.NumberQuotaO item.number_quota_o if item.number_quota_o > 0
-            i.NumberQuotaOZ item.number_quota_oz if item.number_quota_oz > 0
-            i.NumberQuotaZ item.number_quota_z if item.number_quota_z > 0
+      if params[:admission_info_admission_volume]
+        admission_volumes = campaign.admission_volumes
+        ai.AdmissionVolume do |av|
+          admission_volumes.each do |item|
+            av.Item do |i|
+              i.UID item.id
+              i.CampaignUID item.campaign.id
+              i.EducationLevelID item.education_level_id
+              i.DirectionID item.direction_id
+              i.NumberBudgetO item.number_budget_o if item.number_budget_o > 0
+              i.NumberBudgetOZ item.number_budget_oz if item.number_budget_oz > 0
+              i.NumberBudgetZ item.number_budget_z if item.number_budget_z > 0
+              i.NumberPaidO item.number_paid_o if item.number_paid_o > 0
+              i.NumberPaidOZ item.number_paid_oz if item.number_paid_oz > 0
+              i.NumberPaidZ item.number_paid_z if item.number_paid_z > 0
+              i.NumberTargetO item.number_target_o if item.number_target_o > 0
+              i.NumberTargetOZ item.number_target_oz if item.number_target_oz > 0
+              i.NumberTargetZ item.number_target_z if item.number_target_z > 0
+              i.NumberQuotaO item.number_quota_o if item.number_quota_o > 0
+              i.NumberQuotaOZ item.number_quota_oz if item.number_quota_oz > 0
+              i.NumberQuotaZ item.number_quota_z if item.number_quota_z > 0
+            end
           end
         end
       end
-      distributed_admission_volumes = campaign.distributed_admission_volumes
-      ai.DistributedAdmissionVolume do |dav|
-        distributed_admission_volumes.each do |item|
-          dav.Item do |i|
-            i.AdmissionVolumeUID item.admission_volume_id
-            i.LevelBudget item.level_budget_id
-            i.NumberBudgetO item.number_budget_o if item.number_budget_o > 0
-            i.NumberBudgetOZ item.number_budget_oz if item.number_budget_oz > 0
-            i.NumberBudgetZ item.number_budget_z if item.number_budget_z > 0
-            i.NumberTargetO item.number_target_o if item.number_target_o > 0
-            i.NumberTargetOZ item.number_target_oz if item.number_target_oz > 0
-            i.NumberTargetZ item.number_target_z if item.number_target_z > 0
-            i.NumberQuotaO item.number_quota_o if item.number_quota_o > 0
-            i.NumberQuotaOZ item.number_quota_oz if item.number_quota_oz > 0
-            i.NumberQuotaZ item.number_quota_z if item.number_quota_z > 0
+      if params[:admission_info_distributed_admission_volume]
+        distributed_admission_volumes = campaign.distributed_admission_volumes
+        ai.DistributedAdmissionVolume do |dav|
+          distributed_admission_volumes.each do |item|
+            dav.Item do |i|
+              i.AdmissionVolumeUID item.admission_volume_id
+              i.LevelBudget item.level_budget_id
+              i.NumberBudgetO item.number_budget_o if item.number_budget_o > 0
+              i.NumberBudgetOZ item.number_budget_oz if item.number_budget_oz > 0
+              i.NumberBudgetZ item.number_budget_z if item.number_budget_z > 0
+              i.NumberTargetO item.number_target_o if item.number_target_o > 0
+              i.NumberTargetOZ item.number_target_oz if item.number_target_oz > 0
+              i.NumberTargetZ item.number_target_z if item.number_target_z > 0
+              i.NumberQuotaO item.number_quota_o if item.number_quota_o > 0
+              i.NumberQuotaOZ item.number_quota_oz if item.number_quota_oz > 0
+              i.NumberQuotaZ item.number_quota_z if item.number_quota_z > 0
+            end
           end
         end
       end
-      competitive_groups = campaign.competitive_groups
-      ai.CompetitiveGroups do |cgs|
-        competitive_groups.each do |item|
-          cgs.CompetitiveGroup do |cg|
-            cg.UID item.id
-            cg.CampaignUID item.campaign_id
-            cg.Name item.name
-            cg.EducationLevelID item.education_level_id
-            cg.EducationSourceID item.education_source_id
-            cg.EducationFormID item.education_form_id
-            cg.DirectionID item.direction_id
-            edu_programs = item.edu_programs
-            cg.EduPrograms do |eps|
-              edu_programs.each do |sub_item|
-                eps.EduProgram do |ep|
-                  ep.UID sub_item.id
-                  ep.Name sub_item.name
-                  ep.Code sub_item.code
-                end
-              end
-            end
-            cg.IsForKrym true if item.is_for_krym
-            cg.IsAdditional true if item.is_additional
-            competitive_group_item = item.competitive_group_item
-            cg.CompetitiveGroupItem do |cgi|
-              cgi.NumberBudgetO competitive_group_item.number_budget_o if competitive_group_item.number_budget_o > 0
-              cgi.NumberBudgetOZ competitive_group_item.number_budget_oz if competitive_group_item.number_budget_oz > 0
-              cgi.NumberBudgetZ competitive_group_item.number_budget_z if competitive_group_item.number_budget_z > 0
-              cgi.NumberPaidO competitive_group_item.number_paid_o if competitive_group_item.number_paid_o > 0
-              cgi.NumberPaidOZ competitive_group_item.number_paid_oz if competitive_group_item.number_paid_oz > 0
-              cgi.NumberPaidZ competitive_group_item.number_paid_z if competitive_group_item.number_paid_z > 0
-              cgi.NumberTargetO competitive_group_item.number_target_o if competitive_group_item.number_target_o > 0
-              cgi.NumberTargetOZ competitive_group_item.number_target_oz if competitive_group_item.number_target_oz > 0
-              cgi.NumberTargetZ competitive_group_item.number_target_z if competitive_group_item.number_target_z > 0
-              cgi.NumberQuotaO competitive_group_item.number_quota_o if competitive_group_item.number_quota_o > 0
-              cgi.NumberQuotaOZ competitive_group_item.number_quota_oz if competitive_group_item.number_quota_oz > 0
-              cgi.NumberQuotaZ competitive_group_item.number_quota_z if competitive_group_item.number_quota_z > 0
-            end
-            target_numbers = item.target_numbers
-            unless target_numbers.empty?
-              cg.TargetOrganizations do |tos|
-                target_numbers.each do |sub_item|
-                  tos.TargetOrganization do |to|
-                    to.UID sub_item.target_organization_id
-                    to.CompetitiveGroupTargetItem do |cgti|
-                      cgti.NumberTargetO sub_item.number_target_o if sub_item.number_target_o > 0
-                      cgti.NumberTargetOZ sub_item.number_target_oz if sub_item.number_target_oz > 0
-                      cgti.NumberTargetZ sub_item.number_target_z if sub_item.number_target_z > 0
-                    end
+      if params[:admission_info_competitive_groups]
+        competitive_groups = campaign.competitive_groups
+        ai.CompetitiveGroups do |cgs|
+          competitive_groups.each do |item|
+            cgs.CompetitiveGroup do |cg|
+              cg.UID item.id
+              cg.CampaignUID item.campaign_id
+              cg.Name item.name
+              cg.EducationLevelID item.education_level_id
+              cg.EducationSourceID item.education_source_id
+              cg.EducationFormID item.education_form_id
+              cg.DirectionID item.direction_id
+              edu_programs = item.edu_programs
+              cg.EduPrograms do |eps|
+                edu_programs.each do |sub_item|
+                  eps.EduProgram do |ep|
+                    ep.UID "#{sub_item.id}-#{item.id}"
+                    ep.Name sub_item.name
+                    ep.Code sub_item.code
                   end
                 end
               end
-            end
-            entrance_test_items = item.entrance_test_items
-            cg.EntranceTestItems do |etis|
-              entrance_test_items.each do |sub_item|
-                etis.EntranceTestItem do |eti|
-                  eti.UID sub_item.id
-                  eti.EntranceTestTypeID sub_item.entrance_test_type_id
-                  eti.MinScore sub_item.min_score
-                  eti.EntranceTestPriority sub_item.entrance_test_priority
-                  subject = sub_item.subject
-                  eti.EntranceTestSubject do |ets|
-                    ets.SubjectID subject.subject_id
+              cg.IsForKrym true if item.is_for_krym
+              cg.IsAdditional true if item.is_additional
+              competitive_group_item = item.competitive_group_item
+              cg.CompetitiveGroupItem do |cgi|
+                cgi.NumberBudgetO competitive_group_item.number_budget_o if competitive_group_item.number_budget_o > 0
+                cgi.NumberBudgetOZ competitive_group_item.number_budget_oz if competitive_group_item.number_budget_oz > 0
+                cgi.NumberBudgetZ competitive_group_item.number_budget_z if competitive_group_item.number_budget_z > 0
+                cgi.NumberPaidO competitive_group_item.number_paid_o if competitive_group_item.number_paid_o > 0
+                cgi.NumberPaidOZ competitive_group_item.number_paid_oz if competitive_group_item.number_paid_oz > 0
+                cgi.NumberPaidZ competitive_group_item.number_paid_z if competitive_group_item.number_paid_z > 0
+                cgi.NumberTargetO competitive_group_item.number_target_o if competitive_group_item.number_target_o > 0
+                cgi.NumberTargetOZ competitive_group_item.number_target_oz if competitive_group_item.number_target_oz > 0
+                cgi.NumberTargetZ competitive_group_item.number_target_z if competitive_group_item.number_target_z > 0
+                cgi.NumberQuotaO competitive_group_item.number_quota_o if competitive_group_item.number_quota_o > 0
+                cgi.NumberQuotaOZ competitive_group_item.number_quota_oz if competitive_group_item.number_quota_oz > 0
+                cgi.NumberQuotaZ competitive_group_item.number_quota_z if competitive_group_item.number_quota_z > 0
+              end
+#               target_numbers = item.target_numbers
+#               unless target_numbers.empty?
+#                 cg.TargetOrganizations do |tos|
+#                   target_numbers.each do |sub_item|
+#                     tos.TargetOrganization do |to|
+#                       to.UID sub_item.target_organization_id
+#                       to.CompetitiveGroupTargetItem do |cgti|
+#                         cgti.NumberTargetO sub_item.number_target_o if sub_item.number_target_o > 0
+#                         cgti.NumberTargetOZ sub_item.number_target_oz if sub_item.number_target_oz > 0
+#                         cgti.NumberTargetZ sub_item.number_target_z if sub_item.number_target_z > 0
+#                       end
+#                     end
+#                   end
+#                 end
+#               end
+              entrance_test_items = item.entrance_test_items
+              cg.EntranceTestItems do |etis|
+                entrance_test_items.each do |sub_item|
+                  etis.EntranceTestItem do |eti|
+                    eti.UID "#{sub_item.id}-#{item.id}"
+                    eti.EntranceTestTypeID sub_item.entrance_test_type_id
+                    eti.MinScore sub_item.min_score
+                    eti.EntranceTestPriority sub_item.entrance_test_priority
+                    subject = sub_item.subject
+                    eti.EntranceTestSubject do |ets|
+                      ets.SubjectID subject.subject_id
+                    end
                   end
                 end
               end
@@ -218,4 +226,33 @@ class Request < ActiveRecord::Base
       end
     end
   end
+  
+  def self.institution_achievements(pd, params)
+    campaign = Campaign.find(params[:campaign_id])
+    institution_achievements = campaign.institution_achievements
+    pd.InstitutionAchievements do |ias|
+      institution_achievements.each do |item|
+        ias.InstitutionAchievement do |ia|
+          ia.InstitutionAchievementUID item.id
+          ia.Name item.name
+          ia.IdCategory item.id_category
+          ia.MaxValue item.max_value
+          ia.CampaignUID item.campaign_id
+        end
+      end
+    end
+  end
+  
+  def self.target_organizations(pd, params)
+    target_organizations_list = TargetOrganization.order(:target_organization_name)
+    pd.TargetOrganizations do |tos|
+      target_organizations_list.each do |item|
+        tos.TargetOrganization do |to|
+          to.UID item.id
+          to.Name item.target_organization_name
+        end
+      end
+    end
+  end
+  
 end

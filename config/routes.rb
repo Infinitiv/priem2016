@@ -30,6 +30,7 @@ Rails.application.routes.draw do
   resources :subjects
   resources :target_numbers
   resources :entrance_test_items
+  resources :institution_achievements
   
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

@@ -129,6 +129,17 @@ ActiveRecord::Schema.define(version: 20160610094620) do
     t.datetime "updated_at"
   end
 
+  create_table "institution_achievements", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "id_category"
+    t.integer  "max_value"
+    t.integer  "campaign_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "institution_achievements", ["campaign_id"], name: "index_institution_achievements_on_campaign_id", using: :btree
+
   create_table "requests", force: :cascade do |t|
     t.string   "query"
     t.text     "input"

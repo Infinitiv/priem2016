@@ -1,0 +1,19 @@
+= form_for @institution_achievement, html: {class: 'form-horizontal'} do |f|
+  .form-group
+    = f.label :campaign_id, 'Приемная кампания', class: 'label-control col-sm-2'
+    .col-sm-4
+      = f.select :campaign_id, options_for_select = @campaigns.collect{|c| [c.name, c.id]}, {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :name, 'Название', class: 'label-control col-sm-2'
+    .col-sm-4
+      = f.text_field :name, class: 'form-control'
+  .form-group
+    = f.label :id_category, 'Категория', class: 'label-control col-sm-2'
+    .col-sm-4
+      = f.select :id_category, options_for_select(@categories), {include_blank: true}, class: 'form-control'
+  .form-group
+    = f.label :max_value, 'Максимальный балл', class: 'label-control col-sm-2'
+    .col-sm-1
+      = f.number_field :max_value, value: 0, in: 0..10, class: 'form-control'
+  .form-group
+    = f.submit 'Отправить', class: 'btn btn-primary'

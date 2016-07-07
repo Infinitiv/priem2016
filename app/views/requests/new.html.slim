@@ -24,8 +24,28 @@ h1 Отправить запрос
   .form-group
     .col-sm-4
       = f.label '', class: 'checkbox-inline'
+        = check_box_tag :admission_info_admission_volume
+        = label_tag 'сведения о цифрах приема'
+  .form-group
+    .col-sm-4
+      = f.label '', class: 'checkbox-inline'
+        = check_box_tag :admission_info_distributed_admission_volume
+        = label_tag 'сведения о распределенных цифрах приема'
+  .form-group
+    .col-sm-4
+      = f.label '', class: 'checkbox-inline'
+        = check_box_tag :admission_info_competitive_groups
+        = label_tag 'сведения о конкурсах'
+  .form-group
+    .col-sm-4
+      = f.label '', class: 'checkbox-inline'
         = check_box_tag :institution_achievements
         = label_tag 'сведения об индивидуальных достижениях'
+  .form-group
+    .col-sm-4
+      = f.label '', class: 'checkbox-inline'
+        = check_box_tag :target_organizations
+        = label_tag 'сведения о заказчиках целевого приема'
   .form-group
     .col-sm-4
       = f.label '', class: 'checkbox-inline'
