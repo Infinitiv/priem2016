@@ -1,0 +1,15 @@
+h1 Список заявлений
+= form_tag import_entrant_applications_path + "?campaign_id=#{@campaign.id}", multipart: true do
+  = file_field_tag :file
+  br
+  = submit_tag "Загрузить заявления", class: "btn btn-primary"
+
+table.table.datatable
+  thead
+    th Номер заявления
+    th Ф.И.О.
+  tbody
+    - @entrant_applications.each do |entrant_application|
+      tr
+        td= link_to "%04d" % entrant_application.application_number, entrant_application
+        td= entrant_application.fio

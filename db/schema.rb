@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160610094620) do
+ActiveRecord::Schema.define(version: 20160710123445) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -95,6 +95,11 @@ ActiveRecord::Schema.define(version: 20160610094620) do
     t.integer "entrance_test_item_id", null: false
   end
 
+  create_table "competitive_groups_entrant_applications", id: false, force: :cascade do |t|
+    t.integer "entrant_application_id", null: false
+    t.integer "competitive_group_id",   null: false
+  end
+
   create_table "distributed_admission_volumes", force: :cascade do |t|
     t.integer  "admission_volume_id"
     t.integer  "level_budget_id"
@@ -120,6 +125,19 @@ ActiveRecord::Schema.define(version: 20160610094620) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "education_documents", force: :cascade do |t|
+    t.integer  "entrant_application_id"
+    t.string   "education_document_type"
+    t.string   "education_document_series"
+    t.string   "education_document_number"
+    t.date     "education_document_date"
+    t.date     "original_received_date"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "education_documents", ["entrant_application_id"], name: "index_education_documents_on_entrant_application_id", using: :btree
+
   create_table "entrance_test_items", force: :cascade do |t|
     t.integer  "entrance_test_type_id",  default: 1
     t.integer  "min_score"
@@ -128,6 +146,47 @@ ActiveRecord::Schema.define(version: 20160610094620) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "entrant_applications", force: :cascade do |t|
+    t.integer  "registration_number"
+    t.integer  "application_number"
+    t.integer  "campaign_id"
+    t.string   "entrant_last_name"
+    t.string   "entrant_first_name"
+    t.string   "entrant_middle_name"
+    t.integer  "gender_id"
+    t.date     "birth_date"
+    t.integer  "region_id"
+    t.string   "email"
+    t.date     "registration_date"
+    t.boolean  "need_hostel",            default: false
+    t.integer  "status_id",              default: 2
+    t.integer  "nationality_type_id"
+    t.integer  "target_organization_id"
+    t.boolean  "special_entrant",        default: false
+    t.boolean  "olympionic",             default: false
+    t.boolean  "benefit",                default: false
+    t.string   "data_hash"
+    t.boolean  "checked",                default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "entrant_applications_institution_achievements", id: false, force: :cascade do |t|
+    t.integer "entrant_application_id",     null: false
+    t.integer "institution_achievement_id", null: false
+  end
+
+  create_table "identity_documents", force: :cascade do |t|
+    t.integer  "identity_document_type"
+    t.string   "identity_document_series"
+    t.string   "identity_document_number"
+    t.date     "identity_document_date"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "identity_documents", ["identity_document_type"], name: "index_identity_documents_on_identity_document_type", using: :btree
 
   create_table "institution_achievements", force: :cascade do |t|
     t.string   "name"
@@ -139,6 +198,19 @@ ActiveRecord::Schema.define(version: 20160610094620) do
   end
 
   add_index "institution_achievements", ["campaign_id"], name: "index_institution_achievements_on_campaign_id", using: :btree
+
+  create_table "marks", force: :cascade do |t|
+    t.integer  "entrant_application_id"
+    t.integer  "subject_id"
+    t.integer  "value"
+    t.string   "form"
+    t.date     "checked"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "marks", ["entrant_application_id"], name: "index_marks_on_entrant_application_id", using: :btree
+  add_index "marks", ["subject_id"], name: "index_marks_on_subject_id", using: :btree
 
   create_table "requests", force: :cascade do |t|
     t.string   "query"

@@ -31,6 +31,16 @@ Rails.application.routes.draw do
   resources :target_numbers
   resources :entrance_test_items
   resources :institution_achievements
+  resources :entrant_applications do 
+    collection do
+      post 'import'
+      get 'errors'
+      get 'competition'
+      get 'ege_to_txt'
+      get 'competition_lists'
+      get 'competition_one_list'
+    end
+  end
   
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

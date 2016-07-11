@@ -4,6 +4,7 @@ class Campaign < ActiveRecord::Base
   has_many :competitive_groups
   has_many :competitive_group_items, through: :competitive_groups
   has_many :institution_achievements
+  has_many :entrant_applications
   
   validates :name, :year_start, :year_end, :status_id, :campaign_type_id, :education_forms, :education_levels, presence: true
   validates :year_start, :year_end, numericality: { only_integer: true }
