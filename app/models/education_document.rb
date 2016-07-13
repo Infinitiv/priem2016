@@ -1,6 +1,6 @@
 #encoding: utf-8
 class EducationDocument < ActiveRecord::Base
-  belongs_to :application
+  belongs_to :entrant_application
   
   def self.import_from_row(row, entrant_application)
     accessible_attributes = column_names

@@ -2,7 +2,7 @@ class EntrantApplication < ActiveRecord::Base
   belongs_to :campaign
   has_many :marks
   has_one :education_document
-  has_many :identity_documents
+  has_and_belongs_to_many :identity_documents
   has_and_belongs_to_many :institution_achievements
   has_and_belongs_to_many :competitive_groups
   
@@ -34,7 +34,7 @@ class EntrantApplication < ActiveRecord::Base
           entrant_application.attributes = row.to_hash.slice(*accessible_attributes)
           entrant_application.campaign_id = campaign.id
           if entrant_application.save!
-#             IdentityDocument.import_from_row(row, entrant_application)
+             IdentityDocument.import_from_row(row, entrant_application)
              EducationDocument.import_from_row(row, entrant_application)
 #             Competition.import_from_row(row, entrant_application)
              Mark.import_from_row(row, entrant_application)
@@ -48,6 +48,16 @@ class EntrantApplication < ActiveRecord::Base
         end
       end
     end
-  end 
+  end
+  
+  def self.ege_to_txt(entrant_applications)
+    ege_to_txt = ""
+    entrant_applications.each do |entrant_application|
+      entrant_application.identity_documents.each do |identity_document|
+        ege_to_txt += "#{[entrant_application.entrant_last_name, entrant_application.entrant_first_name, entrant_application.entrant_middle_name].join('%')}%#{[identity_document.identity_document_series, identity_document.identity_document_number].join('%')}\r\n"
+      end
+    end
+    ege_to_txt.encode("cp1251")
+  end
   
 end

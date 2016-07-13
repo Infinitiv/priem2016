@@ -43,5 +43,13 @@ body
             li= link_to 'Организации целевого приема', target_organizations_url
             li= link_to 'Предметы', subjects_url
             li= link_to 'Индивидуальные достижения', institution_achievements_url
+        li.dropdown
+          = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
+            span Проверка ЕГЭ
+            span.caret
+          ul.dropdown-menu
+            - @campaigns.each do |campaign|
+              li= link_to "Выгрузить список #{campaign.name} #{campaign.year_start}", ege_to_txt_entrant_applications_url + "?campaign_id=#{campaign.id}"
     .row
       = yield
+  = javascript_include_tag 'datatable'

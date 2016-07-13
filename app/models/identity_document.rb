@@ -1,14 +1,13 @@
 #encoding: utf-8
 class IdentityDocument < ActiveRecord::Base
-  belongs_to :identity_document_type
-  belongs_to :application
+  has_and_belongs_to_many :entrant_application
   
-    def self.import_from_row(row, application)
+  def self.import_from_row(row, entrant_application)
     accessible_attributes = column_names
-    identity_document = application.identity_document || new
+    identity_document = entrant_application.identity_documents.where(identity_document_series: row['identity_document_series'], identity_document_number: row['identity_document_number']).first || new
     identity_document.attributes = row.to_hash.slice(*accessible_attributes)
-    identity_document.application_id = application.id
     identity_document.save!
+    entrant_application.identity_documents << identity_document if identity_document.entrant_application.empty?
   end
 
   def identity_document_data

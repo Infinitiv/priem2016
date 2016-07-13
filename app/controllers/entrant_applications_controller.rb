@@ -2,7 +2,7 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_entrant_application, only: [:show, :edit, :update, :destroy]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
-  before_action :set_campaign, only: [:import, :index]
+  before_action :set_campaign, only: [:import, :index, :ege_to_txt]
   
   def index
     @entrant_applications = @campaign.entrant_applications.order(:application_number)
@@ -44,6 +44,12 @@ class EntrantApplicationsController < ApplicationController
   def import
     EntrantApplication.import(params[:file], @campaign)
     redirect_to entrant_applications_url, notice: "Applications imported."
+  end
+  
+  def ege_to_txt
+    entrant_applications = EntrantApplication.includes(:identity_documents).where(campaign_id: @campaign, status_id: 2)
+    ege_to_txt = EntrantApplication.ege_to_txt(entrant_applications)
+    send_data ege_to_txt, :filename => "ege #{Time.now.to_date}.csv", :type => 'text/plain', :disposition => "attachment"
   end
   
   private
