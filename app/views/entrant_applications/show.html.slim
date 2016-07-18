@@ -1,1 +1,64 @@
-h1= " #{@subject.subject_id} #{@subject.subject_name}"
+- case
+  - when @entrant_application.status_id == 6
+    - label_class = "label label-danger"
+  - when @entrant_application.education_document.original_received_date
+    - label_class = "label label-success"
+  - else
+    - label_class = "label label-default"
+h1.pull-left class=label_class
+  = "#{"%04d" % @entrant_application.application_number}"
+h1= @entrant_application.fio
+h2 Перечень конкурсов
+ol
+  - @entrant_application.competitive_groups.order(:name).each do |competitive_group|
+    li
+      = competitive_group.name
+      - if competitive_group.education_source_id == 16
+        = " #{@entrant_application.target_organization.target_organization_name}."
+        = @entrant_application.rank_target(@entrant_application, competitive_group)
+      - else
+        = @entrant_application.rank(@entrant_application, competitive_group)
+h2 Конкурсные баллы
+table.table
+  thead
+    tr
+      th Химия
+      th Биология
+      th Русский язык
+      th Сумма
+      th С учетом достижений
+  tbody
+    tr
+      - chemistry = @marks.find_by_subject_id(11)
+      - biology = @marks.find_by_subject_id(4)
+      - russian = @marks.find_by_subject_id(1)
+      td= "#{chemistry.value} (#{chemistry.form})" if chemistry
+      td= "#{biology.value} (#{biology.form})" if biology
+      td= "#{russian.value} (#{russian.form})" if russian
+      td= @entrant_application.summa
+      td= @entrant_application.summa + @entrant_application.achiev_summa
+h2= "Льготы" if @entrant_application.olympionic || @entrant_application.benefit
+p= "Олимпиада" if @entrant_application.olympionic
+p= "Особое право поступления" if @entrant_application.benefit
+h2 Персональные данные
+dl
+  dt Пол
+  dh= @entrant_application.gender_id == 1 ? "Мужской" : "Женский"
+  dt Дата рождения
+  dh= @entrant_application.birth_date
+  dt Страна
+  dh= @entrant_application.nationality_type_id
+  dt Регион
+  dh= @entrant_application.region_id
+h2 Документы
+dl
+  dt
+    h3 Документ, удостоверяющий личность
+    - @entrant_application.identity_documents.each do |i|
+      dd= i.identity_document_data
+  dt
+    h3 Документ об образовании
+    = @entrant_application.education_document.education_document_type if @entrant_application.education_document.education_document_type
+  dd
+    = @entrant_application.education_document.education_document_data
+    span.label.label-success= @entrant_application.education_document.original_received_date if @entrant_application.education_document.original_received_date

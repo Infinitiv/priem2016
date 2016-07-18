@@ -5,10 +5,32 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_campaign, only: [:import, :index, :ege_to_txt]
   
   def index
-    @entrant_applications = @campaign.entrant_applications.order(:application_number)
+    entrant_applications = @campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id]).order(:application_number).includes(:institution_achievements, :education_document)
+    
+    marks = Mark.joins(:entrant_application).where(entrant_applications: {id: entrant_applications.map(&:id)}).group_by(&:entrant_application_id).map{|a, ms| {a => ms.map{|m| m.value}}}.inject(:merge)
+    
+    achievements = {}
+    InstitutionAchievement.select(:id, :max_value).each{|i| achievements[i] = i.entrant_applications.map(&:id)}
+    
+    @entrant_applications_hash = {}
+    entrant_applications.each do |entrant_application|
+      @entrant_applications_hash[entrant_application] = {}
+      summa = marks[entrant_application.id].select{|i| i > 37}.size == 3 ? marks[entrant_application.id].sum : 0
+      @entrant_applications_hash[entrant_application][:summa] = summa
+      @entrant_applications_hash[entrant_application][:achievements] = []
+      achievements.each do |i, a|
+        @entrant_applications_hash[entrant_application][:achievements] << i.max_value if a.include?(entrant_application.id)
+      end
+      achievement_sum = @entrant_applications_hash[entrant_application][:achievements].sum
+      @entrant_applications_hash[entrant_application][:achievement] = achievement_sum > 10 ? 10 : achievement_sum
+      summa > 0 ? @entrant_applications_hash[entrant_application][:full_summa] = [@entrant_applications_hash[entrant_application][:summa], @entrant_applications_hash[entrant_application][:achievement]].sum : @entrant_applications_hash[entrant_application][:full_summa] = 0
+      @entrant_applications_hash[entrant_application][:original_received] = true if entrant_application.education_document.original_received_date
+      @entrant_applications_hash[entrant_application][:last_deny_day] = true if entrant_application.status_id == 6
+    end
   end
   
   def show
+    @marks = @entrant_application.marks
   end
   
   def new

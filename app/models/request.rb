@@ -23,7 +23,7 @@ class Request < ActiveRecord::Base
       data.Root do |root|
         auth_data(root)
         data.CheckApp do |ca|
-          ca.RegistrationDate application.registration_date
+          ca.RegistrationDate application.registration_date.to_datetime.to_s.gsub('+00', '+03')
           ca.ApplicationNumber application.number
         end
       end  
@@ -255,4 +255,117 @@ class Request < ActiveRecord::Base
     end
   end
   
+  def self.applications(pd, params)
+    campaign = Campaign.find(params[:campaign_id])
+    applications = campaign.entrant_applications.first(5)
+    pd.Applications do |as|
+      applications.each do |item|
+        as.Application do |a|
+          a.UID item.id
+          a.ApplicationNumber item.application_number
+          a.Entrant do |e|
+            e.UID item.id
+            e.LastName item.entrant_last_name
+            e.FirstName item.entrant_first_name
+            e.MiddleName item.entrant_middle_name if item.entrant_middle_name
+            e.GenderID item.gender_id
+            e.EmailOrMailAddress do |eoma|
+              eoma.Email item.email
+            end
+#             if item.is_for_krym
+#               e.IsForKrym do |efk|
+#                 efk.DocumentUID item.identity_document.id 
+#               end
+#             end
+          end
+          a.RegistrationDate item.registration_date.to_datetime.to_s.gsub('+00', '+03')
+          a.NeedHostel item.need_hostel
+          a.StatusID item.status_id
+          a.FinSourceAndEduForms do |fsaefs|
+            item.competitive_groups.each do |sub_item|
+              fsaefs.FinSourceEduForm do |fsef|
+                fsef.CompetitiveGroupUID sub_item.id
+                fsef.TargetOrganizationUID item.target_organization_id if sub_item.education_source_id == 16 && item.target_organization_id
+              #                   fsef.IsAgreeDate
+              end
+            end
+          end
+          a.ApplicationDocuments do |ads|
+            identity_document = item.identity_documents.last
+            ads.IdentityDocument do |id|
+              id.UID identity_document.id
+              id.DocumentSeries identity_document.identity_document_series ?  identity_document.identity_document_series : "0"
+              id.DocumentNumber identity_document.identity_document_number
+              id.DocumentDate identity_document.identity_document_date
+              id.IdentityDocumentTypeID identity_document.identity_document_type
+              id.NationalityTypeID  item.nationality_type_id
+              id.BirthDate item.birth_date
+            end
+            ads.EduDocuments do |eds|
+              edu_document = item.education_document
+              eds.EduDocument do |ed|
+                case edu_document.education_document_type
+                when "SchoolCertificateDocument"
+                  ed.SchoolCertificateDocument do |scd|
+                    scd.UID edu_document.id
+                    scd.DocumentSeries "0"
+                    scd.DocumentNumber edu_document.education_document_number
+                    scd.DocumentDate edu_document.education_document_date
+                  end
+                when "MiddleEduDiplomaDocument"
+                  ed.MiddleEduDiplomaDocument do |medd|
+                    medd.UID edu_document.id
+                    medd.DocumentSeries "0"
+                    medd.DocumentNumber edu_document.education_document_number
+                    medd.DocumentDate edu_document.education_document_date
+                  end
+                when "HighEduDiplomaDocument"
+                  ed.HighEduDiplomaDocument do |hedd|
+                    hedd.UID edu_document.id
+                    hedd.DocumentSeries "0"
+                    hedd.DocumentNumber edu_document.education_document_number
+                    hedd.DocumentDate edu_document.education_document_date
+                  end
+                end
+              end
+            end
+          end
+          a.EntranceTestResults do |etrs|
+            item.marks.each do |sub_item|
+              item.competitive_groups.each do |cg|
+                etrs.EntranceTestResult do |etr|
+                  etr.UID "#{sub_item.id}-#{cg.id}"
+                  etr.ResultValue sub_item.value
+                  case true
+                  when sub_item.form == "ЕГЭ"
+                    etr.ResultSourceTypeID 1
+                  when sub_item.form == "Экзамен"
+                    etr.ResultSourceTypeID 2
+                  end
+                  etr.EntranceTestSubject do |ets|
+                    ets.SubjectID sub_item.subject.subject_id
+#                     ets.SubjectName sub_item.subject.subject_name
+                  end
+                  etr.EntranceTestTypeID sub_item.subject.entrance_test_item.entrance_test_type_id
+                  etr.CompetitiveGroupUID cg.id
+                end
+              end
+            end
+          end
+          achievements = item.institution_achievements.where.not(id_category: 8)
+          unless achievements.empty?
+            a.IndividualAchievements do |ias|
+              achievements.each do |sub_item|
+                ias.IndividualAchievement do |ia|
+                  ia.IAUID 
+                  ia.InstitutionAchievementUID sub_item.id
+                  ia.IADocumentUID item.education_document.id
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
 end
