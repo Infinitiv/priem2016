@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+Workbook{'xmlns' => "urn:schemas-microsoft-com:office:spreadsheet", 'xmlns:o' => "urn:schemas-microsoft-com:office:office", 'xmlns:x' => "urn:schemas-microsoft-com:office:excel", 'xmlns:ss' => "urn:schemas-microsoft-com:office:spreadsheet", 'xmlns:html' => "http://www.w3.org/TR/REC-html40"}
+  DocumentProperties{'xmlns' => "urn:schemas-microsoft-com:office:office"}
+    Created= Time.now
+    Company ISMA
+  Styles
+    Style{"ss:ID" => "thead"}
+      <Font ss:Bold="1"/>
+  Worksheet{'ss:Name' => 'Личные дела'}
+    Table
+      Row{"ss:StyleID" => "thead"}
+        Cell
+          Data{"ss:Type" => "String"} №
+        Cell
+          Data{"ss:Type" => "String"} Номер дела
+        Cell
+          Data{"ss:Type" => "String"} Отозвано
+        Cell
+          Data{"ss:Type" => "String"} ФИО
+        Cell
+          Data{"ss:Type" => "String"} Оригинал
+        Cell
+          Data{"ss:Type" => "String"} Достижения
+        Cell
+          Data{"ss:Type" => "String"} ЛО
+        Cell
+          Data{"ss:Type" => "String"} ПО
+        Cell
+          Data{"ss:Type" => "String"} СО
+        Cell
+          Data{"ss:Type" => "String"} ЛП
+        Cell
+          Data{"ss:Type" => "String"} ПП
+        Cell
+          Data{"ss:Type" => "String"} СП
+        Cell
+          Data{"ss:Type" => "String"} Целевой факультет
+        Cell
+          Data{"ss:Type" => "String"} Целевой регион
+        Cell
+          Data{"ss:Type" => "String"} Олимп.
+        Cell
+          Data{"ss:Type" => "String"} Льгота
+      - @entrant_applications.each do |a| 
+        Row
+          Cell
+            Data{"ss:Type" => "Number"}= n.to_s + "."
+          Cell
+            Data{"ss:Type" => "String"}= "%04d" % a.application_number
+          Cell
+            Data{"ss:Type" => "String"}= a.fio
+          Cell
+            Data{"ss:Type" => "String"}= "X" if a.enducation_document.original_received_date
+          
+                

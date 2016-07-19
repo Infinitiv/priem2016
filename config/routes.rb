@@ -39,6 +39,7 @@ Rails.application.routes.draw do
       get 'ege_to_txt'
       get 'competition_lists'
       get 'competition_one_list'
+      get 'blue'
     end
   end
   

@@ -257,7 +257,8 @@ class Request < ActiveRecord::Base
   
   def self.applications(pd, params)
     campaign = Campaign.find(params[:campaign_id])
-    applications = campaign.entrant_applications.first(5)
+    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: 2).first(500)
+    
     pd.Applications do |as|
       applications.each do |item|
         as.Application do |a|
@@ -272,11 +273,11 @@ class Request < ActiveRecord::Base
             e.EmailOrMailAddress do |eoma|
               eoma.Email item.email
             end
-#             if item.is_for_krym
-#               e.IsForKrym do |efk|
-#                 efk.DocumentUID item.identity_document.id 
-#               end
-#             end
+            unless item.competitive_groups.where(is_for_krym: true).empty?
+              e.IsForKrym do |efk|
+                efk.DocumentUID item.identity_document.id 
+              end
+            end
           end
           a.RegistrationDate item.registration_date.to_datetime.to_s.gsub('+00', '+03')
           a.NeedHostel item.need_hostel
@@ -286,7 +287,7 @@ class Request < ActiveRecord::Base
               fsaefs.FinSourceEduForm do |fsef|
                 fsef.CompetitiveGroupUID sub_item.id
                 fsef.TargetOrganizationUID item.target_organization_id if sub_item.education_source_id == 16 && item.target_organization_id
-              #                   fsef.IsAgreeDate
+                fsef.IsAgreeDate item.registration_date.to_datetime.to_s.gsub('+00', '+03') if item.budget_agr == sub_item.id || item.paid_agr == sub_item.id
               end
             end
           end
@@ -294,7 +295,7 @@ class Request < ActiveRecord::Base
             identity_document = item.identity_documents.last
             ads.IdentityDocument do |id|
               id.UID identity_document.id
-              id.DocumentSeries identity_document.identity_document_series ?  identity_document.identity_document_series : "0"
+              id.DocumentSeries identity_document.identity_document_series ?  identity_document.identity_document_series : "нет серии"
               id.DocumentNumber identity_document.identity_document_number
               id.DocumentDate identity_document.identity_document_date
               id.IdentityDocumentTypeID identity_document.identity_document_type
@@ -308,22 +309,31 @@ class Request < ActiveRecord::Base
                 when "SchoolCertificateDocument"
                   ed.SchoolCertificateDocument do |scd|
                     scd.UID edu_document.id
-                    scd.DocumentSeries "0"
-                    scd.DocumentNumber edu_document.education_document_number
+                    if edu_document.education_document_date.year > 2013
+                      scd.DocumentNumber edu_document.education_document_number
+                    else
+                      scd.DocumentSeries edu_document.education_document_number.first(4)
+                      scd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 4)
+                    end
                     scd.DocumentDate edu_document.education_document_date
                   end
                 when "MiddleEduDiplomaDocument"
                   ed.MiddleEduDiplomaDocument do |medd|
                     medd.UID edu_document.id
-                    medd.DocumentSeries "0"
-                    medd.DocumentNumber edu_document.education_document_number
+                    if edu_document.education_document_date.year > 2013
+                      medd.DocumentSeries edu_document.education_document_number.first(6)
+                      medd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 6)
+                    else
+                      medd.DocumentSeries edu_document.education_document_number.first(5)
+                      medd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 5)
+                    end
                     medd.DocumentDate edu_document.education_document_date
                   end
                 when "HighEduDiplomaDocument"
                   ed.HighEduDiplomaDocument do |hedd|
                     hedd.UID edu_document.id
-                    hedd.DocumentSeries "0"
-                    hedd.DocumentNumber edu_document.education_document_number
+                    hedd.DocumentSeries edu_document.education_document_series.first(3)
+                    hedd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 3)
                     hedd.DocumentDate edu_document.education_document_date
                   end
                 end

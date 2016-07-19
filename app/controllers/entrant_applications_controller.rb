@@ -74,6 +74,20 @@ class EntrantApplicationsController < ApplicationController
     send_data ege_to_txt, :filename => "ege #{Time.now.to_date}.csv", :type => 'text/plain', :disposition => "attachment"
   end
   
+  def blue
+    @entrant_applications = EntrantApplication.order(:application_number).includes(:competitive_groups)
+    @achievements = {}
+    InstitutionAchievement.all.each do |i|
+      i.entrant_applications.each do |a|
+        @achievements[a.id] =+ i.max_value
+        @achievements[a.id] = 10 if @achievements[a.id] > 10
+      end
+    end
+    respond_to do |format|
+      format.xls
+    end
+  end
+  
   private
   
   def set_entrant_application
