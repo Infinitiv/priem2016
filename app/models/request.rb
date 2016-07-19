@@ -262,10 +262,10 @@ class Request < ActiveRecord::Base
     pd.Applications do |as|
       applications.each do |item|
         as.Application do |a|
-          a.UID item.id
-          a.ApplicationNumber item.application_number
+          a.UID [campaign.year_start, "%04d" % item.application_number].join('-')
+          a.ApplicationNumber [campaign.year_start, "%04d" % item.application_number].join('-')
           a.Entrant do |e|
-            e.UID item.id
+            e.UID [campaign.year_start, "%04d" % item.application_number].join('-')
             e.LastName item.entrant_last_name
             e.FirstName item.entrant_first_name
             e.MiddleName item.entrant_middle_name if item.entrant_middle_name
