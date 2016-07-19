@@ -31,8 +31,8 @@ table.table
       th С учетом достижений
   tbody
     tr
-      - chemistry = @marks.find_by_subject_id(11)
-      - biology = @marks.find_by_subject_id(4)
+      - chemistry = @marks.find_by_subject_id(3)
+      - biology = @marks.find_by_subject_id(2)
       - russian = @marks.find_by_subject_id(1)
       td= "#{chemistry.value} (#{chemistry.form})" if chemistry
       td= "#{biology.value} (#{biology.form})" if biology

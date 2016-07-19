@@ -287,7 +287,7 @@ class Request < ActiveRecord::Base
               fsaefs.FinSourceEduForm do |fsef|
                 fsef.CompetitiveGroupUID sub_item.id
                 fsef.TargetOrganizationUID item.target_organization_id if sub_item.education_source_id == 16 && item.target_organization_id
-                fsef.IsAgreeDate item.registration_date.to_datetime.to_s.gsub('+00', '+03') if item.budget_agr == sub_item.id || item.paid_agr == sub_item.id
+                fsef.IsAgreedDate item.registration_date.to_datetime.to_s.gsub('+00', '+03') if item.budget_agr == sub_item.id || item.paid_agr == sub_item.id
               end
             end
           end
