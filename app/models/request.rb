@@ -339,6 +339,30 @@ class Request < ActiveRecord::Base
                 end
               end
             end
+            achievements = item.institution_achievements.where.not(id_category: 8)
+            unless achievements.empty?
+              ads.CustomDocuments do |cds|
+                achievements.each do |sub_item|
+                    cds.CustomDocument do |cd|
+                      cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
+                      case sub_item.id_category
+                      when 9
+                        cd.DocumentName "Аттестат о среднем общем образовании с отличием"
+                        cd.DocumentOrganization "Организация СО"
+                      when 15
+                        cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
+                        cd.DocumentOrganization "Организация СО"
+                      when 16
+                        cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
+                        cd.DocumentOrganization "Организация СО"
+                      when 17
+                        cd.DocumentName "Диплом о среднем профессиональном образовании с отличием"
+                        cd.DocumentOrganization "Организация СПО"
+                      end
+                    end
+                  end
+                end
+            end
           end
           a.EntranceTestResults do |etrs|
             item.marks.each do |sub_item|
@@ -387,7 +411,7 @@ class Request < ActiveRecord::Base
                 ias.IndividualAchievement do |ia|
                   ia.IAUID [campaign.year_start, "%04d" % item.application_number, sub_item.id_category].join('-')
                   ia.InstitutionAchievementUID sub_item.id
-                  ia.IADocumentUID ["ed", campaign.year_start, item.education_document.id].join('-')
+                  ia.IADocumentUID ["ach", campaign.year_start, item.education_document.id].join('-')
                 end
               end
             end
