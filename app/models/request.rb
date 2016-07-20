@@ -358,6 +358,24 @@ class Request < ActiveRecord::Base
                   end
                   etr.EntranceTestTypeID sub_item.subject.entrance_test_item.entrance_test_type_id
                   etr.CompetitiveGroupUID cg.id
+                  if sub_item.form == "Экзамен"
+                    etr.ResultDocument do |rd|
+                      rd.InstitutionDocument do |id|
+                        case sub_item.subject.subject_id
+                        when 11
+                          id.DocumentNumber "2016-1"
+                          id.DocumentDate "2016-07-14"
+                        when 4
+                          id.DocumentNumber "2016-2"
+                          id.DocumentDate "2016-07-19"
+                        when 1
+                          id.DocumentNumber "2016-3"
+                          id.DocumentDate "2016-07-22"
+                        end
+                        id.DocumentTypeID 1
+                      end
+                    end
+                  end
                 end
               end
             end
