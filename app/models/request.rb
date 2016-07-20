@@ -257,7 +257,7 @@ class Request < ActiveRecord::Base
   
   def self.applications(pd, params)
     campaign = Campaign.find(params[:campaign_id])
-    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6]).first(10)
+    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6]).first(500)
     
     pd.Applications do |as|
       applications.each do |item|
