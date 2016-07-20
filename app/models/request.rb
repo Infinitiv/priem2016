@@ -348,15 +348,19 @@ class Request < ActiveRecord::Base
                       case sub_item.id_category
                       when 9
                         cd.DocumentName "Аттестат о среднем общем образовании с отличием"
+                        cd.DocumentDate item.education_document.education_document_date
                         cd.DocumentOrganization "Организация СО"
                       when 15
                         cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
+                        cd.DocumentDate item.education_document.education_document_date
                         cd.DocumentOrganization "Организация СО"
                       when 16
                         cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
+                        cd.DocumentDate item.education_document.education_document_date
                         cd.DocumentOrganization "Организация СО"
                       when 17
                         cd.DocumentName "Диплом о среднем профессиональном образовании с отличием"
+                        cd.DocumentDate item.education_document.education_document_date
                         cd.DocumentOrganization "Организация СПО"
                       end
                     end
