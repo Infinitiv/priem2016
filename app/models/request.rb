@@ -262,10 +262,10 @@ class Request < ActiveRecord::Base
     pd.Applications do |as|
       applications.each do |item|
         as.Application do |a|
-          a.UID item.id
+          a.UID [campaign.year_start, "%04d" % item.application_number].join('-')
           a.ApplicationNumber [campaign.year_start, "%04d" % item.application_number].join('-')
           a.Entrant do |e|
-            e.UID item.id
+            e.UID [campaign.year_start, "%04d" % item.application_number].join('-')
             e.LastName item.entrant_last_name
             e.FirstName item.entrant_first_name
             e.MiddleName item.entrant_middle_name if item.entrant_middle_name
@@ -287,7 +287,7 @@ class Request < ActiveRecord::Base
               fsaefs.FinSourceEduForm do |fsef|
                 fsef.CompetitiveGroupUID sub_item.id
                 fsef.TargetOrganizationUID item.target_organization_id if sub_item.education_source_id == 16 && item.target_organization_id
-                fsef.IsAgreedDate item.registration_date.to_datetime.to_s.gsub('+00', '+03') if item.budget_agr == sub_item.id || item.paid_agr == sub_item.id
+#                 fsef.IsAgreedDate item.registration_date.to_datetime.to_s.gsub('+00', '+03') if item.budget_agr == sub_item.id || item.paid_agr == sub_item.id
               end
             end
           end
