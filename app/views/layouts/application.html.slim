@@ -51,6 +51,7 @@ body
             - @campaigns.each do |campaign|
               li= link_to "Выгрузить ЕГЭ #{campaign.name} #{campaign.year_start}", ege_to_txt_entrant_applications_url + "?campaign_id=#{campaign.id}"
               li= link_to "Выгрузить синьки #{campaign.name} #{campaign.year_start}", blue_entrant_applications_url(format: :xls) + "?campaign_id=#{campaign.id}"
+              li= link_to "Ошибки #{campaign.name} #{campaign.year_start}", errors_entrant_applications_url + "?campaign_id=#{campaign.id}"
     .row
       = yield
   = javascript_include_tag 'datatable'

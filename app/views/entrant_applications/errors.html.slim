@@ -1,0 +1,15 @@
+h1 Отчет об ошибках
+h2= @campaign.name
+h3= "Повторяющиеся номера заявлений" unless @errors[:dups_numbers].empty?
+ul
+  - @errors[:dups_numbers].each do |applications|
+    - applications.each do |application|
+      li= link_to "%04d" % EntrantApplication.find(application).application_number, entrant_application_path(application)
+h2= "Пропущенные номера заявлений" unless @errors[:lost_numbers].empty?
+p= @errors[:lost_numbers].join(', ')
+
+h2= "Повторяющиеся абитуриенты" unless @errors[:dups_entrants].empty?
+ul
+  - @errors[:dups_entrants].each do |k, v|
+    - v.each do |application|
+      li= link_to "#{"%04d" % EntrantApplication.find(application).application_number} #{EntrantApplication.find(application).fio}", entrant_application_path(application)

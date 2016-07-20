@@ -134,4 +134,42 @@ class EntrantApplication < ActiveRecord::Base
     marks_count > 1 ? "#{marks.index(summa) + 1}-#{marks.index(summa) + 1 + marks_count}" : marks.index(summa) + 1
   end  
   
+  def self.errors(campaign)
+    errors = {}
+    applications = campaign.entrant_applications.includes(:identity_documents)
+    errors[:dups_numbers] = find_dups_numbers(applications)
+    errors[:lost_numbers] = find_lost_numbers(applications)
+    errors[:dups_entrants] = find_dups_entrants(applications)
+#     errors[:empty_target_entrants] = find_empty_target_entrants(target_competition_entrants_array, applications.select(:id).where("target_organization_id like ?", "%"))
+#     errors[:not_original_target_entrants] = find_not_original_target_entrants(target_competition_entrants_array, applications.select(:id).where.not(original_received_date: nil))
+    errors
+  end
+  
+  def self.find_dups_numbers(applications)
+    find_dups_numbers = []
+    h = applications.select(:application_number).group(:application_number).count.select{|k, v| v > 1}
+    h.each{|k, v| find_dups_numbers << applications.find_by_application_number(k)}
+    find_dups_numbers
+  end
+  
+  def self.find_lost_numbers(applications)
+    application_numbers = applications.map(&:application_number)
+    max_number = application_numbers.max
+    max_number ? (1..max_number).to_a - application_numbers : []
+  end
+  
+  def self.find_dups_entrants(applications)
+    find_dups_entrants = {}
+    IdentityDocument.includes(:entrant_application).each{|i| find_dups_entrants[[i.identity_document_series, i.identity_document_number].compact.join('')] ? find_dups_entrants[[i.identity_document_series, i.identity_document_number].compact.join('')] << i.entrant_application.first.id : find_dups_entrants[[i.identity_document_series, i.identity_document_number].compact.join('')] = [i.entrant_application.first.id]}
+    find_dups_entrants.select{|k, v| v.count > 1}
+  end
+  
+  def self.find_empty_target_entrants(target_competition_entrants_array, target_organizations_array)
+    (target_competition_entrants_array - target_organizations_array).sort
+  end
+                                                                                         
+  def self.find_not_original_target_entrants(target_competition_entrants_array, original_received_array)
+    (target_competition_entrants_array - original_received_array).sort
+  end
+  
 end
