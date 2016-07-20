@@ -294,7 +294,7 @@ class Request < ActiveRecord::Base
           a.ApplicationDocuments do |ads|
             identity_document = item.identity_documents.last
             ads.IdentityDocument do |id|
-              id.UID identity_document.id
+              id.UID [campaign.year_start, identity_document.id].join('-')
               id.DocumentSeries identity_document.identity_document_series ?  identity_document.identity_document_series : "нет серии"
               id.DocumentNumber identity_document.identity_document_number
               id.DocumentDate identity_document.identity_document_date
@@ -308,7 +308,7 @@ class Request < ActiveRecord::Base
                 case edu_document.education_document_type
                 when "SchoolCertificateDocument"
                   ed.SchoolCertificateDocument do |scd|
-                    scd.UID edu_document.id
+                    scd.UID [campaign.year_start, edu_document.id].join('-')
                     if edu_document.education_document_date.year > 2013
                       scd.DocumentNumber edu_document.education_document_number
                     else
@@ -319,7 +319,7 @@ class Request < ActiveRecord::Base
                   end
                 when "MiddleEduDiplomaDocument"
                   ed.MiddleEduDiplomaDocument do |medd|
-                    medd.UID edu_document.id
+                    medd.UID [campaign.year_start, edu_document.id].join('-')
                     if edu_document.education_document_date.year > 2013
                       medd.DocumentSeries edu_document.education_document_number.first(6)
                       medd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 6)
@@ -331,7 +331,7 @@ class Request < ActiveRecord::Base
                   end
                 when "HighEduDiplomaDocument"
                   ed.HighEduDiplomaDocument do |hedd|
-                    hedd.UID edu_document.id
+                    hedd.UID [campaign.year_start, edu_document.id].join('-')
                     hedd.DocumentSeries edu_document.education_document_series.first(3)
                     hedd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 3)
                     hedd.DocumentDate edu_document.education_document_date
