@@ -385,7 +385,7 @@ class Request < ActiveRecord::Base
             a.IndividualAchievements do |ias|
               achievements.each do |sub_item|
                 ias.IndividualAchievement do |ia|
-                  ia.IAUID 
+                  ia.IAUID [campaign.year_start, "%04d" % item.application_number, sub_item.id_category].join('-')
                   ia.InstitutionAchievementUID sub_item.id
                   ia.IADocumentUID ["ed", campaign.year_start, item.education_document.id].join('-')
                 end
