@@ -156,8 +156,9 @@ class EntrantApplication < ActiveRecord::Base
   
   def self.find_lost_numbers(applications)
     application_numbers = applications.map(&:application_number)
+    revoked_application_numbers = EntrantApplication.where(status_id: 6).map(&:application_number)
     max_number = application_numbers.max
-    max_number ? (1..max_number).to_a - application_numbers : []
+    max_number ? (1..max_number).to_a - application_numbers - revoked_application_numbers : []
   end
   
   def self.find_dups_entrants(applications)
