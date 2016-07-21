@@ -10,6 +10,5 @@ p= @errors[:lost_numbers].join(', ')
 
 h2= "Повторяющиеся абитуриенты" unless @errors[:dups_entrants].empty?
 ul
-  - @errors[:dups_entrants].each do |k, v|
-    - v.each do |application|
-      li= link_to "#{"%04d" % EntrantApplication.find(application).application_number} #{EntrantApplication.find(application).fio}", entrant_application_path(application)
+  - @errors[:dups_entrants].each do |application|
+    li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)

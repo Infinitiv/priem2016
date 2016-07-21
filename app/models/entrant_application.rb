@@ -159,9 +159,7 @@ class EntrantApplication < ActiveRecord::Base
   end
   
   def self.find_dups_entrants(applications)
-    find_dups_entrants = {}
-    IdentityDocument.includes(:entrant_application).each{|i| find_dups_entrants[[i.identity_document_series, i.identity_document_number].compact.join('')] ? find_dups_entrants[[i.identity_document_series, i.identity_document_number].compact.join('')] << i.entrant_application.first.id : find_dups_entrants[[i.identity_document_series, i.identity_document_number].compact.join('')] = [i.entrant_application.first.id]}
-    find_dups_entrants.select{|k, v| v.count > 1}
+    IdentityDocument.includes(:entrant_application).group_by{|i| i.sn}.select{|k, v| v.size > 1}.map{|k, v| EntrantApplication.joins(:identity_documents).where(identity_documents: {id: v})}.flatten
   end
   
   def self.find_empty_target_entrants(target_competition_entrants_array, target_organizations_array)
