@@ -136,12 +136,14 @@ class EntrantApplication < ActiveRecord::Base
   
   def self.errors(campaign)
     errors = {}
-    applications = campaign.entrant_applications.includes(:identity_documents)
+    applications = campaign.entrant_applications.includes(:identity_documents).where.not(status_id: 6)
     errors[:dups_numbers] = find_dups_numbers(applications)
     errors[:lost_numbers] = find_lost_numbers(applications)
     errors[:dups_entrants] = find_dups_entrants(applications)
-#     errors[:empty_target_entrants] = find_empty_target_entrants(target_competition_entrants_array, applications.select(:id).where("target_organization_id like ?", "%"))
-#     errors[:not_original_target_entrants] = find_not_original_target_entrants(target_competition_entrants_array, applications.select(:id).where.not(original_received_date: nil))
+    target_competition_entrants_array = applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16})
+    errors[:empty_target_entrants] = find_empty_target_entrants(target_competition_entrants_array, applications.joins(:target_organization))
+    errors[:not_original_target_entrants] = find_not_original_target_entrants(target_competition_entrants_array, applications.joins(:education_document).where.not(education_documents: {original_received_date: nil}))
+    errors[:not_agreed_target_entrants] = find_not_agreed_entrants(applications)
     errors
   end
   
@@ -159,7 +161,8 @@ class EntrantApplication < ActiveRecord::Base
   end
   
   def self.find_dups_entrants(applications)
-    IdentityDocument.includes(:entrant_application).group_by{|i| i.sn}.select{|k, v| v.size > 1}.map{|k, v| EntrantApplication.joins(:identity_documents).where(identity_documents: {id: v})}.flatten
+    IdentityDocument.includes(:entrant_application).where.not(entrant_applications: {status_id: 6}).group_by{|i| i.sn}.select{|k, v| v.size > 1}.map{|k, v| applications.joins(:identity_documents).where(identity_documents: {id: v})}.flatten
+    
   end
   
   def self.find_empty_target_entrants(target_competition_entrants_array, target_organizations_array)
@@ -168,6 +171,10 @@ class EntrantApplication < ActiveRecord::Base
                                                                                          
   def self.find_not_original_target_entrants(target_competition_entrants_array, original_received_array)
     (target_competition_entrants_array - original_received_array).sort
+  end
+  
+  def self.find_not_agreed_entrants(applications)
+   applications .joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).select{|a| a.competitive_groups.find_by_education_source_id(16).id != a.budget_agr}
   end
   
 end
