@@ -2,7 +2,7 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_entrant_application, only: [:show, :edit, :update, :destroy]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
-  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors]
+  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition]
   
   def index
     entrant_applications = @campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id]).order(:application_number).includes(:institution_achievements, :education_document)
@@ -69,7 +69,7 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def ege_to_txt
-    entrant_applications = EntrantApplication.includes(:identity_documents).where(campaign_id: @campaign, status_id: 2)
+    entrant_applications = EntrantApplication.includes(:identity_documents).where(campaign_id: @campaign, status_id: 4)
     ege_to_txt = EntrantApplication.ege_to_txt(entrant_applications)
     send_data ege_to_txt, :filename => "ege #{Time.now.to_date}.csv", :type => 'text/plain', :disposition => "attachment"
   end
@@ -90,6 +90,10 @@ class EntrantApplicationsController < ApplicationController
   
   def errors
     @errors = EntrantApplication.errors(@campaign)
+  end
+  
+  def competition
+    @application_hash = EntrantApplication.compatition(@campaign)
   end
   
   private

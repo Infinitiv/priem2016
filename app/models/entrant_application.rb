@@ -178,4 +178,38 @@ class EntrantApplication < ActiveRecord::Base
    applications .joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).select{|a| a.competitive_groups.find_by_education_source_id(16).id != a.budget_agr}
   end
   
+  def competition(campaign)
+    admission_volume_hash = {}
+    campaign.competitive_groups.includes(:competitive_group_item).group_by(&:direction_id).each do |k, v|
+      admission_volume_hash[k] = {}
+      admission_volume_hash[k] 
+    end
+    
+    applications_hash = {}
+    applications = campaign.entrant_applications.includes(:competitive_groups, :education_document).where.not(status_id: 6)
+    achievements = {}
+    InstitutionAchievement.all.each do |i|
+      i.entrant_applications.each do |a|
+        achievements[a.id] =+ i.max_value
+        achievements[a.id] = 10 if achievements[a.id] > 10
+      end
+    end
+
+    marks = campaign.marks.order(:subject_id).joins(:entrant_application).where(entrant_application_id: applications).select(:entrant_application_id, :value).group_by(&:entrant_application_id).select{|a, ms| ms.select{|m| m.value > 37}.size == 3}.map{|a, ms| achievements[a] ? {a => ms.map(&:value) << 10} : {a => ms.map(&:value)}}.inject(:merge)
+    applications.each do |application|
+      applications_hash[application] = {}
+      applications_hash[application][:application_number] = application.application_number
+      applications_hash[application][:compeititive_groups] = application.competitive_groups.map(&:id)
+      applications_hash[application][:russian] = marks[application.id][0]
+      applications_hash[application][:russian] = marks[application.id][1]
+      applications_hash[application][:russian] = marks[application.id][2]
+      applications_hash[application][:achievement] = marks[application.id][3]
+      applications_hash[application][:summa] = marks[application.id][0..2].sum
+      applications_hash[application][:full_summa] = marks[application.id].sum
+      applications_hash[application][:original_received] = application.education_document.original_received_date ? true : false
+      applications_hash[application][:budget_agr] = application.budget_agr
+      applications_hash[application][:paid_agr] = application.paid_agr
+    end
+    applications_hash = applications_hash.applications_hash.sort_by{|k, v| [v[:full_summa], v[:summa], v[:chemistry], v[:biology], v[:russian]]}.reverse
+  end
 end
