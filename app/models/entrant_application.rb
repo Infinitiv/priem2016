@@ -178,13 +178,29 @@ class EntrantApplication < ActiveRecord::Base
    applications .joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).select{|a| a.competitive_groups.find_by_education_source_id(16).id != a.budget_agr}
   end
   
-  def competition(campaign)
+  def self.admission_volume_hash(campaign)
     admission_volume_hash = {}
     campaign.competitive_groups.includes(:competitive_group_item).group_by(&:direction_id).each do |k, v|
       admission_volume_hash[k] = {}
-      admission_volume_hash[k] 
+      v.each do |competitive_group|
+        admission_volume_hash[k][competitive_group] = [competitive_group.competitive_group_item.number_budget_o, 
+        competitive_group.competitive_group_item.number_budget_oz, 
+        competitive_group.competitive_group_item.number_budget_z,
+        competitive_group.competitive_group_item.number_paid_o,
+        competitive_group.competitive_group_item.number_paid_oz,
+        competitive_group.competitive_group_item.number_paid_z,
+        competitive_group.competitive_group_item.number_quota_o, 
+        competitive_group.competitive_group_item.number_quota_oz, 
+        competitive_group.competitive_group_item.number_quota_z,
+        competitive_group.competitive_group_item.number_target_o, 
+        competitive_group.competitive_group_item.number_target_oz, 
+        competitive_group.competitive_group_item.number_target_z].sum
+      end
     end
-    
+    admission_volume_hash
+  end
+  
+  def self.applications_hash(campaign)
     applications_hash = {}
     applications = campaign.entrant_applications.includes(:competitive_groups, :education_document).where.not(status_id: 6)
     achievements = {}
@@ -197,19 +213,20 @@ class EntrantApplication < ActiveRecord::Base
 
     marks = campaign.marks.order(:subject_id).joins(:entrant_application).where(entrant_application_id: applications).select(:entrant_application_id, :value).group_by(&:entrant_application_id).select{|a, ms| ms.select{|m| m.value > 37}.size == 3}.map{|a, ms| achievements[a] ? {a => ms.map(&:value) << 10} : {a => ms.map(&:value)}}.inject(:merge)
     applications.each do |application|
+      if marks[application.id]
       applications_hash[application] = {}
-      applications_hash[application][:application_number] = application.application_number
-      applications_hash[application][:compeititive_groups] = application.competitive_groups.map(&:id)
+      applications_hash[application][:competitive_groups] = application.competitive_groups.map(&:id)
       applications_hash[application][:russian] = marks[application.id][0]
-      applications_hash[application][:russian] = marks[application.id][1]
-      applications_hash[application][:russian] = marks[application.id][2]
+      applications_hash[application][:biology] = marks[application.id][1]
+      applications_hash[application][:chemistry] = marks[application.id][2]
       applications_hash[application][:achievement] = marks[application.id][3]
       applications_hash[application][:summa] = marks[application.id][0..2].sum
       applications_hash[application][:full_summa] = marks[application.id].sum
       applications_hash[application][:original_received] = application.education_document.original_received_date ? true : false
       applications_hash[application][:budget_agr] = application.budget_agr
       applications_hash[application][:paid_agr] = application.paid_agr
+      end
     end
-    applications_hash = applications_hash.applications_hash.sort_by{|k, v| [v[:full_summa], v[:summa], v[:chemistry], v[:biology], v[:russian]]}.reverse
+    applications_hash = applications_hash.sort_by{|k, v| [v[:full_summa], v[:summa], v[:chemistry], v[:biology], v[:russian]]}.reverse
   end
 end

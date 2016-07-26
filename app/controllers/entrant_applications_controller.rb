@@ -93,7 +93,9 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def competition
-    @application_hash = EntrantApplication.compatition(@campaign)
+    @admission_volume_hash = EntrantApplication.admission_volume_hash(@campaign)
+    @applications_hash = EntrantApplication.applications_hash(@campaign)
+    @target_organizations = TargetOrganization.order(:target_organization_name)
   end
   
   private

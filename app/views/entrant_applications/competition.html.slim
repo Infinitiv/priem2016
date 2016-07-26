@@ -1,0 +1,72 @@
+- @admission_volume_hash.each do |direction_id, competitive_groups|
+  - competitive_groups.select{|k, v| k.is_for_krym == false}.each do |competitive_group, numbers|
+    h2= competitive_group.name
+    - if competitive_group.education_source_id == 16
+      - @target_organizations.each do |target_organization|
+        - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.target_organization_id == target_organization.id}
+        - unless applications.empty?
+          h3= target_organization.target_organization_name
+          table.table
+            thead
+              tr
+                th №№
+                th № личного дела
+                th Ф.И.О
+                th Химия
+                th Биология
+                th Русский язык
+                th Сумма баллов за вступительные испытания
+                th Баллы за индивидуальные достижения
+                th Сумма конкурсных баллов
+                th Наличие согласия на зачисление
+                th Наличие преимущественного права на зачисление
+            tbody
+              - n = 0
+              - applications.each do |application, values|
+                - label_class = "success" if values[:original_received]
+                tr class=label_class
+                  - n += 1
+                  td= n
+                  td= "%04d" % application.application_number
+                  td= application.fio
+                  td= values[:chemistry]
+                  td= values[:biology]
+                  td= values[:russian]
+                  td= values[:summa]
+                  td= values[:achievement]
+                  td= values[:full_summa]
+                  td= "+" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id
+                  td= "+" if application.benefit
+    - else
+      - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
+      table.table
+        thead
+          tr
+            th №№
+            th № личного дела
+            th Ф.И.О
+            th Химия
+            th Биология
+            th Русский язык
+            th Сумма баллов за вступительные испытания
+            th Баллы за индивидуальные достижения
+            th Сумма конкурсных баллов
+            th Наличие согласия на зачисление
+            th Наличие преимущественного права на зачисление
+        tbody
+          - n = 0
+          - applications.each do |application, values|
+            - label_class = "success" if values[:original_received]
+            tr class=label_class
+              - n += 1
+              td= n
+              td= "%04d" % application.application_number
+              td= application.fio
+              td= values[:chemistry]
+              td= values[:biology]
+              td= values[:russian]
+              td= values[:summa]
+              td= values[:achievement]
+              td= values[:full_summa]
+              td= "+" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id
+              td= "+" if application.benefit
