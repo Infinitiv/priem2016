@@ -332,7 +332,7 @@ class Request < ActiveRecord::Base
                 when "HighEduDiplomaDocument"
                   ed.HighEduDiplomaDocument do |hedd|
                     hedd.UID ["ed", campaign.year_start, edu_document.id].join('-')
-                    hedd.DocumentSeries edu_document.education_document_series.first(3)
+                    hedd.DocumentSeries edu_document.education_document_number.first(3)
                     hedd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 3)
                     hedd.DocumentDate edu_document.education_document_date
                   end
