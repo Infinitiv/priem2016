@@ -202,7 +202,7 @@ class EntrantApplication < ActiveRecord::Base
   
   def self.applications_hash(campaign)
     applications_hash = {}
-    applications = campaign.entrant_applications.includes(:competitive_groups, :education_document).where.not(status_id: 6)
+    applications = campaign.entrant_applications.includes(:competitive_groups, :education_document).where.not(status_id: 6, target_organization_id: nil)
     achievements = {}
     InstitutionAchievement.all.each do |i|
       i.entrant_applications.each do |a|

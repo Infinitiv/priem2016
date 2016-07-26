@@ -52,4 +52,5 @@ gem 'will_paginate'
 gem 'roo'
 gem 'jquery-datatables-rails'
 gem 'prawn'
+gem 'google_drive'
 
