@@ -257,7 +257,7 @@ class Request < ActiveRecord::Base
   
   def self.applications(pd, params)
     campaign = Campaign.find(params[:campaign_id])
-    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6]).first(500)
+    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6])
     
     pd.Applications do |as|
       applications.each do |item|
@@ -287,7 +287,7 @@ class Request < ActiveRecord::Base
               fsaefs.FinSourceEduForm do |fsef|
                 fsef.CompetitiveGroupUID sub_item.id
                 fsef.TargetOrganizationUID item.target_organization_id if sub_item.education_source_id == 16 && item.target_organization_id
-#                 fsef.IsAgreedDate item.registration_date.to_datetime.to_s.gsub('+00', '+03') if item.budget_agr == sub_item.id || item.paid_agr == sub_item.id
+                fsef.IsAgreedDate item.registration_date.to_datetime.to_s.gsub('+00', '+03') if item.budget_agr == sub_item.id || item.paid_agr == sub_item.id
               end
             end
           end
