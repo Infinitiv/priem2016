@@ -206,7 +206,8 @@ class EntrantApplication < ActiveRecord::Base
     achievements = {}
     InstitutionAchievement.all.each do |i|
       i.entrant_applications.each do |a|
-        achievements[a.id] =+ i.max_value
+        achievements[a.id] ||= 0
+        achievements[a.id] += i.max_value
         achievements[a.id] = 10 if achievements[a.id] > 10
       end
     end
