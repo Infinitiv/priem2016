@@ -211,7 +211,7 @@ class EntrantApplication < ActiveRecord::Base
       end
     end
 
-    marks = campaign.marks.order(:subject_id).joins(:entrant_application).where(entrant_application_id: applications).select(:entrant_application_id, :value).group_by(&:entrant_application_id).select{|a, ms| ms.select{|m| m.value > 37}.size == 3}.map{|a, ms| achievements[a] ? {a => ms.map(&:value) << 10} : {a => ms.map(&:value)}}.inject(:merge)
+    marks = campaign.marks.order(:subject_id).joins(:entrant_application).where(entrant_application_id: applications).select(:entrant_application_id, :value).group_by(&:entrant_application_id).select{|a, ms| ms.select{|m| m.value > 37}.size == 3}.map{|a, ms| achievements[a] ? {a => ms.map(&:value) << achievements[a]} : {a => ms.map(&:value)}}.inject(:merge)
     applications.each do |application|
       if marks[application.id]
       applications_hash[application] = {}
