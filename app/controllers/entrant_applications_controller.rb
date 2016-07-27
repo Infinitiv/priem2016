@@ -2,7 +2,7 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_entrant_application, only: [:show, :edit, :update, :destroy]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
-  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition]
+  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition, :competition_lists]
   
   def index
     entrant_applications = @campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id]).order(:application_number).includes(:institution_achievements, :education_document)
@@ -90,6 +90,12 @@ class EntrantApplicationsController < ApplicationController
   
   def errors
     @errors = EntrantApplication.errors(@campaign)
+  end
+  
+  def competition_lists
+    @admission_volume_hash = EntrantApplication.admission_volume_hash(@campaign)
+    @applications_hash = EntrantApplication.applications_hash(@campaign)
+    @target_organizations = TargetOrganization.order(:target_organization_name)
   end
   
   def competition

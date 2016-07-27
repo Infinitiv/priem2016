@@ -48,7 +48,7 @@ namespace :priem do
                 ws[r + 1, 7] = values[:summa]
                 ws[r + 1, 8] = values[:achievement]
                 ws[r + 1, 9] = values[:full_summa]
-                ws[r + 1, 10] = "да" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id && values[:original_received]
+                ws[r + 1, 10] = "да" if (values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id) && values[:original_received]
                 ws[n + 1, 11] = "да" if application.benefit
               end
               r += 3
@@ -86,7 +86,7 @@ namespace :priem do
             ws[n + 1, 7] = values[:summa]
             ws[n + 1, 8] = values[:achievement]
             ws[n + 1, 9] = values[:full_summa]
-            ws[n + 1, 10] = "да" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id
+            ws[n + 1, 10] = "да" if (values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id) && values[:original_received]
             ws[n + 1, 11] = "да" if application.benefit
           end
           ws.max_rows = n + 2
