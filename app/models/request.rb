@@ -257,7 +257,7 @@ class Request < ActiveRecord::Base
   
   def self.applications(pd, params)
     campaign = Campaign.find(params[:campaign_id])
-    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6])
+    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6]).first(10)
     
     pd.Applications do |as|
       applications.each do |item|
@@ -309,6 +309,7 @@ class Request < ActiveRecord::Base
                 when "SchoolCertificateDocument"
                   ed.SchoolCertificateDocument do |scd|
                     scd.UID ["ed", campaign.year_start, edu_document.id].join('-')
+                    scd.OriginalReceivedDate edu_document.original_received_date if edu_document.original_received_date
                     if edu_document.education_document_date.year > 2013
                       scd.DocumentNumber edu_document.education_document_number
                     else
@@ -320,6 +321,7 @@ class Request < ActiveRecord::Base
                 when "MiddleEduDiplomaDocument"
                   ed.MiddleEduDiplomaDocument do |medd|
                     medd.UID ["ed", campaign.year_start, edu_document.id].join('-')
+                    medd.OriginalReceivedDate edu_document.original_received_date if edu_document.original_received_date
                     if edu_document.education_document_date.year > 2013
                       medd.DocumentSeries edu_document.education_document_number.first(6)
                       medd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 6)
@@ -332,6 +334,7 @@ class Request < ActiveRecord::Base
                 when "HighEduDiplomaDocument"
                   ed.HighEduDiplomaDocument do |hedd|
                     hedd.UID ["ed", campaign.year_start, edu_document.id].join('-')
+                    hedd.OriginalReceivedDate edu_document.original_received_date if edu_document.original_received_date
                     hedd.DocumentSeries edu_document.education_document_number.first(3)
                     hedd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 3)
                     hedd.DocumentDate edu_document.education_document_date

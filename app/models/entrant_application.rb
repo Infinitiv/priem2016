@@ -228,6 +228,6 @@ class EntrantApplication < ActiveRecord::Base
       applications_hash[application][:paid_agr] = application.paid_agr
       end
     end
-    applications_hash = applications_hash.sort_by{|k, v| [v[:full_summa], v[:summa], v[:chemistry], v[:biology], v[:russian], k.benefit]}.reverse
+    applications_hash = applications_hash.sort_by{|k, v| [v[:full_summa], v[:summa], v[:chemistry], v[:biology], v[:russian]]}.reverse
   end
 end

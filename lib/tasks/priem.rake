@@ -8,7 +8,12 @@ namespace :priem do
     target_organizations = TargetOrganization.order(:target_organization_name)
 
     session = GoogleDrive.saved_session("config/google_drive.json")
-    s = session.spreadsheet_by_key("1BFjqg-cdIHAfZit78v8Y_tk8sDBHOfckghZVKkjnX2E")
+    case Rails.env
+      when 'development'
+        s = session.spreadsheet_by_key("1YTVWLPoB8-ADiyOKNiwyo94R_B33WghIGZ0h8-IHuqw")
+      when 'production'
+        s = session.spreadsheet_by_key("1BFjqg-cdIHAfZit78v8Y_tk8sDBHOfckghZVKkjnX2E")        
+    end
     s.title = "Конкурсные списки"
     
     admission_volume_hash.each do |direction_id, competitive_groups|
@@ -87,9 +92,9 @@ namespace :priem do
             ws[n + 1, 8] = values[:achievement]
             ws[n + 1, 9] = values[:full_summa]
             if competitive_group.education_source_id == 15
-              ws[r + 1, 10] = "да" if values[:paid_agr] == competitive_group.id && values[:original_received]
+              ws[n + 1, 10] = "да" if values[:paid_agr] == competitive_group.id && values[:original_received]
             else
-              ws[r + 1, 10] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
+              ws[n + 1, 10] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received] 
             end
             ws[n + 1, 11] = "да" if application.benefit
           end
