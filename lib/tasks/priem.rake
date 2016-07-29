@@ -63,7 +63,7 @@ namespace :priem do
           ws.max_cols = 11
           ws.save
         else
-          applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
+          applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && !v[:competitive_groups].include?(k.enrolled)}
           ws[1, 1] = "№№"
           ws[1, 2] = "№ личного дела"
           ws[1, 3] = "Ф.И.О."
