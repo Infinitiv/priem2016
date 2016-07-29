@@ -257,7 +257,8 @@ class Request < ActiveRecord::Base
   
   def self.applications(pd, params)
     campaign = Campaign.find(params[:campaign_id])
-    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6])
+    last_date = Request.where(query: "import").where("input LIKE ?", '%Applications%').last.updated_at
+    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6]).where("updated_at > ?", last_date)
     
     pd.Applications do |as|
       applications.each do |item|
@@ -274,8 +275,8 @@ class Request < ActiveRecord::Base
               eoma.Email item.email
             end
             unless item.competitive_groups.where(is_for_krym: true).empty?
-              e.IsForKrym do |efk|
-                efk.DocumentUID item.identity_document.id 
+              e.IsFromKrym do |efk|
+                efk.DocumentUID item.identity_documents.last.id 
               end
             end
           end
@@ -427,4 +428,59 @@ class Request < ActiveRecord::Base
       end
     end
   end
+
+  def self.orders_of_admission(pd, params)
+    campaign = Campaign.find(params[:campaign_id])
+    competitive_groups = campaign.competitive_groups
+    pd.Orders do |os|
+      os.OrdersOfAdmission do |ooas|
+        competitive_groups.each do |competitive_group|
+          competitive_group_enrolled_application = competitive_group.entrant_applications.where(enrolled: competitive_group.id).group_by(&:enrolled_date)
+          unless competitive_group_enrolled_application.empty?
+            competitive_group_enrolled_application.each do |d, a|
+              ooas.OrderOfAdmission do |ooa|
+                ooa.OrderOfAdmissionUID "#{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
+                ooa.CampaignUID campaign.id
+                ooa.OrderName "#{competitive_group.name} от #{d.to_date}"
+                ooa.OrderDate d.to_date
+                ooa.EducationFormID competitive_group.education_form_id
+                ooa.FinanceSourceID competitive_group.education_source_id
+                ooa.EducationLevelID competitive_group.education_level_id
+                unless competitive_group.education_source_id == 15
+                  case d.to_date
+                  when "2016-08-03"
+                    ooa.Stage 1
+                  when "2016-08-08"
+                    ooa.Stage 2
+                  else
+                    ooa.Stage 0
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+      os.Applications do |as|
+        competitive_groups.each do |competitive_group|
+          competitive_group_enrolled_application = competitive_group.entrant_applications.where(enrolled: competitive_group.id).group_by(&:enrolled_date)
+          unless competitive_group_enrolled_application.empty?
+            competitive_group_enrolled_application.each do |d, a|
+              a.each do |application|
+                as.Application do |a|
+                  a.ApplicationUID application.id
+                  a.OrderUID "#{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
+                  a.OrderTypeID 1
+                  a.CompetitiveGroupUID competitive_group.id
+                  a.OrderIdLevelBudget 1
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  
+  
 end

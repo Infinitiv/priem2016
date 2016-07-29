@@ -78,6 +78,7 @@ class EntrantApplication < ActiveRecord::Base
         entrant_application.competitive_groups << CompetitiveGroup.find_by_name('Стоматология. Квота особого права. Крым.') if row['Стоматология. Квота особого права. Крым.']
         entrant_application.competitive_groups << CompetitiveGroup.find_by_name('Стоматология. Целевые места.') if row['Стоматология. Целевые места.']
       end
+      entrant_application.touch
     end
   end
   

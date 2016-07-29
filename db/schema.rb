@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160719080156) do
+ActiveRecord::Schema.define(version: 20160728064437) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -128,7 +128,6 @@ ActiveRecord::Schema.define(version: 20160719080156) do
   create_table "education_documents", force: :cascade do |t|
     t.integer  "entrant_application_id"
     t.string   "education_document_type"
-    t.string   "education_document_series"
     t.string   "education_document_number"
     t.date     "education_document_date"
     t.date     "original_received_date"
@@ -172,6 +171,10 @@ ActiveRecord::Schema.define(version: 20160719080156) do
     t.datetime "updated_at"
     t.integer  "budget_agr"
     t.integer  "paid_agr"
+    t.integer  "enrolled"
+    t.date     "enrolled_date"
+    t.integer  "exeptioned"
+    t.date     "exeptioned_date"
   end
 
   create_table "entrant_applications_identity_documents", id: false, force: :cascade do |t|
