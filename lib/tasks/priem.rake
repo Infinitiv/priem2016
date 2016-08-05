@@ -7,15 +7,17 @@ namespace :priem do
     admission_volume_hash = EntrantApplication.admission_volume_hash(campaign)
     applications_hash = EntrantApplication.applications_hash(campaign)
     target_organizations = TargetOrganization.order(:target_organization_name)
+    all_competitive_groups = CompetitiveGroup.all
 
     session = GoogleDrive.saved_session("config/google_drive.json")
     case Rails.env
       when 'development'
         s = session.spreadsheet_by_key("1YTVWLPoB8-ADiyOKNiwyo94R_B33WghIGZ0h8-IHuqw")
+        s.title = "Конкурсные списки (тестовые) по состоянию на #{Time.now.to_datetime.strftime("%F %T")}"
       when 'production'
         s = session.spreadsheet_by_key("1BFjqg-cdIHAfZit78v8Y_tk8sDBHOfckghZVKkjnX2E")        
+        s.title = "Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%F %T")}"
     end
-    s.title = "Конкурсные списки"
     
     admission_volume_hash.each do |direction_id, competitive_groups|
       competitive_groups.select{|k, v| k.is_for_krym == false && [14, 15].include?(k.education_source_id) }.each do |competitive_group, numbers|
@@ -75,7 +77,8 @@ namespace :priem do
           ws[1, 8] = "Баллы за индивидуальные достижения"
           ws[1, 9] = "Сумма конкурсных баллов"
           ws[1, 10] = "Наличие согласия на зачисление"
-          ws[1, 11] = "Наличие преимущественного права на зачисление"
+          ws[1, 11] = "Зачислен по другому конкурсу"
+          ws[1, 12] = "Наличие преимущественного права на зачисление"
           n = 0
           if ws.max_rows > 3
             ws.delete_rows(2, ws.max_rows - 2)
@@ -97,10 +100,11 @@ namespace :priem do
             else
               ws[n + 1, 10] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received] 
             end
-            ws[n + 1, 11] = "да" if application.benefit
+            ws[n + 1, 11] = all_competitive_groups.find(application.enrolled).name if application.enrolled && application.exeptioned != application.enrolled
+            ws[n + 1, 12] = "да" if application.benefit
           end
           ws.max_rows = n + 2
-          ws.max_cols = 11
+          ws.max_cols = 12
           ws.save
         end
       end

@@ -496,7 +496,7 @@ class Request < ActiveRecord::Base
             competitive_group_enrolled_application.each do |d, a|
               a.each do |application|
                 as.Application do |a|
-                  a.ApplicationUID application.id
+                  a.ApplicationUID [campaign.year_start, "%04d" % application.application_number].join('-')
                   a.OrderUID "#{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
                   a.OrderTypeID 1
                   a.CompetitiveGroupUID competitive_group.id
