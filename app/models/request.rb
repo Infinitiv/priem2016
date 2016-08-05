@@ -439,7 +439,7 @@ class Request < ActiveRecord::Base
           unless competitive_group_enrolled_application.empty?
             competitive_group_enrolled_application.each do |d, a|
               ooas.OrderOfAdmission do |ooa|
-                ooa.OrderOfAdmissionUID "#{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
+                ooa.OrderOfAdmissionUID "ao #{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
                 ooa.CampaignUID campaign.id
                 ooa.OrderName "Admission order #{competitive_group.name} от #{d.to_date}"
                 ooa.OrderDate d.to_date
@@ -467,7 +467,7 @@ class Request < ActiveRecord::Base
           unless competitive_group_exeptioned_application.empty?
             competitive_group_exeptioned_application.each do |d, a|
               ooes.OrderOfException do |ooa|
-                ooa.OrderOfExceptionUID "#{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
+                ooa.OrderOfExceptionUID "oe #{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
                 ooa.CampaignUID campaign.id
                 ooa.OrderName "Exeption order #{competitive_group.name} от #{d.to_date}"
                 ooa.OrderDate d.to_date
