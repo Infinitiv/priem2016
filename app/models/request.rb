@@ -439,7 +439,7 @@ class Request < ActiveRecord::Base
           unless competitive_group_enrolled_application.empty?
             competitive_group_enrolled_application.each do |d, a|
               ooas.OrderOfAdmission do |ooa|
-                ooa.OrderOfAdmissionUID "ao #{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
+                ooa.OrderOfAdmissionUID "oa #{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
                 ooa.CampaignUID campaign.id
                 ooa.OrderName "Admission order #{competitive_group.name} от #{d.to_date}"
                 ooa.OrderDate d.to_date
@@ -475,7 +475,7 @@ class Request < ActiveRecord::Base
                 ooa.FinanceSourceID competitive_group.education_source_id
                 ooa.EducationLevelID competitive_group.education_level_id
                 unless competitive_group.education_source_id == 15
-                  case d.to_date
+                  case d.to_date.to_s
                   when "2016-08-03"
                     ooa.Stage 1
                   when "2016-08-08"
