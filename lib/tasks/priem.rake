@@ -20,7 +20,7 @@ namespace :priem do
     end
     
     admission_volume_hash.each do |direction_id, competitive_groups|
-      competitive_groups.select{|k, v| k.is_for_krym == false && [14, 15].include?(k.education_source_id) }.each do |competitive_group, numbers|
+      competitive_groups.select{|k, v| k.is_for_krym == false && [15].include?(k.education_source_id) }.each do |competitive_group, numbers|
         ws = s.worksheet_by_title(competitive_group.name) ? s.worksheet_by_title(competitive_group.name) : s.add_worksheet(competitive_group.name)
         if competitive_group.education_source_id == 16
           r = 1

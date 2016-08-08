@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160728064437) do
+ActiveRecord::Schema.define(version: 20160808064804) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,6 +49,20 @@ ActiveRecord::Schema.define(version: 20160728064437) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "competition_items", force: :cascade do |t|
+    t.integer  "entrant_application_id"
+    t.integer  "competitive_group_id"
+    t.date     "enroll_date"
+    t.date     "agreement_date"
+    t.date     "contract_date"
+    t.date     "exception_date"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "competition_items", ["competitive_group_id"], name: "index_competition_items_on_competitive_group_id", using: :btree
+  add_index "competition_items", ["entrant_application_id"], name: "index_competition_items_on_entrant_application_id", using: :btree
 
   create_table "competitive_group_items", force: :cascade do |t|
     t.integer  "competitive_group_id"
@@ -175,6 +189,7 @@ ActiveRecord::Schema.define(version: 20160728064437) do
     t.date     "enrolled_date"
     t.integer  "exeptioned"
     t.date     "exeptioned_date"
+    t.integer  "contracts",                              array: true
   end
 
   create_table "entrant_applications_identity_documents", id: false, force: :cascade do |t|
@@ -257,6 +272,8 @@ ActiveRecord::Schema.define(version: 20160728064437) do
     t.datetime "updated_at"
   end
 
+  add_foreign_key "competition_items", "competitive_groups"
+  add_foreign_key "competition_items", "entrant_applications"
   add_foreign_key "target_numbers", "competitive_groups"
   add_foreign_key "target_numbers", "target_organizations"
 end

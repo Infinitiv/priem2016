@@ -53,6 +53,10 @@ class EntrantApplication < ActiveRecord::Base
       entrant_application.budget_agr = CompetitiveGroup.find_by_name('Стоматология. Квота особого права.').id if row['stomat_quota_agr']
       entrant_application.budget_agr = CompetitiveGroup.find_by_name('Стоматология. Квота особого права. Крым.').id if row['stomat_quota_krym_agr']
       entrant_application.budget_agr = CompetitiveGroup.find_by_name('Стоматология. Целевые места.').id if row['stomat_target_agr']
+      entrant_application.contracts = []
+      entrant_application.contracts = [] << 3 if row['contract lech']
+      entrant_application.contracts = [] << 9 if row['contract_ped']
+      entrant_application.contracts = [] << 15 if row['contract_stomat']
       if entrant_application.save!
         IdentityDocument.import_from_row(row, entrant_application)
         EducationDocument.import_from_row(row, entrant_application)
