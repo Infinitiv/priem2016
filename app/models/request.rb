@@ -419,6 +419,7 @@ class Request < ActiveRecord::Base
                 ias.IndividualAchievement do |ia|
                   ia.IAUID [campaign.year_start, "%04d" % item.application_number, sub_item.id_category].join('-')
                   ia.InstitutionAchievementUID sub_item.id
+                  ia.IAMark sub_item.max_value
                   ia.IADocumentUID ["ach", campaign.year_start, item.education_document.id].join('-')
                 end
               end

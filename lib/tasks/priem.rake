@@ -114,7 +114,7 @@ namespace :priem do
   end
   
   task custom_import: :environment do
-    request()
+    request(status_id: 2)
   end
   
   private
@@ -124,7 +124,7 @@ namespace :priem do
       when 'development' then url = 'priem.edu.ru:8000'
       when 'production' then url = '127.0.0.1:8080'
     end
-    method = '/import'
+    method = '/validate'
     request = data(options)
     uri = URI.parse('http://' + url + '/import/importservice.svc')
     http = Net::HTTP.new(uri.host, uri.port)
@@ -142,7 +142,7 @@ namespace :priem do
       end
       data.PackageData do |pd|
     campaign = Campaign.first
-    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6]).where("updated_at > ?", "2016-08-03")
+    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6]).joins(:institution_achievements)
     
     pd.Applications do |as|
       applications.each do |item|
@@ -303,6 +303,7 @@ namespace :priem do
                 ias.IndividualAchievement do |ia|
                   ia.IAUID [campaign.year_start, "%04d" % item.application_number, sub_item.id_category].join('-')
                   ia.InstitutionAchievementUID sub_item.id
+                  ia.IAMark sub_item.max_value
                   ia.IADocumentUID ["ach", campaign.year_start, item.education_document.id].join('-')
                 end
               end
@@ -311,6 +312,20 @@ namespace :priem do
         end
       end
     end
+      end
+    end
+  end
+  
+  def self.applications_del(pd, params)
+    campaign = Campaign.find(params[:campaign_id])
+    applications = campaign.entrant_applications.joins(:institution_achievements)
+    
+    pd.Applications do |as|
+      applications.each do |item|
+        as.Application do |a|
+          a.ApplicationNumber [campaign.year_start, "%04d" % item.application_number].join('-')
+          a.RegistrationDate item.registration_date.to_datetime.to_s.gsub('+00', '+03')
+        end
       end
     end
   end
