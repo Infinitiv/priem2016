@@ -124,7 +124,7 @@ namespace :priem do
       when 'development' then url = 'priem.edu.ru:8000'
       when 'production' then url = '127.0.0.1:8080'
     end
-    method = '/validate'
+    method = '/import'
     request = data(options)
     uri = URI.parse('http://' + url + '/import/importservice.svc')
     http = Net::HTTP.new(uri.host, uri.port)
