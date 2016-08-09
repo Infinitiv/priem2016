@@ -526,5 +526,18 @@ class Request < ActiveRecord::Base
     end
   end
   
+  def self.applications_del(pd, params)
+    campaign = Campaign.find(params[:campaign_id])
+    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects)
+    
+    pd.Applications do |as|
+      applications.each do |item|
+        as.Application do |a|
+          a.ApplicationNumber [campaign.year_start, "%04d" % item.application_number].join('-')
+          a.RegistrationDate item.registration_date.to_datetime.to_s.gsub('+00', '+03')
+        end
+      end
+    end
+  end
   
 end
