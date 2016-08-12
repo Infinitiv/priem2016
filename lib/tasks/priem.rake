@@ -222,7 +222,7 @@ namespace :priem do
           lines.p4_2 item.gender_id
           lines.p4_3 campaign.year_start
           lines.p4_4 campaign.year_start + duration
-          lines.p4_5 item.marks.sum(:value)/3
+          lines.p4_5 item.marks.sum(:value)/3.to_f
           lines.p4_6 p4_6
           lines.p4_8 p4_8
           lines.p4_9 p4_9
