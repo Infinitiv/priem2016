@@ -43,6 +43,8 @@ Rails.application.routes.draw do
     end
   end
   
+  get 'reports/mon'
+  
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 

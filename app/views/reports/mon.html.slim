@@ -1,0 +1,20 @@
+h1 Мониторинг приемной кампании
+- @report.each do |direction_id, data|
+  - case direction_id
+    - when 17509
+      h2 Лечебное дело
+    - when 17353
+      h2 Педиатрия
+    - when 17247
+      h2 Стоматология
+  - data.each do |forma, points|
+    table.table
+      caption= forma
+      thead
+        tr
+          - points.each do |p, v|
+            th= p
+      tbody
+        tr
+          - points.each do |p, v|
+            td= v
