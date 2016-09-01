@@ -1,7 +1,1 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Mayor.create(name: 'Emanuel', city: cities.first)
+Campaign.first.entrant_applications.select{|a| a.identity_documents.count > 1}.each{|a| (a.identity_documents - [a.identity_documents.last]).each{|i| i.destroy}}

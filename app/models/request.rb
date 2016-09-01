@@ -292,8 +292,56 @@ class Request < ActiveRecord::Base
               end
             end
           end
+          benefit_competitive_groups = item.competitive_groups.where(education_source_id: 20)
+          unless benefit_competitive_groups.empty?
+            a.ApplicationCommonBenefits do |acbs|
+              benefit_competitive_groups.each do |sub_item|
+                acbs.ApplicationCommonBenefit do |acb|
+                  acb.UID ["benefit", campaign.year_start, item.application_number].join('-')
+                  acb.CompetitiveGroupUID sub_item.id
+                  benefit_document = item.benefit_documents.last
+                  acb.DocumentTypeID benefit_document.benefit_document_type_id
+                  acb.DocumentReason do |dr|
+                    case benefit_document.benefit_document_type_id
+                    when 11
+                      dr.MedicalDocuments do |mds|
+                        mds.BenefitDocument do |bd|
+                          bd.DisabilityDocument do |dd|
+                            dd.UID ["benefit", campaign.year_start, item.application_number, benefit_document.id].join('-')
+                            dd.DocumentSeries benefit_document.benefit_document_series if benefit_document.benefit_document_series
+                            dd.DocumentNumber benefit_document.benefit_document_number if benefit_document.benefit_document_number
+                            dd.DocumentDate benefit_document.benefit_document_date if benefit_document.benefit_document_date
+                            dd.DocumentOrganization benefit_document.benefit_document_organization if benefit_document.benefit_document_organization
+                            dd.DisabilityTypeID benefit_document.benefit_type_id
+                          end
+                        end
+                        mds.AllowEducationDocument do |aed|
+                          aed.UID ["allow", campaign.year_start, item.application_number, benefit_document.id].join('-')
+                          aed.DocumentNumber "0000"
+                          aed.DocumentDate benefit_document.benefit_document_date if benefit_document.benefit_document_date
+                        end
+                      end
+                    when 30
+                      dr.OrphanDocument do |od|
+                        dr.UID ["benefit", campaign.year_start, item.application_number, benefit_document.id].join('-')
+                        dr.OrphanCategoryID benefit_document.benefit_type_id
+                        dr.DocumentName "Документ, подтверждающий сиротство"
+                        dr.DocumentSeries benefit_document.benefit_document_series if benefit_document.benefit_document_series
+                        dr.DocumentNumber benefit_document.benefit_document_number if benefit_document.benefit_document_number
+                        dr.DocumentDate benefit_document.benefit_document_date if benefit_document.benefit_document_date
+                        dr.DocumentOrganization benefit_document.benefit_document_organization if benefit_document.benefit_document_organization
+                      end
+                    end
+                  end
+                  acb.BenefitKindID 4
+                end
+              end
+            end
+          end
           a.ApplicationDocuments do |ads|
-            identity_document = item.identity_documents.last
+            identity_documents = item.identity_documents.order(identity_document_date: :desc)
+            identity_document = identity_documents.last
+            other_identity_documents = identity_documents - [identity_documents.last]
             ads.IdentityDocument do |id|
               id.UID ["id", campaign.year_start, identity_document.id].join('-')
               id.DocumentSeries identity_document.identity_document_series ?  identity_document.identity_document_series : "нет серии"
@@ -302,6 +350,24 @@ class Request < ActiveRecord::Base
               id.IdentityDocumentTypeID identity_document.identity_document_type
               id.NationalityTypeID  item.nationality_type_id
               id.BirthDate item.birth_date
+            end
+            unless other_identity_documents.empty?
+              ads.OtherIdentityDocuments do |oid|
+                other_identity_documents.each do |identity_document|
+                  oid.IdentityDocument do |id|
+                    oid.UID ["id", campaign.year_start, identity_document.id].join('-')
+                    oid.LastName item.entrant_last_name
+                    oid.FirstName item.entrant_first_name
+                    oid.MiddleName item.entrant_middle_name if item.entrant_middle_name
+                    oid.DocumentSeries identity_document.identity_document_series ?  identity_document.identity_document_series : "нет серии"
+                    oid.DocumentNumber identity_document.identity_document_number
+                    oid.DocumentDate identity_document.identity_document_date ? identity_document.identity_document_date : item.birth_date + 14.day
+                    oid.IdentityDocumentTypeID identity_document.identity_document_type
+                    oid.NationalityTypeID  item.nationality_type_id
+                    oid.BirthDate item.birth_date
+                  end
+                end
+              end
             end
             ads.EduDocuments do |eds|
               edu_document = item.education_document
@@ -343,29 +409,37 @@ class Request < ActiveRecord::Base
                 end
               end
             end
-            achievements = item.institution_achievements.where.not(id_category: 8)
+            achievements = item.institution_achievements
             unless achievements.empty?
               ads.CustomDocuments do |cds|
                 achievements.each do |sub_item|
                     cds.CustomDocument do |cd|
-                      cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                       case sub_item.id_category
                       when 9
+                        cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                         cd.DocumentName "Аттестат о среднем общем образовании с отличием"
                         cd.DocumentDate item.education_document.education_document_date
                         cd.DocumentOrganization "Организация СО"
                       when 15
+                        cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                         cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
                         cd.DocumentDate item.education_document.education_document_date
                         cd.DocumentOrganization "Организация СО"
                       when 16
+                        cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                         cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
                         cd.DocumentDate item.education_document.education_document_date
                         cd.DocumentOrganization "Организация СО"
                       when 17
+                        cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                         cd.DocumentName "Диплом о среднем профессиональном образовании с отличием"
                         cd.DocumentDate item.education_document.education_document_date
                         cd.DocumentOrganization "Организация СПО"
+                      when 8
+                        cd.UID ["ach", campaign.year_start, item.application_number, 'gto'].join('-')
+                        cd.DocumentName "Удоствоверение о награждении золотым значком ГТО"
+                        cd.DocumentDate '2016-04-20'
+                        cd.DocumentOrganization 'Министерство спорта Российской Федерации'
                       end
                     end
                   end
@@ -412,15 +486,24 @@ class Request < ActiveRecord::Base
               end
             end
           end
-          achievements = item.institution_achievements.where.not(id_category: 8)
+          achievements = item.institution_achievements
           unless achievements.empty?
             a.IndividualAchievements do |ias|
-              achievements.each do |sub_item|
+              if achievements.length == 2
+              sub_item = achievements.where.not(id_category: 8).first
                 ias.IndividualAchievement do |ia|
                   ia.IAUID [campaign.year_start, "%04d" % item.application_number, sub_item.id_category].join('-')
                   ia.InstitutionAchievementUID sub_item.id
                   ia.IAMark sub_item.max_value
                   ia.IADocumentUID ["ach", campaign.year_start, item.education_document.id].join('-')
+                end
+              else
+                sub_item = achievements.first
+                ias.IndividualAchievement do |ia|
+                  ia.IAUID [campaign.year_start, "%04d" % item.application_number, sub_item.id_category].join('-')
+                  ia.InstitutionAchievementUID sub_item.id
+                  ia.IAMark sub_item.max_value
+                  ia.IADocumentUID sub_item.id_category == 8 ? ["ach", campaign.year_start, item.application_number, 'gto'].join('-') : ["ach", campaign.year_start, item.education_document.id].join('-')
                 end
               end
             end

@@ -5,6 +5,7 @@ class EntrantApplication < ActiveRecord::Base
   has_one :education_document
   has_and_belongs_to_many :identity_documents
   has_and_belongs_to_many :institution_achievements
+  has_many :benefit_documents
   has_and_belongs_to_many :competitive_groups
   belongs_to :target_organization
   
@@ -33,8 +34,8 @@ class EntrantApplication < ActiveRecord::Base
       entrant_application = where(application_number: row["application_number"], campaign_id: campaign).first || new
       entrant_application.attributes = row.to_hash.slice(*accessible_attributes)
       entrant_application.campaign_id = campaign.id
-      entrant_application.budget_agr = nil
-      entrant_application.paid_agr = nil
+      entrant_application.budget_agr = nil if row.keys.include? 'lech_budget_agr'
+      entrant_application.paid_agr = nil if row.keys.include? 'lech_paid_agr'
       entrant_application.budget_agr = CompetitiveGroup.find_by_name('Лечебное дело. Бюджет.').id if row['lech_budget_agr']
       entrant_application.budget_agr = CompetitiveGroup.find_by_name('Лечебное дело. Бюджет. Крым.').id if row['lech_budget_krym_agr']
       entrant_application.paid_agr = CompetitiveGroup.find_by_name('Лечебное дело. Внебюджет.').id if row['lech_paid_agr']
@@ -58,11 +59,12 @@ class EntrantApplication < ActiveRecord::Base
       entrant_application.contracts << 9 if row['contract ped']
       entrant_application.contracts << 15 if row['contract stomat']
       if entrant_application.save!
-        IdentityDocument.import_from_row(row, entrant_application)
-        EducationDocument.import_from_row(row, entrant_application)
-        Mark.import_from_row(row, entrant_application)
-        InstitutionAchievement.import_from_row(row, entrant_application)
-        entrant_application.competitive_groups.each{|c| entrant_application.competitive_groups.delete(c)}
+        IdentityDocument.import_from_row(row, entrant_application) if row.keys.include? 'identity_document_type'
+        EducationDocument.import_from_row(row, entrant_application) if row.keys.include? 'education_document_type'
+        BenefitDocument.import_from_row(row, entrant_application) if row.keys.include? 'benefit_document_type_id'
+        Mark.import_from_row(row, entrant_application) if row.keys.include?('chemistry') || row.keys.include?('biology') || row.keys.include?('russian')
+        InstitutionAchievement.import_from_row(row, entrant_application) if row.keys.include?('achievement_att') || row.keys.include?('achievement_dip') || row.keys.include?('achievement_gto')
+        entrant_application.competitive_groups.each{|c| entrant_application.competitive_groups.delete(c)} if row.keys.include? 'Лечебное дело. Бюджет.'
         entrant_application.competitive_groups << CompetitiveGroup.find_by_name('Лечебное дело. Бюджет.') if row['Лечебное дело. Бюджет.']
         entrant_application.competitive_groups << CompetitiveGroup.find_by_name('Лечебное дело. Бюджет. Крым.') if row['Лечебное дело. Бюджет. Крым.']
         entrant_application.competitive_groups << CompetitiveGroup.find_by_name('Лечебное дело. Внебюджет.') if row['Лечебное дело. Внебюджет.']

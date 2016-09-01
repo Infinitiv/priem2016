@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160808064804) do
+ActiveRecord::Schema.define(version: 20160831155125) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -38,6 +38,20 @@ ActiveRecord::Schema.define(version: 20160808064804) do
 
   add_index "admission_volumes", ["campaign_id"], name: "index_admission_volumes_on_campaign_id", using: :btree
 
+  create_table "benefit_documents", force: :cascade do |t|
+    t.integer  "benefit_document_type_id"
+    t.string   "benefit_document_series"
+    t.string   "benefit_document_number"
+    t.date     "benefit_document_date"
+    t.string   "benefit_document_organization"
+    t.integer  "benefit_type_id"
+    t.integer  "entrant_application_id"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "benefit_documents", ["entrant_application_id"], name: "index_benefit_documents_on_entrant_application_id", using: :btree
+
   create_table "campaigns", force: :cascade do |t|
     t.string   "name",             default: ""
     t.integer  "year_start"
@@ -49,20 +63,6 @@ ActiveRecord::Schema.define(version: 20160808064804) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  create_table "competition_items", force: :cascade do |t|
-    t.integer  "entrant_application_id"
-    t.integer  "competitive_group_id"
-    t.date     "enroll_date"
-    t.date     "agreement_date"
-    t.date     "contract_date"
-    t.date     "exception_date"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  add_index "competition_items", ["competitive_group_id"], name: "index_competition_items_on_competitive_group_id", using: :btree
-  add_index "competition_items", ["entrant_application_id"], name: "index_competition_items_on_entrant_application_id", using: :btree
 
   create_table "competitive_group_items", force: :cascade do |t|
     t.integer  "competitive_group_id"
@@ -272,8 +272,7 @@ ActiveRecord::Schema.define(version: 20160808064804) do
     t.datetime "updated_at"
   end
 
-  add_foreign_key "competition_items", "competitive_groups"
-  add_foreign_key "competition_items", "entrant_applications"
+  add_foreign_key "benefit_documents", "entrant_applications"
   add_foreign_key "target_numbers", "competitive_groups"
   add_foreign_key "target_numbers", "target_organizations"
 end

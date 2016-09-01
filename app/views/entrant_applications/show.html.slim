@@ -20,6 +20,10 @@ ol
         = @entrant_application.rank(@entrant_application, competitive_group)
       span &nbsp;
       span.label.label-success= "согласие" if @entrant_application.budget_agr == competitive_group.id || @entrant_application.paid_agr == competitive_group.id
+      span &nbsp;
+      span.label.label-success= "зачислен #{@entrant_application.enrolled_date}" if @entrant_application.enrolled == competitive_group.id
+      span &nbsp;
+      span.label.label-warning= "отказ #{@entrant_application.exeptioned_date}" if @entrant_application.exeptioned == competitive_group.id
 h2 Конкурсные баллы
 table.table
   thead
@@ -56,7 +60,7 @@ h2 Документы
 dl
   dt
     h3 Документ, удостоверяющий личность
-    - @entrant_application.identity_documents.each do |i|
+    - @entrant_application.identity_documents.order(:identity_document_date).each do |i|
       dd= i.identity_document_data
   dt
     h3 Документ об образовании
