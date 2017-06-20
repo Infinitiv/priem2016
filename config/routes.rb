@@ -7,6 +7,10 @@ Rails.application.routes.draw do
 
   root 'requests#new'
   
+  namespace :api, defaults: {format: 'json'}, path: '/api' do
+    
+  end
+  
   resources :requests, only: [:index, :show, :new, :create, :destroy]
   resources :campaigns
   resources :admission_volumes
