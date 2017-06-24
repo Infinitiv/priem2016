@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160831155125) do
+ActiveRecord::Schema.define(version: 20170620101620) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,15 +53,17 @@ ActiveRecord::Schema.define(version: 20160831155125) do
   add_index "benefit_documents", ["entrant_application_id"], name: "index_benefit_documents_on_entrant_application_id", using: :btree
 
   create_table "campaigns", force: :cascade do |t|
-    t.string   "name",             default: ""
+    t.string   "name",                   default: ""
     t.integer  "year_start"
     t.integer  "year_end"
-    t.integer  "status_id",        default: 1
+    t.integer  "status_id",              default: 1
     t.integer  "campaign_type_id"
-    t.integer  "education_forms",               array: true
-    t.integer  "education_levels",              array: true
+    t.integer  "education_forms",                     array: true
+    t.integer  "education_levels",                    array: true
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "google_key_development"
+    t.string   "google_key_production"
   end
 
   create_table "competitive_group_items", force: :cascade do |t|
