@@ -6,7 +6,7 @@ class CompetitiveGroupsController < ApplicationController
   before_action :set_entrance_test_item, only: [:add_entrance_test_item, :remove_entrance_test_item]
   
   def index
-    @campaigns = Campaign.order(:name)
+    @campaigns = Campaign.order(:name).where(year_start: Time.now.year)
   end
   
   def show

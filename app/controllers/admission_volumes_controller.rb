@@ -3,7 +3,7 @@ class AdmissionVolumesController < ApplicationController
   before_action :admission_volume_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :create, :edit, :update]
   def index
-    @admission_volumes = AdmissionVolume.order(:created_at)
+    @admission_volumes = AdmissionVolume.joins(:campaign).order(:created_at).where(campaigns: {year_start: Time.now.year})
   end
   
   def show

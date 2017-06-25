@@ -3,7 +3,7 @@ class CompetitiveGroupItemsController < ApplicationController
   before_action :competitive_group_item_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :create, :edit, :update]
   def index
-    @competitive_group_items = CompetitiveGroupItem.order(:created_at)
+    @competitive_group_items = CompetitiveGroupItem.join(:campaign).order(:created_at).where(campaign: {year_start: Time.now.year})
   end
   
   def show

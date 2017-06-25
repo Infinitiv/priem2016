@@ -3,7 +3,8 @@ class DistributedAdmissionVolumesController < ApplicationController
   before_action :distributed_admission_volume_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :create, :edit, :update]
   def index
-    @distributed_admission_volumes = DistributedAdmissionVolume.order(:created_at)
+    admission_volumes = AdmissionVolume.joins(:campaign).where(campaigns: {year_start: Time.now.year})
+    @distributed_admission_volumes = DistributedAdmissionVolume.joins(:admission_volume).order(:created_at).where(admission_volumes: {id: admission_volumes})
   end
   
   def show
