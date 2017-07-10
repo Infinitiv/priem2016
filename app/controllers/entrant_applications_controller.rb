@@ -65,7 +65,7 @@ class EntrantApplicationsController < ApplicationController
   
   def import
     EntrantApplication.import(params[:file], @campaign)
-    redirect_to entrant_applications_url + "?campaign_id={@campaign.id}", notice: "Applications imported."
+    redirect_to entrant_applications_url + "?campaign_id=#{@campaign.id}", notice: "Applications imported."
   end
   
   def ege_to_txt
