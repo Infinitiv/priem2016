@@ -93,7 +93,7 @@ class EntrantApplication < ActiveRecord::Base
     ege_to_txt = ""
     entrant_applications.each do |entrant_application|
       entrant_application.identity_documents.each do |identity_document|
-        if identity_document.entrant_last_name
+        if identity_document.alt_entrant_last_name
           ege_to_txt += "#{[identity_document.alt_entrant_last_name, identity_document.alt_entrant_first_name, identity_document.alt_entrant_middle_name].join('%')}%#{[identity_document.identity_document_series, identity_document.identity_document_number].join('%')}\r\n"
         else
           ege_to_txt += "#{[entrant_application.entrant_last_name, entrant_application.entrant_first_name, entrant_application.entrant_middle_name].join('%')}%#{[identity_document.identity_document_series, identity_document.identity_document_number].join('%')}\r\n"
