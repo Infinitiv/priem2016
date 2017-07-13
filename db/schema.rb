@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170620101620) do
+ActiveRecord::Schema.define(version: 20170713064615) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -211,6 +211,9 @@ ActiveRecord::Schema.define(version: 20170620101620) do
     t.date     "identity_document_date"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "alt_entrant_last_name"
+    t.string   "alt_entrant_first_name"
+    t.string   "alt_entrant_middle_name"
   end
 
   add_index "identity_documents", ["identity_document_type"], name: "index_identity_documents_on_identity_document_type", using: :btree
