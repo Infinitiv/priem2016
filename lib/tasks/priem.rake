@@ -5,12 +5,10 @@ namespace :priem do
   task entrants_lists: :environment do
     campaigns = Campaign.where(year_start: Time.now.year)
     campaigns.each do |campaign|
-      title_production = "Приемная кампания #{campaign.name}. Заявления, принятые по состоянию на #{Time.now.to_datetime.strftime("%F %T")}"
+      applications = campaign.entrant_applications.includes([:competitive_groups, :target_organization, :marks]).order(:application_number)
+      title_production = "Приемная кампания #{campaign.name}. Заявления, принятые по состоянию на #{applications.last.registration_date.strftime("%d.%m.%Y")}"
       title_development = [title_production, "(тестовая)"].join(" ")
-      admission_volume_hash = EntrantApplication.admission_volume_hash(campaign)
-      applications_hash = EntrantApplication.applications_hash(campaign)
-      target_organizations = TargetOrganization.order(:target_organization_name)
-      all_competitive_groups = CompetitiveGroup.where(campaign_id: campaign)
+      competitive_groups = campaign.competitive_groups
 
       session = GoogleDrive.saved_session("config/google_drive.json")
       case Rails.env
@@ -32,98 +30,37 @@ namespace :priem do
           end
       end
       
-      admission_volume_hash.each do |direction_id, competitive_groups|
-        competitive_groups.select{|k, v| k.is_for_krym == false && [15].include?(k.education_source_id) }.each do |competitive_group, numbers|
-          ws = s.worksheet_by_title(competitive_group.name) ? s.worksheet_by_title(competitive_group.name) : s.add_worksheet(competitive_group.name)
-          if competitive_group.education_source_id == 16
-            r = 1
-            if ws.max_rows > 3
-              ws.delete_rows(3, ws.max_rows - 2)
-              ws.save
-            end
-            target_organizations.each do |target_organization|
-            applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.target_organization_id == target_organization.id}
-              unless applications.empty?
-                ws[r, 1]= target_organization.target_organization_name
-                ws[r + 1, 1] = "№№"
-                ws[r + 1, 2] = "№ личного дела"
-                ws[r + 1, 3] = "Ф.И.О."
-                ws[r + 1, 4] = "Химия"
-                ws[r + 1, 5] = "Биология"
-                ws[r + 1, 6] = "Русский язык"
-                ws[r + 1, 7] = "Сумма баллов за вступительные испытания"
-                ws[r + 1, 8] = "Баллы за индивидуальные достижения"
-                ws[r + 1, 9] = "Сумма конкурсных баллов"
-                ws[r + 1, 10] = "Наличие согласия на зачисление"
-                ws[r + 1, 11] = "Наличие преимущественного права на зачисление"
-                n = 0
-                applications.each do |application, values|
-                  r += 1
-                  n += 1
-                  ws[r + 1, 1] = n
-                  ws[r + 1, 2] = "%04d" % application.application_number
-                  ws[r + 1, 3] = application.fio
-                  ws[r + 1, 4] = values[:chemistry]
-                  ws[r + 1, 5] = values[:biology]
-                  ws[r + 1, 6] = values[:russian]
-                  ws[r + 1, 7] = values[:summa]
-                  ws[r + 1, 8] = values[:achievement]
-                  ws[r + 1, 9] = values[:full_summa]
-                  ws[r + 1, 10] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
-                  ws[n + 1, 11] = "да" if application.benefit
-                end
-                r += 3
-              end
-            end
-            ws.max_rows = r - 2
-            ws.max_cols = 11
-            ws.save
-          else
-            applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
-            ws[1, 1] = "№№"
-            ws[1, 2] = "№ личного дела"
-            ws[1, 3] = "Ф.И.О."
-            ws[1, 4] = "Химия"
-            ws[1, 5] = "Биология"
-            ws[1, 6] = "Русский язык"
-            ws[1, 7] = "Сумма баллов за вступительные испытания"
-            ws[1, 8] = "Баллы за индивидуальные достижения"
-            ws[1, 9] = "Сумма конкурсных баллов"
-            ws[1, 10] = "Наличие согласия на зачисление"
-            ws[1, 11] = "Наличие договора"
-            ws[1, 12] = "Зачислен по другому конкурсу"
-            ws[1, 13] = "Наличие преимущественного права на зачисление"
-            n = 0
-            if ws.max_rows > 3
-              ws.delete_rows(2, ws.max_rows - 2)
-              ws.save
-            end
-            applications.each do |application, values|
-              n += 1
-              ws[n + 1, 1] = n
-              ws[n + 1, 2] = "%04d" % application.application_number
-              ws[n + 1, 3] = application.fio
-              ws[n + 1, 4] = values[:chemistry]
-              ws[n + 1, 5] = values[:biology]
-              ws[n + 1, 6] = values[:russian]
-              ws[n + 1, 7] = values[:summa]
-              ws[n + 1, 8] = values[:achievement]
-              ws[n + 1, 9] = values[:full_summa]
-              if competitive_group.education_source_id == 15
-                ws[n + 1, 10] = "да" if values[:paid_agr] == competitive_group.id && values[:original_received]
-              else
-                ws[n + 1, 10] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received] 
-              end
-              ws[n + 1, 11] = "да" if application.contracts.include?(competitive_group.id)
-              ws[n + 1, 12] = all_competitive_groups.find(application.enrolled).name if application.enrolled && application.exeptioned != application.enrolled
-              ws[n + 1, 13] = "да" if application.benefit
-            end
-            ws.max_rows = n + 2
-            ws.max_cols = 13
-            ws.save
-          end
+      ws = s.worksheet_by_title("Список") || s.add_worksheet("Список")
+      n = 0
+      applications.each do |application|
+        n += 1
+        ws[n + 2, 1] = "%04d" % application.application_number if ws[n + 2, 2] != "%04d" % application.application_number
+        ws[n + 2, 2] = application.fio if ws[n + 2, 3] != application.fio
+        form = application.marks.map(&:form).include?("Экзамен") ? "Экзамен" : "ЕГЭ"
+        ws[n + 2, 3] = form if ws[n + 2, 4] != form
+        entrant_competitive_groups = application.competitive_groups.map(&:name)
+        entrant_competitive_groups.include?("Лечебное дело. Бюджет.") && ws[n + 2, 4] != 1 ? ws[n + 2, 4] = 1 : ws[n + 2, 4] = ""
+        entrant_competitive_groups.include?("Педиатрия. Бюджет.") && ws[n + 2, 5] != 1 ? ws[n + 2, 5] = 1 : ws[n + 2, 5] = ""
+        entrant_competitive_groups.include?("Стоматология. Бюджет.") && ws[n + 2, 6] != 1 ? ws[n + 2, 6] = 1 : ws[n + 2, 6] = ""
+        entrant_competitive_groups.include?("Лечебное дело. Внебюджет.") && ws[n + 2, 7] != 1 ? ws[n + 2, 7] = 1 : ws[n + 2, 7] = ""
+        entrant_competitive_groups.include?("Педиатрия. Внебюджет.") && ws[n + 2, 8] != 1 ? ws[n + 2, 8] = 1 : ws[n + 2, 8] = ""
+        entrant_competitive_groups.include?("Стоматология. Внебюджет.") && ws[n + 2, 9] != 1 ? ws[n + 2, 9] = 1 : ws[n + 2, 9] = ""
+        entrant_competitive_groups.include?("Лечебное дело. Целевые места.") && ws[n + 2, 10] != 1 ? ws[n + 2, 10] = 1 : ws[n + 2, 10] = ""
+        entrant_competitive_groups.include?("Педиатрия. Целевые места.") && ws[n + 2, 11] != 1 ? ws[n + 2, 11] = 1 : ws[n + 2, 11] = ""
+        entrant_competitive_groups.include?("Стоматология. Целевые места.") && ws[n + 2, 12] != 1 ? ws[n + 2, 12] = 1 : ws[n + 2, 12] = ""
+				application.target_organization && ws[n + 2, 13] != application.target_organization.target_organization_name ? ws[n + 2, 13] = application.target_organization.target_organization_name : ""
+        entrant_competitive_groups.include?("Лечебное дело. Квота особого права.") && ws[n + 2, 14] != 1 ? ws[n + 2, 14] = 1 : ws[n + 2, 14] = ""
+        entrant_competitive_groups.include?("Педиатрия. Квота особого права.") && ws[n + 2, 15] != 1 ? ws[n + 2, 15] = 1 : ws[n + 2, 15] = ""
+        entrant_competitive_groups.include?("Стоматология. Квота особого права.") && ws[n + 2, 16] != 1 ? ws[n + 2, 16] = 1 : ws[n + 2, 16] = ""
+        special_marks = case true
+        when application.status_id == 6
+        	"Заявление отозвано"
         end
+        ws[n + 2, 17] != special_marks ? ws[n + 2, 17] = special_marks : ""
       end
+      ws.max_rows = n + 2
+    	ws.max_cols = 17
+    	ws.save
     end
   end
   

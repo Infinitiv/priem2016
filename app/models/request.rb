@@ -83,7 +83,7 @@ class Request < ActiveRecord::Base
         cs.Campaign do |c|
           campaign = Campaign.find params[:campaign_id]
           c.UID campaign.id
-          c.Name campaign.name
+          c.Name [campaign.name, campaign.year_start].join(" ")
           c.YearStart campaign.year_start
           c.YearEnd campaign.year_end
           c.EducationForms do |edfs|
@@ -158,7 +158,7 @@ class Request < ActiveRecord::Base
             cgs.CompetitiveGroup do |cg|
               cg.UID item.id
               cg.CampaignUID item.campaign_id
-              cg.Name item.name
+              cg.Name [item.name, campaign.year_start].join(" ")
               cg.EducationLevelID item.education_level_id
               cg.EducationSourceID item.education_source_id
               cg.EducationFormID item.education_form_id
