@@ -26,7 +26,7 @@ namespace :priem do
             s.title = title_production
           else
             s = session.create_spreadsheet(title_production)
-            campaign.update_attibutes(google_key_production: s.key)
+            campaign.update_attributes(google_key_production: s.key)
           end
       end
       
