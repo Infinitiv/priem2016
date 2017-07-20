@@ -7,4 +7,8 @@ class BenefitDocument < ActiveRecord::Base
     benefit_document.attributes = row.to_hash.slice(*accessible_attributes)
     benefit_document.save!
   end
+  
+  def benefit_document_data
+    "Серия #{benefit_document_series} номер #{benefit_document_number}, выдан #{benefit_document_date}"
+  end
 end
