@@ -1,8 +1,8 @@
 # 2017
 # удаляем приемную кампанию
-Campaign.find(2).destroy
+Campaign.find(2).destroy if Campaign.find_by_id(2)
 # создаем приемную кампанию
-Campaign.create(id: 2, name: "Специалитет", year_start: 2017, year_end: 2017, status_id: 1, campaign_type_id: 1, education_forms: [11], education_levels: [5])
+Campaign.create(id: 2, name: "Специалитет", year_start: 2017, year_end: 2017, status_id: 1, campaign_type_id: 1, education_forms: [11], education_levels: [5], google_key_development: '1-h7uhz_idoE1MaAUBFLgl34Ok6aMv9l0JTmSlghHVzk', google_key_production: '1BkB6l93qpkK5VNJsPQ1fPxyWaGpCXBOkv1MXfdmbvQE')
 
 # заполняем справочники
 # добавляем заказчиков целевого приема
@@ -44,6 +44,13 @@ TargetOrganization.create(id: 42, target_organization_name: 'ФСИН Росси
 EntranceTestItem.create(entrance_test_type_id: 1, min_score: 42, entrance_test_priority: 1, subject_id: 3)
 EntranceTestItem.create(entrance_test_type_id: 1, min_score: 42, entrance_test_priority: 2, subject_id: 2)
 EntranceTestItem.create(entrance_test_type_id: 1, min_score: 42, entrance_test_priority: 3, subject_id: 1)
+
+# добавляем индивидуальные достижения
+InstitutionAchievement.create(name: "Аттестат с золотой медалью", id_category: 15, max_value: 10, campaign_id: 2)
+InstitutionAchievement.create(name: "Аттестат с серебряной медалью", id_category: 16, max_value: 10, campaign_id: 2)
+InstitutionAchievement.create(name: "Аттестат с отличием", id_category: 9, max_value: 10, campaign_id: 2)
+InstitutionAchievement.create(name: "Диплом с отличием", id_category: 17, max_value: 10, campaign_id: 2)
+InstitutionAchievement.create(name: "Золотой знак отличия ГТО", id_category: 8, max_value: 2, campaign_id: 2)
 
 # добавляем объемы приема
 # Лечебное дело

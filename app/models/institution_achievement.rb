@@ -6,10 +6,10 @@ class InstitutionAchievement < ActiveRecord::Base
   validates :id_category, :max_value, :campaign_id, numericality: {only_integer: true}
   
   def self.import_from_row(row, entrant_application)
-    
-    achievement_8 = find_by_id_category(8)
-    achievement_9 = find_by_id_category(9)
-    achievement_17 = find_by_id_category(17)
+    institution_achievements = entrant_application.campaign.institution_achievements
+    achievement_8 = institution_achievements.find_by_id_category(8)
+    achievement_9 = institution_achievements.find_by_id_category(9)
+    achievement_17 = institution_achievements.find_by_id_category(17)
     case row["achievement_att"]
     when '1'
       entrant_application.institution_achievements << achievement_9 unless entrant_application.institution_achievements.include?(achievement_9)
