@@ -216,7 +216,7 @@ class EntrantApplication < ActiveRecord::Base
     applications_hash = {}
     applications = campaign.entrant_applications.includes(:competitive_groups, :education_document).where.not(status_id: 6)
     achievements = {}
-    InstitutionAchievement.all.each do |i|
+    campaign.institution_achievements.each do |i|
       i.entrant_applications.each do |a|
         achievements[a.id] ||= 0
         achievements[a.id] += i.max_value
