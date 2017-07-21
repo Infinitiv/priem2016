@@ -1,7 +1,7 @@
 class CompetitiveGroup < ActiveRecord::Base
   belongs_to :campaign
-  has_one :competitive_group_item
-  has_many :target_numbers
+  has_one :competitive_group_item, dependent: :destroy
+  has_many :target_numbers, dependent: :destroy
   has_many :target_organizations, through: :target_numbers
   has_and_belongs_to_many :edu_programs
   has_and_belongs_to_many :entrance_test_items

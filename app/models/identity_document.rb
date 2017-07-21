@@ -4,10 +4,9 @@ class IdentityDocument < ActiveRecord::Base
   
   def self.import_from_row(row, entrant_application)
     accessible_attributes = column_names
-    identity_document = entrant_application.identity_documents.where(identity_document_series: row['identity_document_series'], identity_document_number: row['identity_document_number']).first || new
+    identity_document = entrant_application.identity_documents.where(identity_document_series: row['identity_document_series'], identity_document_number: row['identity_document_number']).first || entrant_application.identity_documents.new
     identity_document.attributes = row.to_hash.slice(*accessible_attributes)
     identity_document.save!
-    entrant_application.identity_documents << identity_document if identity_document.entrant_application.empty?
   end
 
   def identity_document_data

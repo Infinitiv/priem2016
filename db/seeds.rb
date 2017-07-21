@@ -1,4 +1,10 @@
 # 2017
+# меняем атрибуты документов 2016 года
+EntrantApplication.all.each do |application|
+  application.identity_documents.each do |document|
+    document.update_attributes(entrant_application_id: application.id)
+  end
+end
 # удаляем приемную кампанию
 Campaign.find(2).destroy if Campaign.find_by_id(2)
 # создаем приемную кампанию
@@ -55,20 +61,20 @@ InstitutionAchievement.create(name: "Золотой знак отличия ГТ
 # добавляем объемы приема
 # Лечебное дело
 campaign_id = Campaign.last.id
-AdmissionVolume.create(campaign_id: campaign_id, education_level_id: 5, direction_id: 17509, number_budget_o: 22, number_budget_oz: 0, number_budget_z: 0, number_paid_o: 75, number_paid_oz: 0, number_paid_z: 0, number_target_o: 140, number_target_oz: 0, number_target_z: 0, number_quota_o: 18, number_quota_oz: 0, number_quota_z: 0)
+AdmissionVolume.create(id: 4, campaign_id: campaign_id, education_level_id: 5, direction_id: 17509, number_budget_o: 22, number_budget_oz: 0, number_budget_z: 0, number_paid_o: 75, number_paid_oz: 0, number_paid_z: 0, number_target_o: 140, number_target_oz: 0, number_target_z: 0, number_quota_o: 18, number_quota_oz: 0, number_quota_z: 0)
 # распределяем места по источникам финансирования
 admission_volume = AdmissionVolume.last
-DistributedAdmissionVolume.create(admission_volume_id: admission_volume.id, level_budget_id: 1, number_budget_o: 22, number_budget_oz: 0, number_budget_z: 0, number_target_o: 140, number_target_oz: 0, number_target_z: 0, number_quota_o: 18, number_quota_oz: 0, number_quota_z: 0)
+DistributedAdmissionVolume.create(id: 4, admission_volume_id: admission_volume.id, level_budget_id: 1, number_budget_o: 22, number_budget_oz: 0, number_budget_z: 0, number_target_o: 140, number_target_oz: 0, number_target_z: 0, number_quota_o: 18, number_quota_oz: 0, number_quota_z: 0)
 # Педиатрия
-AdmissionVolume.create(campaign_id: campaign_id, education_level_id: 5, direction_id: 17353, number_budget_o: 46, number_budget_oz: 0, number_budget_z: 0, number_paid_o: 90, number_paid_oz: 0, number_paid_z: 0, number_target_o: 62, number_target_oz: 0, number_target_z: 0, number_quota_o: 12, number_quota_oz: 0, number_quota_z: 0)
+AdmissionVolume.create(id: 5, campaign_id: campaign_id, education_level_id: 5, direction_id: 17353, number_budget_o: 46, number_budget_oz: 0, number_budget_z: 0, number_paid_o: 90, number_paid_oz: 0, number_paid_z: 0, number_target_o: 62, number_target_oz: 0, number_target_z: 0, number_quota_o: 12, number_quota_oz: 0, number_quota_z: 0)
 # распределяем места по источникам финансирования
 admission_volume = AdmissionVolume.last
-DistributedAdmissionVolume.create(admission_volume_id: admission_volume.id, level_budget_id: 1, number_budget_o: 46, number_budget_oz: 0, number_budget_z: 0, number_target_o: 62, number_target_oz: 0, number_target_z: 0, number_quota_o: 12, number_quota_oz: 0, number_quota_z: 0)
+DistributedAdmissionVolume.create(id: 5, admission_volume_id: admission_volume.id, level_budget_id: 1, number_budget_o: 46, number_budget_oz: 0, number_budget_z: 0, number_target_o: 62, number_target_oz: 0, number_target_z: 0, number_quota_o: 12, number_quota_oz: 0, number_quota_z: 0)
 # Стоматология
-AdmissionVolume.create(campaign_id: campaign_id, education_level_id: 5, direction_id: 17247, number_budget_o: 4, number_budget_oz: 0, number_budget_z: 0, number_paid_o: 25, number_paid_oz: 0, number_paid_z: 0, number_target_o: 9, number_target_oz: 0, number_target_z: 0, number_quota_o: 2, number_quota_oz: 0, number_quota_z: 0)
+AdmissionVolume.create(id: 6, campaign_id: campaign_id, education_level_id: 5, direction_id: 17247, number_budget_o: 4, number_budget_oz: 0, number_budget_z: 0, number_paid_o: 25, number_paid_oz: 0, number_paid_z: 0, number_target_o: 9, number_target_oz: 0, number_target_z: 0, number_quota_o: 2, number_quota_oz: 0, number_quota_z: 0)
 # распределяем места по источникам финансирования
 admission_volume = AdmissionVolume.last
-DistributedAdmissionVolume.create(admission_volume_id: admission_volume.id, level_budget_id: 1, number_budget_o: 4, number_budget_oz: 0, number_budget_z: 0, number_target_o: 9, number_target_oz: 0, number_target_z: 0, number_quota_o: 2, number_quota_oz: 0, number_quota_z: 0)
+DistributedAdmissionVolume.create(id: 6, admission_volume_id: admission_volume.id, level_budget_id: 1, number_budget_o: 4, number_budget_oz: 0, number_budget_z: 0, number_target_o: 9, number_target_oz: 0, number_target_z: 0, number_quota_o: 2, number_quota_oz: 0, number_quota_z: 0)
 
 # добавляем конкурсные группы
 # Лечебное дело
