@@ -3,7 +3,7 @@ class EntrantApplication < ActiveRecord::Base
   has_many :marks, dependent: :destroy
   has_many :subjects, through: :marks
   has_one :education_document, dependent: :destroy
-  has_and_belongs_to_many :identity_documents, dependent: :destroy
+  has_many :identity_documents, dependent: :destroy
   has_and_belongs_to_many :institution_achievements
   has_many :benefit_documents, dependent: :destroy
   has_and_belongs_to_many :competitive_groups
