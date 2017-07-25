@@ -74,7 +74,7 @@ namespace :priem do
       admission_volume_hash = EntrantApplication.admission_volume_hash(campaign)
       applications_hash = EntrantApplication.applications_hash(campaign)
       target_organizations = TargetOrganization.order(:target_organization_name)
-      all_competitive_groups = CompetitiveGroup.where(campaign_id: campaign)
+      all_competitive_groups = campaign.competitive_groups
 
       session = GoogleDrive.saved_session("config/google_drive.json")
       case Rails.env
@@ -97,7 +97,7 @@ namespace :priem do
       end
       
       admission_volume_hash.each do |direction_id, competitive_groups|
-        competitive_groups.select{|k, v| k.is_for_krym == false && [15].include?(k.education_source_id) }.each do |competitive_group, numbers|
+        competitive_groups.each do |competitive_group, numbers|
           ws = s.worksheet_by_title(competitive_group.name) ? s.worksheet_by_title(competitive_group.name) : s.add_worksheet(competitive_group.name)
           if competitive_group.education_source_id == 16
             r = 1

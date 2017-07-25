@@ -1,6 +1,6 @@
 class Subject < ActiveRecord::Base
   has_many :marks
-  has_one :entrance_test_item
+  has_many :entrance_test_items
   
-  validates :subject_id, :subject_name, presence: true
+  validates :subject_name, presence: true
 end

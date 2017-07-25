@@ -17,13 +17,19 @@ class RequestsController < ApplicationController
   
   def create
     case Rails.env
-      when 'development' then url = 'priem.edu.ru:8000'
-      when 'production' then url = '10.0.3.1:8080'
+      when 'development'
+        url = 'priem.edu.ru:8000'
+        proxy_ip = nil
+        proxy_port = nil
+      when 'production' 
+        url = '10.0.3.1:8080'
+        proxy_ip = '87.255.247.34'
+        proxy_port = '3333'
     end
     method = '/' + params[:request][:query]
     request = !params[:custom_request].empty? ? params[:custom_request] : Request.data(method, params)
     uri = URI.parse('http://' + url + '/import/importservice.svc')
-    http = Net::HTTP.new(uri.host, uri.port, '87.255.247.34', '3333')
+    http = Net::HTTP.new(uri.host, uri.port, proxy_ip, proxy_port)
     headers = {'Content-Type' => 'text/xml'}
     response = http.post(uri.path + method, request, headers)
     request = Request.new(query: params[:request][:query], input: request, output: Nokogiri::XML(response.body).to_xml(encoding: 'UTF-8'))
