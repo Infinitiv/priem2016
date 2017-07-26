@@ -360,7 +360,7 @@ class Request < ActiveRecord::Base
                     oid.UID ["id", campaign.year_start, identity_document.id].join('-')
                     oid.LastName id.alt_entrant_last_name ? id.alt_entrant_last_name : item.entrant_last_name
                     oid.FirstName id.alt_entrant_first_name ? id.alt_entrant_first_name : item.entrant_first_name
-                    oid.MiddleName (id.alt_entrant_middlet_name ? id.alt_entrant_middle_name : item.entrant_middle_name) if item.entrant_middle_name
+                    oid.MiddleName (id.alt_entrant_middle_name ? id.alt_entrant_middle_name : item.entrant_middle_name) if item.entrant_middle_name
                     oid.DocumentSeries identity_document.identity_document_series ?  identity_document.identity_document_series : "нет серии"
                     oid.DocumentNumber identity_document.identity_document_number
                     oid.DocumentDate identity_document.identity_document_date ? identity_document.identity_document_date : item.birth_date + 14.day
