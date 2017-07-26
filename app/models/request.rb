@@ -357,16 +357,16 @@ class Request < ActiveRecord::Base
               ads.OtherIdentityDocuments do |oid|
                 other_identity_documents.each do |identity_document|
                   oid.IdentityDocument do |id|
-                    oid.UID ["id", campaign.year_start, identity_document.id].join('-')
-                    oid.LastName id.entrant_last_name
-                    oid.FirstName id.entrant_first_name
-                    oid.MiddleName id.entrant_middle_name if item.entrant_middle_name
-                    oid.DocumentSeries identity_document.identity_document_series ?  identity_document.identity_document_series : "нет серии"
-                    oid.DocumentNumber identity_document.identity_document_number
+                    id.UID ["id", campaign.year_start, identity_document.id].join('-')
+                    id.LastName identity_document.alt_entrant_last_name ? identity_document.alt_entrant_last_name : item.entrant_last_name
+                    id.FirstName identity_document.alt_entrant_first_name ? identity_document.alt_entrant_first_name : item.entrant_first_name
+                    id.MiddleName (identity_document.alt_entrant_middle_name ? identity_document.alt_entrant_middle_name : item.entrant_middle_name) if item.entrant_middle_name
+                    id.DocumentSeries identity_document.identity_document_series ?  identity_document.identity_document_series : "нет серии"
+                    id.DocumentNumber identity_document.identity_document_number
                     oid.DocumentDate identity_document.identity_document_date ? identity_document.identity_document_date : item.birth_date + 14.day
-                    oid.IdentityDocumentTypeID identity_document.identity_document_type
-                    oid.NationalityTypeID  item.nationality_type_id
-                    oid.BirthDate item.birth_date
+                    id.IdentityDocumentTypeID identity_document.identity_document_type
+                    id.NationalityTypeID  item.nationality_type_id
+                    id.BirthDate item.birth_date
                   end
                 end
               end
