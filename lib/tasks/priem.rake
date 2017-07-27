@@ -98,9 +98,8 @@ namespace :priem do
       
       admission_volume_hash.each do |direction_id, competitive_groups|
         competitive_groups.each do |competitive_group, numbers|
-        s.worksheet_by_title(competitive_group.name).delete if s.worksheet_by_title(competitive_group.name)
-        ws = s.add_worksheet(competitive_group.name)
-          end
+          s.worksheet_by_title(competitive_group.name).delete if s.worksheet_by_title(competitive_group.name)
+          ws = s.add_worksheet(competitive_group.name)
           puts "Заполняем #{competitive_group.name}"
           case competitive_group.education_source_id
           when 16
