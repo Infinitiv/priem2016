@@ -106,7 +106,6 @@ namespace :priem do
           case competitive_group.education_source_id
           when 16
             r = 1
-            ws.delete_rows(2, ws.max_rows - 1)
             target_organizations.each do |target_organization|
             applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.target_organization_id == target_organization.id}
               unless applications.empty?
@@ -146,7 +145,6 @@ namespace :priem do
             ws.save
           when 14
             r = 1
-            ws.delete_rows(2, ws.max_rows - 1)
             
             applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id && v[:examless]}
             unless applications.empty?
@@ -209,7 +207,6 @@ namespace :priem do
             ws.save
           when 15
             r = 1
-            ws.delete_rows(2, ws.max_rows - 1)
             applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
             unless applications.empty?
               ws[r, 1] = "№№"
@@ -247,7 +244,6 @@ namespace :priem do
             ws.save
           when 20
             r = 1
-            ws.delete_rows(2, ws.max_rows - 1)
             applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
             unless applications.empty?
               ws[r, 1] = "№№"
