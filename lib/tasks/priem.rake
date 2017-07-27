@@ -111,13 +111,13 @@ namespace :priem do
                 ws[r + 1, 1] = "№№"
                 ws[r + 1, 2] = "№ личного дела"
                 ws[r + 1, 3] = "Ф.И.О."
-                ws[r + 1, 4] = "Химия"
-                ws[r + 1, 5] = "Биология"
-                ws[r + 1, 6] = "Русский язык"
-                ws[r + 1, 7] = "Сумма баллов за вступительные испытания"
-                ws[r + 1, 8] = "Баллы за индивидуальные достижения"
-                ws[r + 1, 9] = "Сумма конкурсных баллов"
-                ws[r + 1, 10] = "Наличие согласия на зачисление"
+                ws[r + 1, 4] = "Наличие согласия на зачисление"
+                ws[r + 1, 5] = "Сумма конкурсных баллов"
+                ws[r + 1, 6] = "Химия"
+                ws[r + 1, 7] = "Биология"
+                ws[r + 1, 8] = "Русский язык"
+                ws[r + 1, 9] = "Сумма баллов за вступительные испытания"
+                ws[r + 1, 10] = "Баллы за индивидуальные достижения"
                 ws[r + 1, 11] = "Наличие преимущественного права на зачисление"
                 n = 0
                 applications.each do |application, values|
@@ -126,13 +126,13 @@ namespace :priem do
                   ws[r + 1, 1] = n
                   ws[r + 1, 2] = "%04d" % application.application_number
                   ws[r + 1, 3] = application.fio
-                  ws[r + 1, 4] = values[:chemistry]
-                  ws[r + 1, 5] = values[:biology]
-                  ws[r + 1, 6] = values[:russian]
-                  ws[r + 1, 7] = values[:summa]
-                  ws[r + 1, 8] = values[:achievement]
-                  ws[r + 1, 9] = values[:full_summa]
-                  ws[r + 1, 10] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
+                  ws[r + 1, 4] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
+                  ws[r + 1, 5] = values[:full_summa]
+                  ws[r + 1, 6] = values[:chemistry]
+                  ws[r + 1, 7] = values[:biology]
+                  ws[r + 1, 8] = values[:russian]
+                  ws[r + 1, 9] = values[:summa]
+                  ws[r + 1, 10] = values[:achievement]
                   ws[r + 1, 11] = "да" if application.benefit
                 end
                 r += 3
@@ -173,13 +173,13 @@ namespace :priem do
               ws[r + 1, 1] = "№№"
               ws[r + 1, 2] = "№ личного дела"
               ws[r + 1, 3] = "Ф.И.О."
-              ws[r + 1, 4] = "Химия"
-              ws[r + 1, 5] = "Биология"
-              ws[r + 1, 6] = "Русский язык"
-              ws[r + 1, 7] = "Сумма баллов за вступительные испытания"
-              ws[r + 1, 8] = "Баллы за индивидуальные достижения"
-              ws[r + 1, 9] = "Сумма конкурсных баллов"
-              ws[r + 1, 10] = "Наличие согласия на зачисление"
+              ws[r + 1, 4] = "Наличие согласия на зачисление"
+              ws[r + 1, 5] = "Сумма конкурсных баллов"
+              ws[r + 1, 6] = "Химия"
+              ws[r + 1, 7] = "Биология"
+              ws[r + 1, 8] = "Русский язык"
+              ws[r + 1, 9] = "Сумма баллов за вступительные испытания"
+              ws[r + 1, 10] = "Баллы за индивидуальные достижения"
               ws[r + 1, 11] = "Зачислен по другому конкурсу"
               ws[r + 1, 12] = "Наличие преимущественного права на зачисление"
               n = 0
@@ -189,13 +189,13 @@ namespace :priem do
                 ws[r + 1, 1] = n
                 ws[r + 1, 2] = "%04d" % application.application_number
                 ws[r + 1, 3] = application.fio
-                ws[r + 1, 4] = values[:chemistry]
-                ws[r + 1, 5] = values[:biology]
-                ws[r + 1, 6] = values[:russian]
-                ws[r + 1, 7] = values[:summa]
-                ws[r + 1, 8] = values[:achievement]
-                ws[r + 1, 9] = values[:full_summa]
-                ws[r + 1, 10] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
+                ws[r + 1, 4] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
+                ws[r + 1, 5] = values[:full_summa]
+                ws[r + 1, 6] = values[:chemistry]
+                ws[r + 1, 7] = values[:biology]
+                ws[r + 1, 8] = values[:russian]
+                ws[r + 1, 9] = values[:summa]
+                ws[r + 1, 10] = values[:achievement]
                 ws[r + 1, 11] = all_competitive_groups.find(application.enrolled).name if application.enrolled && application.exeptioned != application.enrolled
                 ws[r + 1, 12] = "да" if application.benefit
               end
@@ -210,13 +210,13 @@ namespace :priem do
               ws[r, 1] = "№№"
               ws[r, 2] = "№ личного дела"
               ws[r, 3] = "Ф.И.О."
-              ws[r, 4] = "Химия"
-              ws[r, 5] = "Биология"
+              ws[r, 4] = "Наличие согласия на зачисление"
+              ws[r, 5] = "Сумма конкурсных баллов"
+              ws[r, 6] = "Химия"
+              ws[r, 7] = "Биология"
               ws[r, 6] = "Русский язык"
-              ws[r, 7] = "Сумма баллов за вступительные испытания"
-              ws[r, 8] = "Баллы за индивидуальные достижения"
-              ws[r, 9] = "Сумма конкурсных баллов"
-              ws[r, 10] = "Наличие согласия на зачисление"
+              ws[r, 9] = "Сумма баллов за вступительные испытания"
+              ws[r, 10] = "Баллы за индивидуальные достижения"
               ws[r, 11] = "Зачислен по другому конкурсу"
               ws[r, 12] = "Наличие преимущественного права на зачисление"
               n = 0
@@ -226,13 +226,13 @@ namespace :priem do
                 ws[r, 1] = n
                 ws[r, 2] = "%04d" % application.application_number
                 ws[r, 3] = application.fio
-                ws[r, 4] = values[:chemistry]
-                ws[r, 5] = values[:biology]
-                ws[r, 6] = values[:russian]
-                ws[r, 7] = values[:summa]
-                ws[r, 8] = values[:achievement]
-                ws[r, 9] = values[:full_summa]
-                ws[r, 10] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
+                ws[r, 4] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
+                ws[r, 5] = values[:full_summa]
+                ws[r, 6] = values[:chemistry]
+                ws[r, 7] = values[:biology]
+                ws[r, 8] = values[:russian]
+                ws[r, 9] = values[:summa]
+                ws[r, 10] = values[:achievement]
                 ws[r, 11] = all_competitive_groups.find(application.enrolled).name if application.enrolled && application.exeptioned != application.enrolled
                 ws[r, 12] = "да" if application.benefit
               end
@@ -247,13 +247,13 @@ namespace :priem do
               ws[r, 1] = "№№"
               ws[r, 2] = "№ личного дела"
               ws[r, 3] = "Ф.И.О."
-              ws[r, 4] = "Химия"
-              ws[r, 5] = "Биология"
-              ws[r, 6] = "Русский язык"
-              ws[r, 7] = "Сумма баллов за вступительные испытания"
-              ws[r, 8] = "Баллы за индивидуальные достижения"
-              ws[r, 9] = "Сумма конкурсных баллов"
-              ws[r, 10] = "Наличие согласия на зачисление"
+              ws[r, 4] = "Наличие согласия на зачисление"
+              ws[r, 5] = "Сумма баллов за вступительные испытания"
+              ws[r, 6] = "Химия"
+              ws[r, 7] = "Биология"
+              ws[r, 8] = "Русский язык"
+              ws[r, 9] = "Баллы за индивидуальные достижения"
+              ws[r, 10] = "Сумма конкурсных баллов"
               n = 0
               applications.each do |application, values|
                 r += 1
@@ -261,13 +261,13 @@ namespace :priem do
                 ws[r, 1] = n
                 ws[r, 2] = "%04d" % application.application_number
                 ws[r, 3] = application.fio
-                ws[r, 4] = values[:chemistry]
-                ws[r, 5] = values[:biology]
-                ws[r, 6] = values[:russian]
-                ws[r, 7] = values[:summa]
-                ws[r, 8] = values[:achievement]
-                ws[r, 9] = values[:full_summa]
-                ws[r, 10] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
+                ws[r, 4] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
+                ws[r, 5] = values[:full_summa]
+                ws[r, 6] = values[:chemistry]
+                ws[r, 7] = values[:biology]
+                ws[r, 8] = values[:russian]
+                ws[r, 9] = values[:summa]
+                ws[r, 10] = values[:achievement]
               end
             end
             ws.max_cols = 10
