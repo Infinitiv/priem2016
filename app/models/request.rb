@@ -547,27 +547,29 @@ class Request < ActiveRecord::Base
           end
         end
       end
-      os.OrdersOfException do |ooes|
-        competitive_groups.each do |competitive_group|
-          competitive_group_exeptioned_application = competitive_group.entrant_applications.where(exeptioned: competitive_group.id).group_by(&:exeptioned_date)
-          unless competitive_group_exeptioned_application.empty?
-            competitive_group_exeptioned_application.each do |d, a|
-              ooes.OrderOfException do |ooa|
-                ooa.OrderOfExceptionUID "oe #{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
-                ooa.CampaignUID campaign.id
-                ooa.OrderName "Exeption order #{competitive_group.name} от #{d.to_date}"
-                ooa.OrderDate d.to_date
-                ooa.EducationFormID competitive_group.education_form_id
-                ooa.FinanceSourceID competitive_group.education_source_id
-                ooa.EducationLevelID competitive_group.education_level_id
-                unless competitive_group.education_source_id == 15
-                  case d.to_date.to_s
-                  when "2016-08-03"
-                    ooa.Stage 1
-                  when "2016-08-08"
-                    ooa.Stage 2
-                  else
-                    ooa.Stage 0
+      if campaign.entrant_applications.where.not(exeptioned: nil).count > 0
+        os.OrdersOfException do |ooes|
+          competitive_groups.each do |competitive_group|
+            competitive_group_exeptioned_application = competitive_group.entrant_applications.where(exeptioned: competitive_group.id).group_by(&:exeptioned_date)
+            unless competitive_group_exeptioned_application.empty?
+              competitive_group_exeptioned_application.each do |d, a|
+                ooes.OrderOfException do |ooa|
+                  ooa.OrderOfExceptionUID "oe #{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
+                  ooa.CampaignUID campaign.id
+                  ooa.OrderName "Exeption order #{competitive_group.name} от #{d.to_date}"
+                  ooa.OrderDate d.to_date
+                  ooa.EducationFormID competitive_group.education_form_id
+                  ooa.FinanceSourceID competitive_group.education_source_id
+                  ooa.EducationLevelID competitive_group.education_level_id
+                  unless competitive_group.education_source_id == 15
+                    case d.to_date.to_s
+                    when "2016-08-03"
+                      ooa.Stage 1
+                    when "2016-08-08"
+                      ooa.Stage 2
+                    else
+                      ooa.Stage 0
+                    end
                   end
                 end
               end

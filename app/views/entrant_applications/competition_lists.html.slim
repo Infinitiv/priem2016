@@ -12,13 +12,14 @@
                 th №№
                 th № личного дела
                 th Ф.И.О
+                th Наличие оригинала
+                th Наличие согласия на зачисление
                 th Химия
                 th Биология
                 th Русский язык
                 th Сумма баллов за вступительные испытания
                 th Баллы за индивидуальные достижения
                 th Сумма конкурсных баллов
-                th Наличие согласия на зачисление
                 th Наличие преимущественного права на зачисление
             tbody
               - n = 0
@@ -29,13 +30,14 @@
                   td= n
                   td= "%04d" % application.application_number
                   td= application.fio
+                  td= "+" if values[:original_received]
+                  td= "+" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id
                   td= values[:chemistry]
                   td= values[:biology]
                   td= values[:russian]
                   td= values[:summa]
                   td= values[:achievement]
                   td= values[:full_summa]
-                  td= "+" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id
                   td= "+" if application.benefit
     - else
       - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
@@ -45,13 +47,14 @@
             th №№
             th № личного дела
             th Ф.И.О
+            th Наличие оригинала
+            th Наличие согласия на зачисление
             th Химия
             th Биология
             th Русский язык
             th Сумма баллов за вступительные испытания
             th Баллы за индивидуальные достижения
             th Сумма конкурсных баллов
-            th Наличие согласия на зачисление
             th Наличие преимущественного права на зачисление
         tbody
           - n = 0
@@ -62,11 +65,12 @@
               td= n
               td= "%04d" % application.application_number
               td= application.fio
+              td= "+" if values[:original_received]
+              td= "+" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id
               td= values[:chemistry]
               td= values[:biology]
               td= values[:russian]
               td= values[:summa]
               td= values[:achievement]
               td= values[:full_summa]
-              td= "+" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id
               td= "+" if application.benefit
