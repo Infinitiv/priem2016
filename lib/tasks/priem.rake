@@ -226,7 +226,7 @@ namespace :priem do
                 ws[r, 1] = n
                 ws[r, 2] = "%04d" % application.application_number
                 ws[r, 3] = application.fio
-                ws[r, 4] = "да" if values[:paid_agr] == competitive_group.id && values[:original_received]
+                ws[r, 4] = "да" if values[:paid_agr] == competitive_group.id
                 ws[r, 5] = values[:full_summa]
                 ws[r, 6] = values[:chemistry]
                 ws[r, 7] = values[:biology]
