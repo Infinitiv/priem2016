@@ -1,8 +1,7 @@
 class ReportsController < ApplicationController
   before_action :set_campaign
   def mon
-    admission_volumes = @campaign.admission_volumes
-    @report = Report.mon(admission_volumes)
+    @report = Report.mon(@campaign)
   end
     
   private
