@@ -23,8 +23,8 @@ class RequestsController < ApplicationController
         proxy_port = nil
       when 'production' 
         url = '127.0.0.1:8080'
-        proxy_ip = = nil
-        proxy_port = = nil
+        proxy_ip = nil
+        proxy_port = nil
     end
     method = '/' + params[:request][:query]
     request = !params[:custom_request].empty? ? params[:custom_request] : Request.data(method, params)
