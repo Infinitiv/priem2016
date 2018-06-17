@@ -32,7 +32,7 @@ class Request < ActiveRecord::Base
       data.Root do |root|
         auth_data(root)
       end
-    when '/validate' || '/import'
+    when '/validate'
       data = ::Builder::XmlMarkup.new(indent: 2)
       data.Root do |root|
         auth_data(root)
@@ -43,6 +43,7 @@ class Request < ActiveRecord::Base
           target_organizations(pd, params) if params[:target_organizations]
 	  applications(pd, params) if params[:applications]
           orders_of_admission(pd, params) if params[:orders_of_admission]
+          institution_programs(pd, params) if params[:institution_programs]
         end
       end
     when '/import'
@@ -56,6 +57,7 @@ class Request < ActiveRecord::Base
           target_organizations(pd, params) if params[:target_organizations]
 	  applications(pd, params) if params[:applications]
           orders_of_admission(pd, params) if params[:orders_of_admission]
+          institution_programs(pd, params) if params[:institution_programs]
         end
       end
     when '/delete'
@@ -127,6 +129,7 @@ class Request < ActiveRecord::Base
               i.NumberQuotaO item.number_quota_o if item.number_quota_o > 0
               i.NumberQuotaOZ item.number_quota_oz if item.number_quota_oz > 0
               i.NumberQuotaZ item.number_quota_z if item.number_quota_z > 0
+              i.IsPlan false
             end
           end
         end
@@ -147,6 +150,7 @@ class Request < ActiveRecord::Base
               i.NumberQuotaO item.number_quota_o if item.number_quota_o > 0
               i.NumberQuotaOZ item.number_quota_oz if item.number_quota_oz > 0
               i.NumberQuotaZ item.number_quota_z if item.number_quota_z > 0
+              i.IsPlan false
             end
           end
         end
@@ -167,44 +171,47 @@ class Request < ActiveRecord::Base
               cg.EduPrograms do |eps|
                 edu_programs.each do |sub_item|
                   eps.EduProgram do |ep|
-                    ep.UID "#{sub_item.id}-#{item.id}"
-                    ep.Name sub_item.name
-                    ep.Code sub_item.code
+                    ep.UID sub_item.id
                   end
                 end
               end
               cg.IsForKrym true if item.is_for_krym
               cg.IsAdditional true if item.is_additional
+              cg.LevelBudget 1
               competitive_group_item = item.competitive_group_item
-              cg.CompetitiveGroupItem do |cgi|
-                cgi.NumberBudgetO competitive_group_item.number_budget_o if competitive_group_item.number_budget_o > 0
-                cgi.NumberBudgetOZ competitive_group_item.number_budget_oz if competitive_group_item.number_budget_oz > 0
-                cgi.NumberBudgetZ competitive_group_item.number_budget_z if competitive_group_item.number_budget_z > 0
-                cgi.NumberPaidO competitive_group_item.number_paid_o if competitive_group_item.number_paid_o > 0
-                cgi.NumberPaidOZ competitive_group_item.number_paid_oz if competitive_group_item.number_paid_oz > 0
-                cgi.NumberPaidZ competitive_group_item.number_paid_z if competitive_group_item.number_paid_z > 0
-                cgi.NumberTargetO competitive_group_item.number_target_o if competitive_group_item.number_target_o > 0
-                cgi.NumberTargetOZ competitive_group_item.number_target_oz if competitive_group_item.number_target_oz > 0
-                cgi.NumberTargetZ competitive_group_item.number_target_z if competitive_group_item.number_target_z > 0
-                cgi.NumberQuotaO competitive_group_item.number_quota_o if competitive_group_item.number_quota_o > 0
-                cgi.NumberQuotaOZ competitive_group_item.number_quota_oz if competitive_group_item.number_quota_oz > 0
-                cgi.NumberQuotaZ competitive_group_item.number_quota_z if competitive_group_item.number_quota_z > 0
+              unless item.education_source_id == 16
+                cg.CompetitiveGroupItem do |cgi|
+                  cgi.NumberBudgetO competitive_group_item.number_budget_o if competitive_group_item.number_budget_o > 0
+                  cgi.NumberBudgetOZ competitive_group_item.number_budget_oz if competitive_group_item.number_budget_oz > 0
+                  cgi.NumberBudgetZ competitive_group_item.number_budget_z if competitive_group_item.number_budget_z > 0
+                  cgi.NumberPaidO competitive_group_item.number_paid_o if competitive_group_item.number_paid_o > 0
+                  cgi.NumberPaidOZ competitive_group_item.number_paid_oz if competitive_group_item.number_paid_oz > 0
+                  cgi.NumberPaidZ competitive_group_item.number_paid_z if competitive_group_item.number_paid_z > 0
+                  cgi.NumberTargetO competitive_group_item.number_target_o if competitive_group_item.number_target_o > 0
+                  cgi.NumberTargetOZ competitive_group_item.number_target_oz if competitive_group_item.number_target_oz > 0
+                  cgi.NumberTargetZ competitive_group_item.number_target_z if competitive_group_item.number_target_z > 0
+                  cgi.NumberQuotaO competitive_group_item.number_quota_o if competitive_group_item.number_quota_o > 0
+                  cgi.NumberQuotaOZ competitive_group_item.number_quota_oz if competitive_group_item.number_quota_oz > 0
+                  cgi.NumberQuotaZ competitive_group_item.number_quota_z if competitive_group_item.number_quota_z > 0
+                end
               end
-#               target_numbers = item.target_numbers
-#               unless target_numbers.empty?
-#                 cg.TargetOrganizations do |tos|
-#                   target_numbers.each do |sub_item|
-#                     tos.TargetOrganization do |to|
-#                       to.UID sub_item.target_organization_id
-#                       to.CompetitiveGroupTargetItem do |cgti|
-#                         cgti.NumberTargetO sub_item.number_target_o if sub_item.number_target_o > 0
-#                         cgti.NumberTargetOZ sub_item.number_target_oz if sub_item.number_target_oz > 0
-#                         cgti.NumberTargetZ sub_item.number_target_z if sub_item.number_target_z > 0
-#                       end
-#                     end
-#                   end
-#                 end
-#               end
+              if item.education_source_id == 16
+                target_numbers = item.target_numbers
+                unless target_numbers.empty?
+                  cg.TargetOrganizations do |tos|
+                    target_numbers.each do |sub_item|
+                      tos.TargetOrganization do |to|
+                        to.UID sub_item.target_organization_id
+                        to.CompetitiveGroupTargetItem do |cgti|
+                          cgti.NumberTargetO sub_item.number_target_o if sub_item.number_target_o > 0
+                          cgti.NumberTargetOZ sub_item.number_target_oz if sub_item.number_target_oz > 0
+                          cgti.NumberTargetZ sub_item.number_target_z if sub_item.number_target_z > 0
+                        end
+                      end
+                    end
+                  end
+                end
+              end
               entrance_test_items = item.entrance_test_items
               cg.EntranceTestItems do |etis|
                 entrance_test_items.each do |sub_item|
@@ -250,6 +257,19 @@ class Request < ActiveRecord::Base
         tos.TargetOrganization do |to|
           to.UID item.id
           to.Name item.target_organization_name
+        end
+      end
+    end
+  end
+  
+  def self.institution_programs(pd, params)
+    institution_programs_list = EduProgram.order(:code)
+    pd.InstitutionPrograms do |ips|
+      institution_programs_list.each do |item|
+        ips.InstitutionProgram do |ip|
+          ip.UID item.id
+          ip.Name item.name
+          ip.Code item.code
         end
       end
     end

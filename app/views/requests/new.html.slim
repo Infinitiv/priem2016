@@ -49,6 +49,11 @@ h1 Отправить запрос
   .form-group
     .col-sm-4
       = f.label '', class: 'checkbox-inline'
+        = check_box_tag :institution_programs
+        = label_tag 'сведения об образовательных программах'
+  .form-group
+    .col-sm-4
+      = f.label '', class: 'checkbox-inline'
         = check_box_tag :applications
         = label_tag 'сведения о заявлениях'
   .form-group

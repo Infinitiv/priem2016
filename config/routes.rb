@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   root 'requests#new'
   
   namespace :api, defaults: {format: 'json'}, path: '/api' do
-    
+    resources :entrant_applications, only: [:show]
   end
   
   resources :requests, only: [:index, :show, :new, :create, :destroy]
