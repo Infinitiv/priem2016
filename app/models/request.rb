@@ -406,6 +406,7 @@ class Request < ActiveRecord::Base
                       scd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 4)
                     end
                     scd.DocumentDate edu_document.education_document_date
+                    scd.DocumentOrganization 'школа'
                   end
                 when "MiddleEduDiplomaDocument"
                   ed.MiddleEduDiplomaDocument do |medd|
@@ -419,6 +420,7 @@ class Request < ActiveRecord::Base
                       medd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 5)
                     end
                     medd.DocumentDate edu_document.education_document_date
+                    medd.DocumentOrganization 'колледж'
                   end
                 when "HighEduDiplomaDocument"
                   ed.HighEduDiplomaDocument do |hedd|
@@ -427,6 +429,7 @@ class Request < ActiveRecord::Base
                     hedd.DocumentSeries edu_document.education_document_number.first(3)
                     hedd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 3)
                     hedd.DocumentDate edu_document.education_document_date
+                    hedd.DocumentOrganization 'вуз'
                   end
                 end
               end
