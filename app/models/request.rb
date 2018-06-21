@@ -361,7 +361,7 @@ class Request < ActiveRecord::Base
             end
           end
           a.ApplicationDocuments do |ads|
-            identity_documents = item.identity_documents.order(identity_document_date: :desc)
+            identity_documents = item.identity_documents.order(identity_document_date: :asc)
             identity_document = identity_documents.last
             other_identity_documents = identity_documents - [identity_documents.last]
             ads.IdentityDocument do |id|
