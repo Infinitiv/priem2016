@@ -13,6 +13,9 @@ Rails.application.routes.draw do
       member do
         get 'entrants'
       end
+      collection do
+        get 'campaigns'
+      end
     end
   end
   
