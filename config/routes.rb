@@ -9,6 +9,11 @@ Rails.application.routes.draw do
   
   namespace :api, defaults: {format: 'json'}, path: '/api' do
     resources :entrant_applications, only: [:show]
+    resources 'stats' do
+      member do
+        get 'entrants'
+      end
+    end
   end
   
   resources :requests, only: [:index, :show, :new, :create, :destroy]
