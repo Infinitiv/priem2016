@@ -422,7 +422,7 @@ namespace :priem do
         proxy_ip = nil
         proxy_port = nil
       when 'production' 
-        url = '10.0.3.1:8080'
+        url = '127.0.0.1:8080'
         proxy_ip = 'nil'
         proxy_port = 'nil'
     end
