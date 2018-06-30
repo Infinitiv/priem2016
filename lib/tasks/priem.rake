@@ -423,8 +423,8 @@ namespace :priem do
         proxy_port = nil
       when 'production' 
         url = '127.0.0.1:8080'
-        proxy_ip = 'nil'
-        proxy_port = 'nil'
+        proxy_ip = nil
+        proxy_port = nil
     end
     method = '/dictionarydetails'
     request = '<Root><AuthData><Login>priem@isma.ivanovo.ru</Login><Pass>FdW5jz7e</Pass></AuthData><GetDictionaryContent><DictionaryCode>10</DictionaryCode></GetDictionaryContent></Root>'
