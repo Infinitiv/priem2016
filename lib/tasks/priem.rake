@@ -408,6 +408,112 @@ namespace :priem do
     File.open('public/target.xml', "w"){|f| f.write xml}
   end
   
+  desc "Import common information of campaign from csv files"
+  task import_admission_volume: :environment do
+    # 2018
+    year = 2018
+    
+    # загружаем список направлений подготовки и объемов приема
+    file = open_spreadsheet('admission_volumes.csv')
+    # получаем список направлений подготовки и кодов
+    case Rails.env
+      when 'development'
+        url = 'priem.edu.ru:8000'
+        proxy_ip = nil
+        proxy_port = nil
+      when 'production' 
+        url = '10.0.3.1:8080'
+        proxy_ip = 'nil'
+        proxy_port = 'nil'
+    end
+    method = '/dictionarydetails'
+    request = '<Root><AuthData><Login>priem@isma.ivanovo.ru</Login><Pass>FdW5jz7e</Pass></AuthData><GetDictionaryContent><DictionaryCode>10</DictionaryCode></GetDictionaryContent></Root>'
+    uri = URI.parse('http://' + url + '/import/importservice.svc')
+    http = Net::HTTP.new(uri.host, uri.port, proxy_ip, proxy_port)
+    headers = {'Content-Type' => 'text/xml'}
+    response = http.post(uri.path + method, request, headers)
+    body = Nokogiri::XML(response.body)
+    header = file.row(1)
+    admissions = {}
+    (2..file.last_row).to_a.each do |i|
+      row = Hash[[header, file.row(i)].transpose]
+      code = row["Код направления подготовки"]
+      if body.at("NewCode:contains('#{code}')")
+        direction_id = body.at("NewCode:contains('#{code}')").parent.at_css("ID").text
+        name = body.at("NewCode:contains('#{code}')").parent.at_css("Name").text
+        admissions[code] = {}
+        admissions[code]['direction_id'] = direction_id
+        admissions[code]['name'] = name
+        admissions[code]['number_budget_o'] = row["Количество бюджетных мест"] if row["Количество бюджетных мест"].to_i > 0 
+        admissions[code]['number_paid_o'] = row["Количество внебюджетных мест"] if row["Количество внебюджетных мест"].to_i > 0
+        admissions[code]['number_target_o'] = row["Количество целевых мест"] if row["Количество целевых мест"].to_i > 0
+      end
+    end
+
+    # заполняем справочники
+    # добавляем образовательные программы
+    admissions.each do |code, values|
+      EduProgram.create(name: values['name'], code: code) unless EduProgram.find_by_code(code)
+    end
+
+    # добавляем вступительные испытания
+    subject = Subject.create(subject_name: "Здравоохранение")
+    EntranceTestItem.create(entrance_test_type_id: 1, min_score: 70, entrance_test_priority: 1, subject_id: subject.id)
+
+    # добавялем приемную кампанию
+    campaign = Campaign.create(name: "Кадры высшей квалификации", year_start: year, year_end: year, status_id: 1, campaign_type_id: 4, education_forms: [11], education_levels: [18])
+    file = open_spreadsheet('achievements.csv')
+    header = file.row(1)
+    achievements = {}
+    (2..file.last_row).to_a.each do |i|
+      row = Hash[[header, file.row(i)].transpose]
+      campaign.institution_achievements.create(name: row['Название достижения'], id_category: 13, max_value: row['Максимальный балл'])
+    end
+
+    admissions.each do |code, values|
+      # добавляем объемы приема
+      attrib = {education_level_id: 18, direction_id: values['direction_id']}
+      attrib.merge!(values.select{|i| i =~ /number/})
+      admission_volume = campaign.admission_volumes.new
+      admission_volume.attributes = attrib
+      if admission_volume.save!
+        # распределяем места по источникам финансирования
+        attrib = {level_budget_id: 1}
+        attrib.merge!(values.select{|i| i =~ /budget|target/})
+        distributed_admission_volume = admission_volume.distributed_admission_volumes.new
+        distributed_admission_volume.attributes = attrib
+        distributed_admission_volume.save!
+        if values['number_budget_o']
+          # добавляем конкурсные группы (Бюджет)
+          competitive_group = campaign.competitive_groups.create(name: "#{values['name']}. Бюджет.", education_level_id: 18, education_source_id: 14, education_form_id: 11, direction_id: values['direction_id'])
+          # добавляем элементы конкурсных групп
+          CompetitiveGroupItem.create(number_budget_o: values['number_budget_o'], competitive_group_id: competitive_group.id)
+          # прикрепляем образовательные программы
+          competitive_group.edu_programs << EduProgram.find_by_code(code)
+        end
+        if values['number_paid_o']
+          # добавляем конкурсные группы (Внебюджет)
+          competitive_group = campaign.competitive_groups.create(name: "#{values['name']}. Внебюджет.", education_level_id: 18, education_source_id: 15, education_form_id: 11, direction_id: values['direction_id'])
+          # добавляем элементы конкурсных групп
+          CompetitiveGroupItem.create(number_paid_o: values['number_paid_o'], competitive_group_id: competitive_group.id)
+          # прикрепляем образовательные программы
+          competitive_group.edu_programs << EduProgram.find_by_code(code)
+        end
+        if values['number_target_o']
+          # добавляем конкурсные группы (Целевой прием)
+          competitive_group = campaign.competitive_groups.create(name: "#{values['name']}. Целевые места.", education_level_id: 18, education_source_id: 16, education_form_id: 11, direction_id: values['direction_id'])
+          # добавляем элементы конкурсных групп
+          CompetitiveGroupItem.create(number_target_o: values['number_target_o'], competitive_group_id: competitive_group.id)
+          # прикрепляем образовательные программы
+          competitive_group.edu_programs << EduProgram.find_by_code(code)
+        end
+      end
+    end
+
+    # прикрепляем вступительные испытания к конкурсным группам
+    campaign.competitive_groups.each{|cg| cg.entrance_test_items << EntranceTestItem.where(min_score: 70)}
+  end
+  
   private
   
   def request(options = {})
@@ -619,6 +725,10 @@ namespace :priem do
         end
       end
     end
+  end
+  
+  def open_spreadsheet(file)
+    Roo::CSV.new([Rails.root, 'lib', 'tasks', 'data', file].join('/'))
   end
   
 end
