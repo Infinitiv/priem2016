@@ -15,7 +15,7 @@ class EntrantApplicationsController < ApplicationController
     @entrant_applications_hash = {}
     entrant_applications.each do |entrant_application|
       @entrant_applications_hash[entrant_application] = {}
-      summa = marks[entrant_application.id].select{|i| i > 37}.size == 3 ? marks[entrant_application.id].sum : 0
+      summa = marks[entrant_application.id].select{|i| i > 41}.size == 3 ? marks[entrant_application.id].sum : 0
       @entrant_applications_hash[entrant_application][:summa] = summa
       @entrant_applications_hash[entrant_application][:achievements] = []
       achievements.each do |i, a|
