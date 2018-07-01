@@ -15,9 +15,9 @@ ol
       = competitive_group.name
       - if competitive_group.education_source_id == 16
         = " #{@entrant_application.target_organization.target_organization_name}."
-        = @entrant_application.rank_target(@entrant_application, competitive_group)
+        = @entrant_application.rank_target(@entrant_application, competitive_group) if @entrant_application.marks.count == 3 && @entrant_application.marks.map(&:value).select{|v| v > 41}.count == 3
       - else
-        = @entrant_application.rank(@entrant_application, competitive_group)
+        = @entrant_application.rank(@entrant_application, competitive_group) if @entrant_application.marks.count == 3 && @entrant_application.marks.map(&:value).select{|v| v > 41}.count == 3
       span &nbsp;
       span.label.label-success= "согласие" if @entrant_application.budget_agr == competitive_group.id || @entrant_application.paid_agr == competitive_group.id
       span &nbsp;
