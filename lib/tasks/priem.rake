@@ -457,18 +457,11 @@ namespace :priem do
     end
 
     # добавляем вступительные испытания
-    subject = Subject.create(subject_name: "Здравоохранение")
-    EntranceTestItem.create(entrance_test_type_id: 1, min_score: 70, entrance_test_priority: 1, subject_id: subject.id)
+    #subject = Subject.create(subject_name: "Здравоохранение")
+    #EntranceTestItem.create(entrance_test_type_id: 1, min_score: 70, entrance_test_priority: 1, subject_id: subject.id)
 
     # добавялем приемную кампанию
-    campaign = Campaign.create(name: "Кадры высшей квалификации", year_start: year, year_end: year, status_id: 1, campaign_type_id: 4, education_forms: [11], education_levels: [18])
-    file = open_spreadsheet('achievements.csv')
-    header = file.row(1)
-    achievements = {}
-    (2..file.last_row).to_a.each do |i|
-      row = Hash[[header, file.row(i)].transpose]
-      campaign.institution_achievements.create(name: row['Название достижения'], id_category: 13, max_value: row['Максимальный балл'])
-    end
+    campaign = Campaign.last
 
     admissions.each do |code, values|
       # добавляем объемы приема
@@ -512,6 +505,18 @@ namespace :priem do
 
     # прикрепляем вступительные испытания к конкурсным группам
     campaign.competitive_groups.each{|cg| cg.entrance_test_items << EntranceTestItem.where(min_score: 70)}
+  end
+
+  desc "Import common information of campaign from csv files"
+  task import_achievements: :environment do
+    campaign = Campaign.last
+    file = open_spreadsheet('achievements.csv')
+    header = file.row(1)
+    achievements = {}
+    (2..file.last_row).to_a.each do |i|
+      row = Hash[[header, file.row(i)].transpose]
+      campaign.institution_achievements.create(name: row['Название достижения'], id_category: 13, max_value: row['Максимальный балл'])
+    end
   end
   
   private
