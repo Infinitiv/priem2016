@@ -156,6 +156,7 @@ class EntrantApplication < ActiveRecord::Base
     errors[:empty_target_entrants] = find_empty_target_entrants(target_competition_entrants_array, applications.joins(:target_organization))
     errors[:not_original_target_entrants] = find_not_original_target_entrants(target_competition_entrants_array, applications.joins(:education_document).where.not(education_documents: {original_received_date: nil}))
     errors[:not_agreed_target_entrants] = find_not_agreed_entrants(applications)
+    errors[:expired_passports] = find_expired_passports(applications)
     errors
   end
   
@@ -187,7 +188,11 @@ class EntrantApplication < ActiveRecord::Base
   end
   
   def self.find_not_agreed_entrants(applications)
-   applications .joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).select{|a| a.competitive_groups.find_by_education_source_id(16).id != a.budget_agr}
+   applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).select{|a| a.competitive_groups.find_by_education_source_id(16).id != a.budget_agr}
+  end
+
+  def self.find_expired_passports(applications)
+    applications.select{|a| Time.now.to_date > a.birth_date + 20.years}.select{|a| a.identity_documents.where.not(identity_document_date: nil).order(identity_document_date: :asc).last.identity_document_date < a.birth_date + 20.years}
   end
   
   def self.admission_volume_hash(campaign)

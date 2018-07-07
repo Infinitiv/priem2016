@@ -1,11 +1,13 @@
 - @admission_volume_hash.each do |direction_id, competitive_groups|
   - competitive_groups.select{|k, v| k.is_for_krym == false}.each do |competitive_group, numbers|
-    h2= competitive_group.name
+    h2= "#{competitive_group.name} (мест в конкурсе - #{numbers})"
     - if competitive_group.education_source_id == 16
       - @target_organizations.each do |target_organization|
         - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.target_organization_id == target_organization.id}
         - unless applications.empty?
-          h3= target_organization.target_organization_name
+          - number_target_o = competitive_group.target_numbers.where(target_organization_id: target_organization.id).map(&:number_target_o).sum
+          h3= "#{target_organization.target_organization_name} (мест в конкурсе - #{number_target_o})"
+
           table.table
             thead
               tr
@@ -24,9 +26,10 @@
             tbody
               - n = 0
               - applications.each do |application, values|
+                - n += 1
                 - label_class = "success" if values[:original_received]
+                - label_class = "info" if n == number_target_o
                 tr class=label_class
-                  - n += 1
                   td= n
                   td= "%04d" % application.application_number
                   td= application.fio

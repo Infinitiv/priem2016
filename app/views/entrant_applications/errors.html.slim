@@ -12,7 +12,10 @@ h2= "Повторяющиеся абитуриенты" unless @errors[:dups_ent
 ul
   - @errors[:dups_entrants].each do |application|
     li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
-
+h2= 'Просроченные паспорта' unless  @errors[:expired_passports].empty?
+ul
+  - @errors[:expired_passports].each do |application|
+    li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
 h2= "Целевики без региона или конкурса" unless @errors[:empty_target_entrants].empty?
 ul
   - @errors[:empty_target_entrants].each do |application|
