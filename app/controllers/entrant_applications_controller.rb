@@ -2,7 +2,7 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_entrant_application, only: [:show, :edit, :update, :destroy]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
-  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition, :competition_lists]
+  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition, :competition_lists, :ord_export]
   
   def index
     entrant_applications = @campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id]).order(:application_number).includes(:institution_achievements, :education_document)
@@ -102,6 +102,11 @@ class EntrantApplicationsController < ApplicationController
     @admission_volume_hash = EntrantApplication.admission_volume_hash(@campaign)
     @applications_hash = EntrantApplication.applications_hash(@campaign)
     @target_organizations = TargetOrganization.order(:target_organization_name)
+  end
+  
+  def ord_export
+    @entrant_applications = @campaign.entrant_applications.select(:id, :snils, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :birth_date, :nationality_type_id, :registration_date).includes(:marks, :competitive_groups, :education_document)
+    send_data @entrant_applications.ord_export(@entrant_applications), filename: "entrant_applications-#{Date.today}.csv"
   end
   
   private

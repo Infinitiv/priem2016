@@ -35,55 +35,85 @@ class EntrantApplication < ActiveRecord::Base
       entrant_application = where(application_number: row["application_number"], campaign_id: campaign).first || new
       entrant_application.attributes = row.to_hash.slice(*accessible_attributes)
       entrant_application.campaign_id = campaign.id
-      entrant_application.budget_agr = nil if row.keys.include? 'lech_budget_agr'
-      entrant_application.paid_agr = nil if row.keys.include? 'lech_paid_agr'
-      entrant_application.budget_agr = competitive_groups.find_by_name('Лечебное дело. Бюджет.').id if row['lech_budget_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Лечебное дело. Бюджет. Крым.').id if row['lech_budget_krym_agr']
-      entrant_application.paid_agr = competitive_groups.find_by_name('Лечебное дело. Внебюджет.').id if row['lech_paid_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Лечебное дело. Квота особого права.').id if row['lech_quota_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Лечебное дело. Квота особого права. Крым.').id if row['lech_quota_krym_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Лечебное дело. Целевые места.').id if row['lech_target_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Педиатрия. Бюджет.').id if row['ped_budget_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Педиатрия. Бюджет. Крым.').id if row['ped_budget_krym_agr']
-      entrant_application.paid_agr = competitive_groups.find_by_name('Педиатрия. Внебюджет.').id if row['ped_paid_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Педиатрия. Квота особого права.').id if row['ped_quota_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Педиатрия. Квота особого права. Крым.').id if row['ped_quota_krym_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Педиатрия. Целевые места.').id if row['ped_target_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Стоматология. Бюджет.').id if row['stomat_budget_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Стоматология. Бюджет. Крым.').id if row['stomat_budget_krym_agr']
-      entrant_application.paid_agr = competitive_groups.find_by_name('Стоматология. Внебюджет.').id if row['stomat_paid_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Стоматология. Квота особого права.').id if row['stomat_quota_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Стоматология. Квота особого права. Крым.').id if row['stomat_quota_krym_agr']
-      entrant_application.budget_agr = competitive_groups.find_by_name('Стоматология. Целевые места.').id if row['stomat_target_agr']
-      entrant_application.contracts = []
-      entrant_application.contracts << 3 if row['contract lech']
-      entrant_application.contracts << 9 if row['contract ped']
-      entrant_application.contracts << 15 if row['contract stomat']
+      case true
+      when campaign.education_levels.include?(5)
+        entrant_application.budget_agr = nil if row.keys.include? 'lech_budget_agr'
+        entrant_application.paid_agr = nil if row.keys.include? 'lech_paid_agr'
+        entrant_application.budget_agr = competitive_groups.find_by_name('Лечебное дело. Бюджет.').id if row['lech_budget_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Лечебное дело. Бюджет. Крым.').id if row['lech_budget_krym_agr']
+        entrant_application.paid_agr = competitive_groups.find_by_name('Лечебное дело. Внебюджет.').id if row['lech_paid_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Лечебное дело. Квота особого права.').id if row['lech_quota_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Лечебное дело. Квота особого права. Крым.').id if row['lech_quota_krym_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Лечебное дело. Целевые места.').id if row['lech_target_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Педиатрия. Бюджет.').id if row['ped_budget_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Педиатрия. Бюджет. Крым.').id if row['ped_budget_krym_agr']
+        entrant_application.paid_agr = competitive_groups.find_by_name('Педиатрия. Внебюджет.').id if row['ped_paid_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Педиатрия. Квота особого права.').id if row['ped_quota_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Педиатрия. Квота особого права. Крым.').id if row['ped_quota_krym_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Педиатрия. Целевые места.').id if row['ped_target_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Стоматология. Бюджет.').id if row['stomat_budget_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Стоматология. Бюджет. Крым.').id if row['stomat_budget_krym_agr']
+        entrant_application.paid_agr = competitive_groups.find_by_name('Стоматология. Внебюджет.').id if row['stomat_paid_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Стоматология. Квота особого права.').id if row['stomat_quota_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Стоматология. Квота особого права. Крым.').id if row['stomat_quota_krym_agr']
+        entrant_application.budget_agr = competitive_groups.find_by_name('Стоматология. Целевые места.').id if row['stomat_target_agr']
+        entrant_application.contracts = []
+        entrant_application.contracts << 3 if row['contract lech']
+        entrant_application.contracts << 9 if row['contract ped']
+        entrant_application.contracts << 15 if row['contract stomat']
+      when campaign.education_levels.include?(18)
+        if row['agreement']
+          if row['agreement'] =~ /Внебюджет/
+            entrant_application.paid_agr = competitive_groups.find_by_name(row['agreement'])
+          else
+            entrant_application.budget_agr = competitive_groups.find_by_name(row['agreement'])
+          end
+        end
+          entrant_application.target_organization_id = row['target1'].to_i if row['target1']
+          entrant_application.target_organization_id = row['target2'].to_i if row['target2']
+        entrant_application.contracts = []
+      end
       if entrant_application.save!
-        IdentityDocument.import_from_row(row, entrant_application) if row.keys.include? 'identity_document_type'
-        EducationDocument.import_from_row(row, entrant_application) if row.keys.include? 'education_document_type'
-        BenefitDocument.import_from_row(row, entrant_application) if row.keys.include? 'benefit_document_type_id'
-        Mark.import_from_row(row, entrant_application) if row.keys.include?('chemistry') || row.keys.include?('biology') || row.keys.include?('russian')
-        InstitutionAchievement.import_from_row(row, entrant_application) if row.keys.include?('achievement_att') || row.keys.include?('achievement_dip') || row.keys.include?('achievement_gto')
-        entrant_application.competitive_groups.each{|c| entrant_application.competitive_groups.delete(c)} if row.keys.include? 'Лечебное дело. Бюджет.'
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Бюджет.') if row['Лечебное дело. Бюджет.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Бюджет. Крым.') if row['Лечебное дело. Бюджет. Крым.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Внебюджет.') if row['Лечебное дело. Внебюджет.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Квота особого права.') if row['Лечебное дело. Квота особого права.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Квота особого права. Крым.') if row['Лечебное дело. Квота особого права. Крым.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Целевые места.') if row['Лечебное дело. Целевые места.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Педиатрия. Бюджет.') if row['Педиатрия. Бюджет.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Педиатрия. Бюджет. Крым.') if row['Педиатрия. Бюджет. Крым.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Педиатрия. Внебюджет.') if row['Педиатрия. Внебюджет.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Педиатрия. Квота особого права.') if row['Педиатрия. Квота особого права.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Педиатрия. Квота особого права. Крым.') if row['Педиатрия. Квота особого права. Крым.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Педиатрия. Целевые места.') if row['Педиатрия. Целевые места.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Бюджет.') if row['Стоматология. Бюджет.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Бюджет. Крым.') if row['Стоматология. Бюджет. Крым.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Внебюджет.') if row['Стоматология. Внебюджет.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Квота особого права.') if row['Стоматология. Квота особого права.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Квота особого права. Крым.') if row['Стоматология. Квота особого права. Крым.']
-        entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Целевые места.') if row['Стоматология. Целевые места.']
+          IdentityDocument.import_from_row(row, entrant_application) if row.keys.include? 'identity_document_type'
+          EducationDocument.import_from_row(row, entrant_application) if row.keys.include? 'education_document_type'
+        case true
+        when campaign.education_levels.include?(5)
+          BenefitDocument.import_from_row(row, entrant_application) if row.keys.include? 'benefit_document_type_id'
+          Mark.import_from_row(row, entrant_application) if row.keys.include?('chemistry') || row.keys.include?('biology') || row.keys.include?('russian')
+          InstitutionAchievement.import_from_row(row, entrant_application) if row.keys.include?('achievement_att') || row.keys.include?('achievement_dip') || row.keys.include?('achievement_gto')
+          entrant_application.competitive_groups.each{|c| entrant_application.competitive_groups.delete(c)} if row.keys.include? 'Лечебное дело. Бюджет.'
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Бюджет.') if row['Лечебное дело. Бюджет.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Бюджет. Крым.') if row['Лечебное дело. Бюджет. Крым.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Внебюджет.') if row['Лечебное дело. Внебюджет.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Квота особого права.') if row['Лечебное дело. Квота особого права.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Квота особого права. Крым.') if row['Лечебное дело. Квота особого права. Крым.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Целевые места.') if row['Лечебное дело. Целевые места.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Педиатрия. Бюджет.') if row['Педиатрия. Бюджет.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Педиатрия. Бюджет. Крым.') if row['Педиатрия. Бюджет. Крым.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Педиатрия. Внебюджет.') if row['Педиатрия. Внебюджет.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Педиатрия. Квота особого права.') if row['Педиатрия. Квота особого права.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Педиатрия. Квота особого права. Крым.') if row['Педиатрия. Квота особого права. Крым.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Педиатрия. Целевые места.') if row['Педиатрия. Целевые места.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Бюджет.') if row['Стоматология. Бюджет.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Бюджет. Крым.') if row['Стоматология. Бюджет. Крым.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Внебюджет.') if row['Стоматология. Внебюджет.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Квота особого права.') if row['Стоматология. Квота особого права.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Квота особого права. Крым.') if row['Стоматология. Квота особого права. Крым.']
+          entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Целевые места.') if row['Стоматология. Целевые места.']
+        when campaign.education_levels.include?(18)
+          Mark.import_from_row(row, entrant_application) if row.keys.include?('test_result')
+          entrant_application.competitive_groups.each{|c| entrant_application.competitive_groups.delete(c)} if row['spec1'] || row['spec2']
+          if row['spec1']
+            entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec1']}).where(education_source_id: 14) if row['budg1'] == 1.to_s
+            entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec1']}).where(education_source_id: 15) if row['paid1'] == 1.to_s
+            entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec1']}).where(education_source_id: 16) if row['target1']
+          end
+          if row['spec2']
+            entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec2']}).where(education_source_id: 14) if row['budg2'] == 1.to_s
+            entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec2']}).where(education_source_id: 15) if row['paid2'] == 1.to_s
+            entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec2']}).where(education_source_id: 16) if row['target2']
+          end
+        end
       end
       entrant_application.touch
     end
@@ -250,5 +280,63 @@ class EntrantApplication < ActiveRecord::Base
       end
     end
     applications_hash = applications_hash.sort_by{|k, v| [v[:full_summa], v[:summa], v[:chemistry], v[:biology], v[:russian], v[:benefit]]}.reverse
+  end
+  
+  def self.ord_export(applications)
+    oid = '1.2.643.5.1.13.13.12.4.37.21'
+    headers = [
+      'snils',
+      'surname',
+      'name',
+      'patronymic',
+      'oid',
+      'compaignId',
+      'dateOfBirth',
+      'citizenship',
+      'specialty',
+      'financingType',
+      'applicationDate',
+      'targetReception',
+      'testResultType',
+      'testResultOrganization',
+      'testResultYear'
+    ]
+
+    CSV.generate(headers: true, col_sep: ';') do |csv|
+      csv << headers
+      applications.each do |application|
+        application.competitive_groups.each do |competitive_group|
+          citizenship = application.nationality_type_id == 1 ? 643 : ''
+          test_result_type = application.marks.map(&:form).include?('аккредитация') ? 'аккредитация' : 'ординатура'
+          test_result_year = case true
+                              when test_result_type == 'ординатура'
+                                2018
+                              when test_result_type == 'аккредитация' && application.education_document.education_document_date.year == 2018
+                                2018
+                              else
+                                2017
+                              end
+          row = [
+            application.snils,
+            application.entrant_last_name,
+            application.entrant_first_name,
+            application.entrant_middle_name,
+            oid,
+            1,
+            application.birth_date.strftime("%d.%m.%Y"),
+            citizenship,
+            competitive_group.edu_programs.last.code,
+            (competitive_group.education_source_id == 15 ? 'договор' : 'бюджет'),
+            application.registration_date.strftime("%d.%m.%Y"),
+            (competitive_group.education_source_id == 16 ? 'да' : 'нет'),
+            test_result_type,
+            oid,
+            test_result_year
+            ]
+          csv << row
+        end
+      end
+    end
+    
   end
 end

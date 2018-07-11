@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170721071255) do
+ActiveRecord::Schema.define(version: 20180709113636) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -192,6 +192,7 @@ ActiveRecord::Schema.define(version: 20170721071255) do
     t.integer  "exeptioned"
     t.date     "exeptioned_date"
     t.integer  "contracts",                              array: true
+    t.string   "snils",                  default: ""
   end
 
   create_table "entrant_applications_identity_documents", id: false, force: :cascade do |t|

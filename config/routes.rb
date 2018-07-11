@@ -52,6 +52,7 @@ Rails.application.routes.draw do
       get 'competition_lists'
       get 'competition_one_list'
       get 'blue'
+      get 'ord_export'
     end
   end
   
