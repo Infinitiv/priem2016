@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     resources 'stats' do
       member do
         get 'entrants'
+        get 'marks'
       end
       collection do
         get 'campaigns'
