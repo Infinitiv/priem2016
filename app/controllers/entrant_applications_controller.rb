@@ -30,6 +30,9 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def show
+    entrant_applications = @entrant_application.campaign.entrant_applications.select(:id, :application_number)
+    @previous_entrant = entrant_applications.find_by_application_number(@entrant_application.application_number - 1)
+    @next_entrant = entrant_applications.find_by_application_number(@entrant_application.application_number + 1)
     @marks = @entrant_application.marks
   end
   
