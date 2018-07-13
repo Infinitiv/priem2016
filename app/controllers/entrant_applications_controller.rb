@@ -1,5 +1,5 @@
 class EntrantApplicationsController < ApplicationController
-  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy]
+  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
   before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition, :competition_lists, :ord_export]
@@ -61,6 +61,11 @@ class EntrantApplicationsController < ApplicationController
   def destroy
     @entrant_application.destroy
     redirect_to entrant_applications_path
+  end
+  
+  def touch
+    @entrant_application.touch
+    redirect_to :back
   end
   
   def import

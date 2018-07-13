@@ -55,6 +55,9 @@ Rails.application.routes.draw do
       get 'blue'
       get 'ord_export'
     end
+    member do
+      get 'touch'
+    end
   end
   
   get 'reports/mon'

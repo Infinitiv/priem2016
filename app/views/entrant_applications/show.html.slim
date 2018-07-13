@@ -5,6 +5,7 @@
     - label_class = "label label-success"
   - else
     - label_class = "label label-default"
+= link_to "Обновлено #{@entrant_application.updated_at.strftime("%Y-%m-%d")}", touch_entrant_application_url(@entrant_application), class: "pull-right label label-default"
 h1.pull-left class=label_class
   = "#{"%04d" % @entrant_application.application_number}"
 h1= @entrant_application.fio
