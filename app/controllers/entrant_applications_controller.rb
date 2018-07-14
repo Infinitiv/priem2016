@@ -114,7 +114,7 @@ class EntrantApplicationsController < ApplicationController
   
   def ord_export
     @entrant_applications = @campaign.entrant_applications.select(:id, :snils, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :birth_date, :nationality_type_id, :registration_date).includes(:marks, :competitive_groups, :education_document)
-    send_data @entrant_applications.ord_export(@entrant_applications), filename: "entrant_applications-#{Date.today}.csv"
+    send_data @entrant_applications.ord_export(@entrant_applications), filename: "entrant_applications-#{Date.today}.csv", type: 'text/csv', disposition: "attachment"
   end
   
   private

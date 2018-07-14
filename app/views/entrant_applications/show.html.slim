@@ -33,19 +33,14 @@
   table.table
     thead
       tr
-        th Химия
-        th Биология
-        th Русский язык
+        - @marks.each do |mark|
+          th = mark.subject.subject_name
         th Сумма
         th С учетом достижений
     tbody
       tr
-        - chemistry = @marks.find_by_subject_id(3)
-        - biology = @marks.find_by_subject_id(2)
-        - russian = @marks.find_by_subject_id(1)
-        td= "#{chemistry.value} (#{chemistry.form})" if chemistry
-        td= "#{biology.value} (#{biology.form})" if biology
-        td= "#{russian.value} (#{russian.form})" if russian
+        - @marks.each do |mark|
+         td= "#{mark.value} (#{mark.form})"
         td= @entrant_application.summa
         td= @entrant_application.summa + @entrant_application.achiev_summa
   h2= "Льготы" if @entrant_application.olympionic || @entrant_application.benefit
