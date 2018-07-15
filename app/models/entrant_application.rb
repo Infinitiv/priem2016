@@ -8,6 +8,7 @@ class EntrantApplication < ActiveRecord::Base
   has_many :benefit_documents, dependent: :destroy
   has_and_belongs_to_many :competitive_groups
   belongs_to :target_organization
+  has_many :achievements
   
 #   validates :application_number, :campaign_id, :entrant_last_name, :entrant_first_name, :gender_id, :birth_date, :registration_date, :status_id, :data_hash, presence: true
   
@@ -102,6 +103,7 @@ class EntrantApplication < ActiveRecord::Base
           entrant_application.competitive_groups << competitive_groups.find_by_name('Стоматология. Целевые места.') if row['Стоматология. Целевые места.']
         when campaign.education_levels.include?(18)
           Mark.import_from_row(row, entrant_application) if row.keys.include?('test_result')
+          Achievement.import_from_row(row, entrant_application)
           entrant_application.competitive_groups.each{|c| entrant_application.competitive_groups.delete(c)} if row['spec1'] || row['spec2']
           if row['spec1']
             entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec1']}).where(education_source_id: 14) if row['budg1'] == 1.to_s
@@ -138,7 +140,12 @@ class EntrantApplication < ActiveRecord::Base
   end
   
   def achiev_summa
-    institution_achievements.sum(:max_value) < 10 ? institution_achievements.sum(:max_value) : 10    
+    case true
+    when campaign.education_levels.include?(5)
+      institution_achievements.sum(:max_value) < 10 ? institution_achievements.sum(:max_value) : 10    
+    when campaign.education_levels.include?(18)
+      achievements.sum(:value)
+    end
   end
   
   def rank(entrant_application, competitive_group)
@@ -158,13 +165,10 @@ class EntrantApplication < ActiveRecord::Base
   
   def rank_all(campaign_id, summa, entrant_applications)
     achievements = {}
-    InstitutionAchievement.all.each do |i|
-      i.entrant_applications.each do |a|
-        achievements[a.id] =+ i.max_value
-        achievements[a.id] = 10 if achievements[a.id] > 10
-      end
+    entrant_applications.each do |a|
+      achievements[a.id] = a.achiev_summa
     end
-
+    
     marks = campaign.marks.joins(:entrant_application).where(entrant_application_id: entrant_applications).select(:entrant_application_id, :value).group_by(&:entrant_application_id).select{|a, ms| ms.select{|m| m.value > 37}.size == 3}.map{|a, ms| achievements[a] ? {a => ms.map(&:value).sum + 10} : {a => ms.map(&:value).sum}}.inject(:merge).values.sort.reverse
     marks_count = marks.count{|x| x == summa}
     marks_count > 1 ? "#{marks.index(summa) + 1}-#{marks.index(summa) + 1 + marks_count}" : marks.index(summa) + 1
@@ -251,12 +255,8 @@ class EntrantApplication < ActiveRecord::Base
     applications_hash = {}
     applications = campaign.entrant_applications.includes(:competitive_groups, :education_document, :benefit_documents).where.not(status_id: 6)
     achievements = {}
-    campaign.institution_achievements.each do |i|
-      i.entrant_applications.each do |a|
-        achievements[a.id] ||= 0
-        achievements[a.id] += i.max_value
-        achievements[a.id] = 10 if achievements[a.id] > 10
-      end
+    applications.each do |a|
+      achievements[a.id] = a.achiev_summa
     end
 
     marks = campaign.marks.order(:subject_id).joins(:entrant_application).where(entrant_application_id: applications).select(:entrant_application_id, :value).group_by(&:entrant_application_id).select{|a, ms| ms.select{|m| m.value > 41}.size == 3}.map{|a, ms| achievements[a] ? {a => ms.map(&:value) << achievements[a]} : {a => ms.map(&:value)}}.inject(:merge)
