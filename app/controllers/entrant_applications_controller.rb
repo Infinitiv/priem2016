@@ -7,17 +7,24 @@ class EntrantApplicationsController < ApplicationController
   def index
     entrant_applications = @campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id]).order(:application_number).includes(:achievements, :education_document)
     
-    marks = Mark.joins(:entrant_application).where(entrant_applications: {id: entrant_applications.map(&:id)}).group_by(&:entrant_application_id).map{|a, ms| {a => ms.map{|m| m.value}}}.inject(:merge)
+    entrance_test_items = @campaign.entrance_test_items.select(:subject_id, :min_score).uniq
+    
+    
+    marks = Mark.joins(:entrant_application).where(entrant_applications: {id: entrant_applications.map(&:id)}).group_by(&:entrant_application_id).map{|a, ms| {a => ms.map{|m| [m.subject_id => m.value].inject(:merge)}}}.inject(:merge)
     
     @entrant_applications_hash = {}
     entrant_applications.each do |entrant_application|
       @entrant_applications_hash[entrant_application] = {}
-      summa = marks[entrant_application.id].select{|i| i > 41}.size == 3 ? marks[entrant_application.id].sum : 0
-      @entrant_applications_hash[entrant_application][:summa] = summa
+      @entrant_applications_hash[entrant_application][:marks] = []
+      entrance_test_items.each do |entrance_test_item|
+        mark = marks[entrant_application.id].inject(:merge)[entrance_test_item.subject_id]
+        @entrant_applications_hash[entrant_application][:marks] << mark if mark >= entrance_test_item.min_score
+      end
+      @entrant_applications_hash[entrant_application][:summa] = @entrant_applications_hash[entrant_application][:marks].size == 3 ? @entrant_applications_hash[entrant_application][:marks].sum : 0
       @entrant_applications_hash[entrant_application][:achievements] = entrant_application.achievements.map(&:value)
       achievement_sum = @entrant_applications_hash[entrant_application][:achievements].sum
       @entrant_applications_hash[entrant_application][:achievement] = achievement_sum > 10 ? 10 : achievement_sum
-      summa > 0 ? @entrant_applications_hash[entrant_application][:full_summa] = [@entrant_applications_hash[entrant_application][:summa], @entrant_applications_hash[entrant_application][:achievement]].sum : @entrant_applications_hash[entrant_application][:full_summa] = '-'
+      @entrant_applications_hash[entrant_application][:summa] > 0 ? @entrant_applications_hash[entrant_application][:full_summa] = [@entrant_applications_hash[entrant_application][:summa], @entrant_applications_hash[entrant_application][:achievement]].sum : @entrant_applications_hash[entrant_application][:full_summa] = '-'
       @entrant_applications_hash[entrant_application][:original_received] = true if entrant_application.education_document.original_received_date
       @entrant_applications_hash[entrant_application][:last_deny_day] = true if entrant_application.status_id == 6
     end
