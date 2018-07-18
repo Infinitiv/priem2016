@@ -54,6 +54,7 @@ Rails.application.routes.draw do
       get 'competition_one_list'
       get 'blue'
       get 'ord_export'
+      get 'ord_marks_request'
     end
     member do
       get 'touch'

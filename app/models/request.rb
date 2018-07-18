@@ -303,6 +303,10 @@ class Request < ActiveRecord::Base
           a.RegistrationDate item.registration_date.to_datetime.to_s.gsub('+00', '+03')
           a.NeedHostel item.need_hostel
           a.StatusID item.status_id
+          if item.status_id == 6
+            a.ReturnDocumentsDate item.return_documents_date
+            a.ReturnDocumentsTypeId 1
+          end
           a.FinSourceAndEduForms do |fsaefs|
             item.competitive_groups.each do |sub_item|
               fsaefs.FinSourceEduForm do |fsef|

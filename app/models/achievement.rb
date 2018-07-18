@@ -11,8 +11,8 @@ class Achievement < ActiveRecord::Base
     row_achievements = row.slice(*accessible_attributes)
     row_achievements.each do |row_achievement_name, row_achievement_value|
       institution_achievement = institution_achievements.find_by_name(row_achievement_name)
-      achievement = achievements.find_by_institution_achievement_id(institution_achievement.id) || Achievement.new(institution_achievement_id: institution_achievement.id)
-      achievement.value = row_achievement_value < institution_achievement.max_value ? row_achievement_value : institution_achievement.max_value
+      achievement = achievements.find_by_institution_achievement_id(institution_achievement.id) || achievements.new(institution_achievement_id: institution_achievement.id)
+      achievement.value = row_achievement_value.to_i < institution_achievement.max_value ? row_achievement_value.to_i : institution_achievement.max_value
       achievement.save!
     end
   end

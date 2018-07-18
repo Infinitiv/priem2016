@@ -81,7 +81,7 @@ class EntrantApplication < ActiveRecord::Base
         when campaign.education_levels.include?(5)
           BenefitDocument.import_from_row(row, entrant_application) if row.keys.include? 'benefit_document_type_id'
           Mark.import_from_row(row, entrant_application) if row.keys.include?('chemistry') || row.keys.include?('biology') || row.keys.include?('russian')
-          InstitutionAchievement.import_from_row(row, entrant_application) if row.keys.include?('achievement_att') || row.keys.include?('achievement_dip') || row.keys.include?('achievement_gto')
+          Achievement.import_from_row(row, entrant_application)
           entrant_application.competitive_groups.each{|c| entrant_application.competitive_groups.delete(c)} if row.keys.include? 'Лечебное дело. Бюджет.'
           entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Бюджет.') if row['Лечебное дело. Бюджет.']
           entrant_application.competitive_groups << competitive_groups.find_by_name('Лечебное дело. Бюджет. Крым.') if row['Лечебное дело. Бюджет. Крым.']
@@ -151,15 +151,15 @@ class EntrantApplication < ActiveRecord::Base
   def rank(entrant_application, competitive_group)
     campaign_id = entrant_application.campaign_id
     summa = entrant_application.summa + entrant_application.achiev_summa
-    entrant_applications = EntrantApplication.where(campaign_id: campaign_id).joins(:competitive_groups).where(competitive_groups: {id: competitive_group.id}).map(&:id)
-    original_entrant_applications = EntrantApplication.where(campaign_id: campaign_id).joins(:competitive_groups, :education_document).where(competitive_groups: {id: competitive_group.id}).where.not(education_documents: {original_received_date: nil}).map(&:id)
+    entrant_applications = EntrantApplication.where(campaign_id: campaign_id).joins(:competitive_groups).where(competitive_groups: {id: competitive_group.id}).select(:id, :campaign_id)
+    original_entrant_applications = EntrantApplication.where(campaign_id: campaign_id).joins(:competitive_groups, :education_document).where(competitive_groups: {id: competitive_group.id}).where.not(education_documents: {original_received_date: nil}).select(:id, :campaign_id)
     entrant_application.education_document.original_received_date ? " (место в конкурсе - #{rank_all(campaign_id, summa, entrant_applications)}, с учетом оригиналов - #{rank_all(campaign_id, summa, original_entrant_applications)})" : " (место в конкурсе - #{rank_all(campaign_id, summa, entrant_applications)})"
   end
   
   def rank_target(entrant_application, competitive_group)
     campaign_id = entrant_application.campaign_id
     summa = entrant_application.summa + entrant_application.achiev_summa
-    entrant_applications = EntrantApplication.where(campaign_id: campaign_id).joins(:competitive_groups).where(competitive_groups: {id: competitive_group.id}, target_organization_id: entrant_application.target_organization_id).map(&:id)
+    entrant_applications = EntrantApplication.where(campaign_id: campaign_id).joins(:competitive_groups).where(competitive_groups: {id: competitive_group.id}, target_organization_id: entrant_application.target_organization_id).select(:id, :campaign_id)
     " (место в конкурсе - #{rank_all(campaign_id, summa, entrant_applications)}). Всего мест в конкурсе - #{competitive_group.target_numbers.find_by_target_organization_id(entrant_application.target_organization_id).number_target_o}"
   end
   
@@ -169,7 +169,7 @@ class EntrantApplication < ActiveRecord::Base
       achievements[a.id] = a.achiev_summa
     end
     
-    marks = campaign.marks.joins(:entrant_application).where(entrant_application_id: entrant_applications).select(:entrant_application_id, :value).group_by(&:entrant_application_id).select{|a, ms| ms.select{|m| m.value > 37}.size == 3}.map{|a, ms| achievements[a] ? {a => ms.map(&:value).sum + 10} : {a => ms.map(&:value).sum}}.inject(:merge).values.sort.reverse
+    marks = campaign.marks.joins(:entrant_application).where(entrant_application_id: entrant_applications.map(&:id)).select(:entrant_application_id, :value).group_by(&:entrant_application_id).select{|a, ms| ms.select{|m| m.value > 37}.size == 3}.map{|a, ms| achievements[a] ? {a => ms.map(&:value).sum + 10} : {a => ms.map(&:value).sum}}.inject(:merge).values.sort.reverse
     marks_count = marks.count{|x| x == summa}
     marks_count > 1 ? "#{marks.index(summa) + 1}-#{marks.index(summa) + 1 + marks_count}" : marks.index(summa) + 1
   end
@@ -330,13 +330,53 @@ class EntrantApplication < ActiveRecord::Base
             application.registration_date.strftime("%d.%m.%Y"),
             (competitive_group.education_source_id == 16 ? 'да' : 'нет'),
             test_result_type,
-            application.marks.map(&:organization_uid).first || oid,
+            application.marks.map(&:organization_uid).first,
             test_result_year
             ]
           csv << row
         end
       end
     end
-    
   end
+  
+  def self.ord_marks_request(applications)
+    oid = '1.2.643.5.1.13.13.12.4.37.21'
+    headers = [
+      'snils',
+      'oid',
+      'dateOfBirth',
+      'testResultType',
+      'testResultYear',
+      'testResultOrganization',
+      'specialty'
+    ]
+
+    CSV.generate(headers: true, col_sep: ';') do |csv|
+      csv << headers
+      applications.each do |application|
+        application.competitive_groups.each do |competitive_group|
+          test_result_type = application.marks.map(&:form).include?('аккредитация') ? 'аккредитация' : 'ординатура'
+          test_result_year = case true
+                              when test_result_type == 'ординатура'
+                                2018
+                              when test_result_type == 'аккредитация' && application.education_document.education_document_date.year == 2018
+                                2018
+                              else
+                                2017
+                              end
+          row = [
+            application.snils,
+            oid,
+            application.birth_date.strftime("%d.%m.%Y"),
+            test_result_type,
+            test_result_year,
+            application.marks.map(&:organization_uid).first,
+            competitive_group.edu_programs.last.code
+            ]
+          csv << row
+        end
+      end
+    end
+  end
+  
 end

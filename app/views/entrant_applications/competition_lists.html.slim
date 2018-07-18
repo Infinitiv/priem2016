@@ -31,7 +31,7 @@
                 - label_class = "info" if n == number_target_o
                 tr class=label_class
                   td= n
-                  td= "%04d" % application.application_number
+                  td= link_to "%04d" % application.application_number, application
                   td= application.fio
                   td= "+" if values[:original_received]
                   td= "+" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id

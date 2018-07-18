@@ -1,4 +1,4 @@
-h1 Список заявлений
+h1 = "Список заявлений #{@campaign.name} #{@campaign.year_start}"
 = form_tag import_entrant_applications_path + "?campaign_id=#{@campaign.id}", multipart: true do
   = file_field_tag :file
   br

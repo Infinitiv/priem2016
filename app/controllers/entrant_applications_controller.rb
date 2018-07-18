@@ -2,25 +2,19 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
-  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition, :competition_lists, :ord_export]
+  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition, :competition_lists, :ord_export, :ord_marks_request]
   
   def index
-    entrant_applications = @campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id]).order(:application_number).includes(:institution_achievements, :education_document)
+    entrant_applications = @campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id]).order(:application_number).includes(:achievements, :education_document)
     
     marks = Mark.joins(:entrant_application).where(entrant_applications: {id: entrant_applications.map(&:id)}).group_by(&:entrant_application_id).map{|a, ms| {a => ms.map{|m| m.value}}}.inject(:merge)
-    
-    achievements = {}
-    InstitutionAchievement.select(:id, :max_value).each{|i| achievements[i] = i.entrant_applications.map(&:id)}
     
     @entrant_applications_hash = {}
     entrant_applications.each do |entrant_application|
       @entrant_applications_hash[entrant_application] = {}
       summa = marks[entrant_application.id].select{|i| i > 41}.size == 3 ? marks[entrant_application.id].sum : 0
       @entrant_applications_hash[entrant_application][:summa] = summa
-      @entrant_applications_hash[entrant_application][:achievements] = []
-      achievements.each do |i, a|
-        @entrant_applications_hash[entrant_application][:achievements] << i.max_value if a.include?(entrant_application.id)
-      end
+      @entrant_applications_hash[entrant_application][:achievements] = entrant_application.achievements.map(&:value)
       achievement_sum = @entrant_applications_hash[entrant_application][:achievements].sum
       @entrant_applications_hash[entrant_application][:achievement] = achievement_sum > 10 ? 10 : achievement_sum
       summa > 0 ? @entrant_applications_hash[entrant_application][:full_summa] = [@entrant_applications_hash[entrant_application][:summa], @entrant_applications_hash[entrant_application][:achievement]].sum : @entrant_applications_hash[entrant_application][:full_summa] = '-'
@@ -115,6 +109,11 @@ class EntrantApplicationsController < ApplicationController
   def ord_export
     @entrant_applications = @campaign.entrant_applications.select(:id, :snils, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :birth_date, :nationality_type_id, :registration_date).includes(:marks, :competitive_groups, :education_document)
     send_data @entrant_applications.ord_export(@entrant_applications), filename: "entrant_applications-#{Date.today}.csv", type: 'text/csv', disposition: "attachment"
+  end
+  
+  def ord_marks_request
+    @entrant_applications = @campaign.entrant_applications.select(:id, :snils, :birth_date).includes(:marks, :competitive_groups, :education_document)
+    send_data @entrant_applications.ord_marks_request(@entrant_applications), filename: "entrant_marks_request-#{Date.today}.csv", type: 'text/csv', disposition: "attachment"
   end
   
   private
