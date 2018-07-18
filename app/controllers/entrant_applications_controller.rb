@@ -26,7 +26,6 @@ class EntrantApplicationsController < ApplicationController
       @entrant_applications_hash[entrant_application][:achievement] = achievement_sum > 10 ? 10 : achievement_sum
       @entrant_applications_hash[entrant_application][:summa] > 0 ? @entrant_applications_hash[entrant_application][:full_summa] = [@entrant_applications_hash[entrant_application][:summa], @entrant_applications_hash[entrant_application][:achievement]].sum : @entrant_applications_hash[entrant_application][:full_summa] = '-'
       @entrant_applications_hash[entrant_application][:original_received] = true if entrant_application.education_document.original_received_date
-      @entrant_applications_hash[entrant_application][:last_deny_day] = true if entrant_application.status_id == 6
     end
   end
   
