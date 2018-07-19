@@ -304,7 +304,7 @@ class Request < ActiveRecord::Base
           a.NeedHostel item.need_hostel
           a.StatusID item.status_id
           if item.status_id == 6
-            a.ReturnDocumentsDate item.return_documents_date
+            a.ReturnDocumentsDate item.return_documents_date.to_datetime.to_s.gsub('+00', '+03')
             a.ReturnDocumentsTypeId 1
           end
           a.FinSourceAndEduForms do |fsaefs|
