@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180718065754) do
+ActiveRecord::Schema.define(version: 20180719064239) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -160,6 +160,7 @@ ActiveRecord::Schema.define(version: 20180718065754) do
     t.date     "original_received_date"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "education_speciality_code", default: ""
   end
 
   add_index "education_documents", ["entrant_application_id"], name: "index_education_documents_on_entrant_application_id", using: :btree

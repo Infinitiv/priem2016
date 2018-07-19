@@ -68,6 +68,7 @@
     dd
       = @entrant_application.education_document.education_document_data
       span.label.label-success= @entrant_application.education_document.original_received_date if @entrant_application.education_document.original_received_date
+      p= @entrant_application.education_document.education_speciality_code
     dt
       h3 Документы на льготу
       - @entrant_application.benefit_documents.each do |b|

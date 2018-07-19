@@ -354,27 +354,25 @@ class EntrantApplication < ActiveRecord::Base
     CSV.generate(headers: true, col_sep: ';') do |csv|
       csv << headers
       applications.each do |application|
-        application.competitive_groups.each do |competitive_group|
-          test_result_type = application.marks.map(&:form).include?('аккредитация') ? 'аккредитация' : 'ординатура'
-          test_result_year = case true
-                              when test_result_type == 'ординатура'
-                                2018
-                              when test_result_type == 'аккредитация' && application.education_document.education_document_date.year == 2018
-                                2018
-                              else
-                                2017
-                              end
-          row = [
-            application.snils,
-            oid,
-            application.birth_date.strftime("%d.%m.%Y"),
-            test_result_type,
-            test_result_year,
-            application.marks.map(&:organization_uid).first,
-            competitive_group.edu_programs.last.code
-            ]
-          csv << row
-        end
+        test_result_type = application.marks.map(&:form).include?('аккредитация') ? 'аккредитация' : 'ординатура'
+        test_result_year = case true
+                            when test_result_type == 'ординатура'
+                              2018
+                            when test_result_type == 'аккредитация' && application.education_document.education_document_date.year == 2018
+                              2018
+                            else
+                              2017
+                            end
+        row = [
+          application.snils,
+          oid,
+          application.birth_date.strftime("%d.%m.%Y"),
+          test_result_type,
+          test_result_year,
+          application.marks.map(&:organization_uid).first,
+          application.education_document.education_speciality_code
+          ]
+        csv << row
       end
     end
   end
