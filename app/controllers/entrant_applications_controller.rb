@@ -20,7 +20,7 @@ class EntrantApplicationsController < ApplicationController
         mark = marks[entrant_application.id].inject(:merge)[entrance_test_item.subject_id]
         @entrant_applications_hash[entrant_application][:marks] << mark if mark >= entrance_test_item.min_score
       end
-      @entrant_applications_hash[entrant_application][:summa] = @entrant_applications_hash[entrant_application][:marks].size == 3 ? @entrant_applications_hash[entrant_application][:marks].sum : 0
+      @entrant_applications_hash[entrant_application][:summa] = @entrant_applications_hash[entrant_application][:marks].size == entrance_test_items.size ? @entrant_applications_hash[entrant_application][:marks].sum : 0
       @entrant_applications_hash[entrant_application][:achievements] = entrant_application.achievements.map(&:value)
       achievement_sum = @entrant_applications_hash[entrant_application][:achievements].sum
       @entrant_applications_hash[entrant_application][:achievement] = achievement_sum > 10 ? 10 : achievement_sum
