@@ -21,6 +21,6 @@ table.table.datatable
       tr
         td= link_to "%04d" % entrant_application.application_number, entrant_application, class: label_class
         td= entrant_application.fio
-        - data[:achievement] > 0 ? summa_class = 'label label-success' : 'label label-default'
+        - data[:achievements_sum] > 0 ? summa_class = 'label label-success' : 'label label-default'
         td 
           span class=summa_class = data[:full_summa]
