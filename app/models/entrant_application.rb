@@ -135,51 +135,6 @@ class EntrantApplication < ActiveRecord::Base
     ege_to_txt.encode("cp1251")
   end
   
-  def summa
-    marks.sum(:value)
-  end
-  
-  def achiev_summa
-    case true
-    when campaign.education_levels.include?(5)
-      institution_achievements.sum(:max_value) < 10 ? institution_achievements.sum(:max_value) : 10    
-    when campaign.education_levels.include?(18)
-      achievements.sum(:value)
-    end
-  end
-  
-  def rank(entrant_application, competitive_group)
-    campaign_id = entrant_application.campaign_id
-    summa = entrant_application.summa + entrant_application.achiev_summa
-    entrant_applications = EntrantApplication.where(campaign_id: campaign_id).joins(:competitive_groups).where(competitive_groups: {id: competitive_group.id}).select(:id, :campaign_id)
-    original_entrant_applications = EntrantApplication.where(campaign_id: campaign_id).joins(:competitive_groups, :education_document).where(competitive_groups: {id: competitive_group.id}).where.not(education_documents: {original_received_date: nil}).select(:id, :campaign_id)
-    entrant_application.education_document.original_received_date ? " (место в конкурсе - #{rank_all(campaign_id, summa, entrant_applications)}, с учетом оригиналов - #{rank_all(campaign_id, summa, original_entrant_applications)})" : " (место в конкурсе - #{rank_all(campaign_id, summa, entrant_applications)})"
-  end
-  
-  def rank_target(entrant_application, competitive_group)
-    campaign_id = entrant_application.campaign_id
-    summa = entrant_application.summa + entrant_application.achiev_summa
-    entrant_applications = EntrantApplication.where(campaign_id: campaign_id).joins(:competitive_groups).where(competitive_groups: {id: competitive_group.id}, target_organization_id: entrant_application.target_organization_id).select(:id, :campaign_id)
-    " (место в конкурсе - #{rank_all(campaign_id, summa, entrant_applications)}). Всего мест в конкурсе - #{competitive_group.target_numbers.find_by_target_organization_id(entrant_application.target_organization_id).number_target_o}"
-  end
-  
-  def rank_all(campaign_id, summa, entrant_applications)
-    achievements = {}
-    entrant_applications.each do |a|
-      achievements[a.id] = a.achiev_summa
-    end
-    
-    marks = campaign.marks.joins(:entrant_application).where(entrant_application_id: entrant_applications.map(&:id)).select(:entrant_application_id, :value).group_by(&:entrant_application_id).select{|a, ms| ms.select{|m| m.value > 37}.size == 3}.map{|a, ms| achievements[a] ? {a => ms.map(&:value).sum + 10} : {a => ms.map(&:value).sum}}.inject(:merge).values.sort.reverse
-    marks_count = marks.count{|x| x == summa}
-    marks_count > 1 ? "#{marks.index(summa) + 1}-#{marks.index(summa) + 1 + marks_count}" : marks.index(summa) + 1
-  end
-  
-  def rank_original_only(campaign_id, summa, applications)
-    marks = Mark.joins(:competitions).where(competitions: {competition_item_id: competition_item_id}, applications: {campaign_id: campaign_id}).where.not(applications: {original_received_date: nil}).group_by(&:application_id).map{|a, ms| applications.include?(a) ? ms.map{|m| m.value}.sum + 10 : ms.map{|m| m.value}.sum}.sort.reverse
-    marks_count = marks.count{|x| x == summa}
-    marks_count > 1 ? "#{marks.index(summa) + 1}-#{marks.index(summa) + 1 + marks_count}" : marks.index(summa) + 1
-  end  
-  
   def self.errors(campaign)
     errors = {}
     applications = campaign.entrant_applications.includes(:identity_documents).where.not(status_id: 6)
@@ -251,6 +206,36 @@ class EntrantApplication < ActiveRecord::Base
     admission_volume_hash
   end
   
+
+  def self.entrant_applications_hash(campaign)
+    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :target_organization_id]).order(:application_number).includes(:achievements, :education_document, :competitive_groups)
+    
+    entrance_test_items = campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
+    
+    
+    marks = Mark.joins(:entrant_application).where(entrant_applications: {id: entrant_applications.map(&:id)}).group_by(&:entrant_application_id).map{|a, ms| {a => ms.map{|m| [m.subject_id => m.value].inject(:merge)}}}.inject(:merge)
+    
+    entrant_applications_hash = {}
+    entrant_applications.each do |entrant_application|
+      entrant_applications_hash[entrant_application] = {}
+      entrant_applications_hash[entrant_application][:competitive_groups] = entrant_application.competitive_groups.map(&:id)
+      entrant_applications_hash[entrant_application][:marks] = []
+      entrance_test_items.each do |entrance_test_item|
+        mark = marks[entrant_application.id].inject(:merge)[entrance_test_item.subject_id]
+        entrant_applications_hash[entrant_application][:marks] << mark if mark >= entrance_test_item.min_score
+      end
+      entrant_applications_hash[entrant_application][:summa] = entrant_applications_hash[entrant_application][:marks].size == entrance_test_items.size ? entrant_applications_hash[entrant_application][:marks].sum : 0
+      entrant_applications_hash[entrant_application][:achievements] = entrant_application.achievements.map(&:value)
+      achievements_sum = entrant_applications_hash[entrant_application][:achievements].sum
+      achievements_limit = 10 if campaign.education_levels.include?(5)
+      entrant_applications_hash[entrant_application][:achievements_sum] = achievements_limit ? (achievements_sum > achievements_limit ? achievements_limit : achievements_sum) : achievements_sum
+      entrant_applications_hash[entrant_application][:summa] > 0 ? entrant_applications_hash[entrant_application][:full_summa] = [entrant_applications_hash[entrant_application][:summa], entrant_applications_hash[entrant_application][:achievements_sum]].sum : entrant_applications_hash[entrant_application][:full_summa] = 0
+      entrant_applications_hash[entrant_application][:original_received] = true if entrant_application.education_document.original_received_date
+      entrant_applications_hash[entrant_application][:benefit] = entrant_application.benefit ? 1 : 0
+    end
+    entrant_applications_hash
+  end
+
   def self.applications_hash(campaign)
     applications_hash = {}
     applications = campaign.entrant_applications.includes(:competitive_groups, :education_document, :benefit_documents).where.not(status_id: 6)

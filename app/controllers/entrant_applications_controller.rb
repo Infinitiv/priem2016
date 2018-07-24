@@ -5,36 +5,16 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition, :competition_lists, :ord_export, :ord_marks_request]
   
   def index
-    entrant_applications = @campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id]).order(:application_number).includes(:achievements, :education_document)
-    
-    entrance_test_items = @campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
-    
-    
-    marks = Mark.joins(:entrant_application).where(entrant_applications: {id: entrant_applications.map(&:id)}).group_by(&:entrant_application_id).map{|a, ms| {a => ms.map{|m| [m.subject_id => m.value].inject(:merge)}}}.inject(:merge)
-    
-    @entrant_applications_hash = {}
-    entrant_applications.each do |entrant_application|
-      @entrant_applications_hash[entrant_application] = {}
-      @entrant_applications_hash[entrant_application][:marks] = []
-      entrance_test_items.each do |entrance_test_item|
-        mark = marks[entrant_application.id].inject(:merge)[entrance_test_item.subject_id]
-        @entrant_applications_hash[entrant_application][:marks] << mark if mark >= entrance_test_item.min_score
-      end
-      @entrant_applications_hash[entrant_application][:summa] = @entrant_applications_hash[entrant_application][:marks].size == entrance_test_items.size ? @entrant_applications_hash[entrant_application][:marks].sum : 0
-      @entrant_applications_hash[entrant_application][:achievements] = entrant_application.achievements.map(&:value)
-      achievements_sum = @entrant_applications_hash[entrant_application][:achievements].sum
-      achievements_limit = 10 if @campaign.education_levels.include?(5)
-      @entrant_applications_hash[entrant_application][:achievements_sum] = achievements_limit ? (achievements_sum > achievements_limit ? achievements_limit : achievements_sum) : achievements_sum
-      @entrant_applications_hash[entrant_application][:summa] > 0 ? @entrant_applications_hash[entrant_application][:full_summa] = [@entrant_applications_hash[entrant_application][:summa], @entrant_applications_hash[entrant_application][:achievements_sum]].sum : @entrant_applications_hash[entrant_application][:full_summa] = '-'
-      @entrant_applications_hash[entrant_application][:original_received] = true if entrant_application.education_document.original_received_date
-    end
+    @entrant_applications_hash = EntrantApplication.entrant_applications_hash(@campaign)
   end
   
   def show
+    @entrant_applications_hash = EntrantApplication.entrant_applications_hash(@entrant_application.campaign).sort_by{|k, v| [v[:full_summa].to_i, v[:summa].to_i, v[:marks], v[:benefit]]}.reverse.to_h
     entrant_applications = @entrant_application.campaign.entrant_applications.select(:id, :application_number)
     @previous_entrant = entrant_applications.find_by_application_number(@entrant_application.application_number - 1)
     @next_entrant = entrant_applications.find_by_application_number(@entrant_application.application_number + 1)
     @marks = @entrant_application.marks
+    @full_summa = @entrant_applications_hash[@entrant_application][:full_summa]
     @entrance_test_items_count = @entrant_application.campaign.entrance_test_items.select(:subject_id, :min_score).uniq.size
   end
   
@@ -103,8 +83,9 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def competition_lists
+    @entrance_test_items = @campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     @admission_volume_hash = EntrantApplication.admission_volume_hash(@campaign)
-    @applications_hash = EntrantApplication.applications_hash(@campaign)
+    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign).sort_by{|k, v| [v[:full_summa].to_i, v[:summa].to_i, v[:marks], v[:benefit]]}.reverse
     @target_organizations = TargetOrganization.order(:target_organization_name)
   end
   
@@ -127,7 +108,7 @@ class EntrantApplicationsController < ApplicationController
   private
   
   def set_entrant_application
-    @entrant_application = EntrantApplication.find(params[:id]).includes(:campaign, :competitive_groups, :marks, :achievements, :identity_documents, :education_document)
+    @entrant_application = EntrantApplication.includes(:campaign, :competitive_groups, :marks, :achievements, :identity_documents, :education_document).find(params[:id])
   end
   
   def entrant_application_params

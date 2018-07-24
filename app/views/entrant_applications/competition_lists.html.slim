@@ -16,9 +16,8 @@
                 th Ф.И.О
                 th Наличие оригинала
                 th Наличие согласия на зачисление
-                th Химия
-                th Биология
-                th Русский язык
+                - @entrance_test_items.each do |entrance_test_item|
+                  th= entrance_test_item.subject.subject_name
                 th Сумма баллов за вступительные испытания
                 th Баллы за индивидуальные достижения
                 th Сумма конкурсных баллов
@@ -35,9 +34,8 @@
                   td= application.fio
                   td= "+" if values[:original_received]
                   td= "+" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id
-                  td= values[:chemistry]
-                  td= values[:biology]
-                  td= values[:russian]
+                  - values[:marks].each do |mark|
+                    td= mark
                   td= values[:summa]
                   td= values[:achievement]
                   td= values[:full_summa]
@@ -52,9 +50,8 @@
             th Ф.И.О
             th Наличие оригинала
             th Наличие согласия на зачисление
-            th Химия
-            th Биология
-            th Русский язык
+            - @entrance_test_items.each do |entrance_test_item|
+                  th= entrance_test_item.subject.subject_name
             th Сумма баллов за вступительные испытания
             th Баллы за индивидуальные достижения
             th Сумма конкурсных баллов
@@ -66,13 +63,12 @@
             tr class=label_class
               - n += 1
               td= n
-              td= "%04d" % application.application_number
+              td= link_to "%04d" % application.application_number, application
               td= application.fio
               td= "+" if values[:original_received]
               td= "+" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id
-              td= values[:chemistry]
-              td= values[:biology]
-              td= values[:russian]
+              - values[:marks].each do |mark|
+                    td= mark
               td= values[:summa]
               td= values[:achievement]
               td= values[:full_summa]
