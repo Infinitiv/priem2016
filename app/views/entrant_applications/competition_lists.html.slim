@@ -33,11 +33,11 @@
                   td= link_to "%04d" % application.application_number, application
                   td= application.fio
                   td= "+" if values[:original_received]
-                  td= "+" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id
+                  td= "+" if application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id
                   - values[:marks].each do |mark|
                     td= mark
                   td= values[:summa]
-                  td= values[:achievement]
+                  td= values[:achievements_sum]
                   td= values[:full_summa]
                   td= "+" if application.benefit
     - else
@@ -66,10 +66,10 @@
               td= link_to "%04d" % application.application_number, application
               td= application.fio
               td= "+" if values[:original_received]
-              td= "+" if values[:budget_agr] == competitive_group.id || values[:paid_agr] == competitive_group.id
+              td= "+" if application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id
               - values[:marks].each do |mark|
                     td= mark
               td= values[:summa]
-              td= values[:achievement]
+              td= values[:achievements_sum]
               td= values[:full_summa]
               td= "+" if application.benefit

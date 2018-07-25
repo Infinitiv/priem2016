@@ -208,7 +208,7 @@ class EntrantApplication < ActiveRecord::Base
   
 
   def self.entrant_applications_hash(campaign)
-    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :target_organization_id]).order(:application_number).includes(:achievements, :education_document, :competitive_groups)
+    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :target_organization_id, :budget_agr, :paid_agr, :enrolled]).order(:application_number).includes(:achievements, :education_document, :competitive_groups)
     
     entrance_test_items = campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     
@@ -236,37 +236,6 @@ class EntrantApplication < ActiveRecord::Base
     entrant_applications_hash
   end
 
-  def self.applications_hash(campaign)
-    applications_hash = {}
-    applications = campaign.entrant_applications.includes(:competitive_groups, :education_document, :benefit_documents).where.not(status_id: 6)
-    achievements = {}
-    applications.each do |a|
-      achievements[a.id] = a.achiev_summa
-    end
-
-    marks = campaign.marks.order(:subject_id).joins(:entrant_application).where(entrant_application_id: applications).select(:entrant_application_id, :value).group_by(&:entrant_application_id).select{|a, ms| ms.select{|m| m.value > 41}.size == 3}.map{|a, ms| achievements[a] ? {a => ms.map(&:value) << achievements[a]} : {a => ms.map(&:value)}}.inject(:merge)
-    applications.each do |application|
-      if marks[application.id]
-        applications_hash[application] = {}
-        applications_hash[application][:competitive_groups] = application.competitive_groups.map(&:id)
-        applications_hash[application][:russian] = marks[application.id][0]
-        applications_hash[application][:biology] = marks[application.id][1]
-        applications_hash[application][:chemistry] = marks[application.id][2]
-        applications_hash[application][:achievement] = marks[application.id][3]
-        applications_hash[application][:summa] = marks[application.id][0..2].sum
-        applications_hash[application][:benefit] = application.benefit ? 1 : 0
-        applications_hash[application][:full_summa] = marks[application.id].sum
-        applications_hash[application][:original_received] = application.education_document.original_received_date ? true : false
-        applications_hash[application][:budget_agr] = application.budget_agr
-        applications_hash[application][:paid_agr] = application.paid_agr
-        unless application.benefit_documents.empty?
-          applications_hash[application][:examless] = application.benefit_documents.map(&:benefit_type_id).include?(1) ? true : false
-        end
-      end
-    end
-    applications_hash = applications_hash.sort_by{|k, v| [v[:full_summa], v[:summa], v[:chemistry], v[:biology], v[:russian], v[:benefit]]}.reverse
-  end
-  
   def self.ord_export(applications)
     oid = '1.2.643.5.1.13.13.12.4.37.21'
     headers = [
@@ -361,5 +330,4 @@ class EntrantApplication < ActiveRecord::Base
       end
     end
   end
-  
 end

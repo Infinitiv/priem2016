@@ -48,11 +48,8 @@ Rails.application.routes.draw do
     collection do
       post 'import'
       get 'errors'
-      get 'competition'
       get 'ege_to_txt'
       get 'competition_lists'
-      get 'competition_one_list'
-      get 'blue'
       get 'ord_export'
       get 'ord_marks_request'
     end

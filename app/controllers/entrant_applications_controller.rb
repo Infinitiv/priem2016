@@ -64,20 +64,6 @@ class EntrantApplicationsController < ApplicationController
     send_data ege_to_txt, :filename => "ege #{Time.now.to_date}.csv", :type => 'text/plain', :disposition => "attachment"
   end
   
-  def blue
-    @entrant_applications = EntrantApplication.order(:application_number).includes(:competitive_groups)
-    @achievements = {}
-    InstitutionAchievement.all.each do |i|
-      i.entrant_applications.each do |a|
-        @achievements[a.id] =+ i.max_value
-        @achievements[a.id] = 10 if @achievements[a.id] > 10
-      end
-    end
-    respond_to do |format|
-      format.xls
-    end
-  end
-  
   def errors
     @errors = EntrantApplication.errors(@campaign)
   end
@@ -85,13 +71,7 @@ class EntrantApplicationsController < ApplicationController
   def competition_lists
     @entrance_test_items = @campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     @admission_volume_hash = EntrantApplication.admission_volume_hash(@campaign)
-    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign).sort_by{|k, v| [v[:full_summa].to_i, v[:summa].to_i, v[:marks], v[:benefit]]}.reverse
-    @target_organizations = TargetOrganization.order(:target_organization_name)
-  end
-  
-  def competition
-    @admission_volume_hash = EntrantApplication.admission_volume_hash(@campaign)
-    @applications_hash = EntrantApplication.applications_hash(@campaign)
+    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign).select{|k, v| v[:summa] > 0}.sort_by{|k, v| [v[:full_summa].to_i, v[:summa].to_i, v[:marks], v[:benefit]]}.reverse
     @target_organizations = TargetOrganization.order(:target_organization_name)
   end
   

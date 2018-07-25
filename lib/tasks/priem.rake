@@ -67,12 +67,12 @@ namespace :priem do
   desc "Publish competition lists to google drive"
   task competition_lists: :environment do
     
-    campaigns = Campaign.where(year_start: Time.now.year)
+    campaigns = Campaign.where(id: 3)
     campaigns.each do |campaign|
       title_production = "Приемная кампания #{campaign.name}. Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%F %T")}"
       title_development = [title_production, "(тестовая)"].join(" ")
       admission_volume_hash = EntrantApplication.admission_volume_hash(campaign)
-      applications_hash = EntrantApplication.applications_hash(campaign)
+      entrant_applications_hash = EntrantApplication.entrant_applications_hash(campaign).select{|k, v| v[:summa] > 0}.sort_by{|k, v| [v[:full_summa].to_i, v[:summa].to_i, v[:marks], v[:benefit]]}.reverse
       target_organizations = TargetOrganization.order(:target_organization_name)
       all_competitive_groups = campaign.competitive_groups
 
@@ -97,7 +97,7 @@ namespace :priem do
       end
       
       admission_volume_hash.each do |direction_id, competitive_groups|
-        competitive_groups.select{|cg| [14, 15].include? cg.education_source_id}.each do |competitive_group, numbers|
+        competitive_groups.select{|cg| [14, 15, 16, 20].include? cg.education_source_id}.each do |competitive_group, numbers|
           s.worksheet_by_title(competitive_group.name).delete if s.worksheet_by_title(competitive_group.name)
           ws = s.add_worksheet(competitive_group.name)
           puts "Заполняем #{competitive_group.name}"
@@ -105,7 +105,7 @@ namespace :priem do
           when 16
             r = 1
             target_organizations.each do |target_organization|
-            applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.target_organization_id == target_organization.id}
+            applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.target_organization_id == target_organization.id}
               unless applications.empty?
                 ws[r, 1]= target_organization.target_organization_name
                 ws[r + 1, 1] = "№№"
@@ -126,13 +126,13 @@ namespace :priem do
                   ws[r + 1, 1] = n
                   ws[r + 1, 2] = "%04d" % application.application_number
                   ws[r + 1, 3] = application.fio
-                  ws[r + 1, 4] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
+                  ws[r + 1, 4] = "да" if application.budget_agr == competitive_group.id && values[:original_received]
                   ws[r + 1, 5] = values[:full_summa]
-                  ws[r + 1, 6] = values[:chemistry]
-                  ws[r + 1, 7] = values[:biology]
-                  ws[r + 1, 8] = values[:russian]
+                  ws[r + 1, 6] = values[:marks][0]
+                  ws[r + 1, 7] = values[:marks][1]
+                  ws[r + 1, 8] = values[:marks][2]
                   ws[r + 1, 9] = values[:summa]
-                  ws[r + 1, 10] = values[:achievement]
+                  ws[r + 1, 10] = values[:achievements_sum]
                   ws[r + 1, 11] = "да" if application.benefit
                 end
                 r += 3
@@ -144,7 +144,7 @@ namespace :priem do
           when 14
             r = 1
             
-            applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id && v[:examless]}
+            applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id && v[:examless]}
             unless applications.empty?
               ws[r, 1] = "Без вступительных испытаний"
               ws[r + 1, 1] = "№№"
@@ -161,13 +161,13 @@ namespace :priem do
                 ws[r + 1, 2] = "%04d" % application.application_number
                 ws[r + 1, 3] = application.fio
                 ws[r + 1, 4] = "Олимпиада"
-                ws[r + 1, 5] = values[:achievement]
+                ws[r + 1, 5] = values[:achievements_sum]
                 ws[r + 1, 6] = "да" if application.benefit
               end
               r += 2
             end
             
-            applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
+            applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
             unless applications.empty?
               ws[r, 1] = "Общий конкурс"
               ws[r + 1, 1] = "№№"
@@ -189,13 +189,13 @@ namespace :priem do
                 ws[r + 1, 1] = n
                 ws[r + 1, 2] = "%04d" % application.application_number
                 ws[r + 1, 3] = application.fio
-                ws[r + 1, 4] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
+                ws[r + 1, 4] = "да" if application.budget_agr == competitive_group.id && values[:original_received]
                 ws[r + 1, 5] = values[:full_summa]
-                ws[r + 1, 6] = values[:chemistry]
-                ws[r + 1, 7] = values[:biology]
-                ws[r + 1, 8] = values[:russian]
+                ws[r + 1, 6] = values[:marks][0]
+                ws[r + 1, 7] = values[:marks][1]
+                ws[r + 1, 8] = values[:marks][2]
                 ws[r + 1, 9] = values[:summa]
-                ws[r + 1, 10] = values[:achievement]
+                ws[r + 1, 10] = values[:achievements_sum]
                 ws[r + 1, 11] = all_competitive_groups.find(application.enrolled).name if application.enrolled && application.exeptioned != application.enrolled
                 ws[r + 1, 12] = "да" if application.benefit
               end
@@ -205,7 +205,7 @@ namespace :priem do
             ws.save
           when 15
             r = 1
-            applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
+            applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
             unless applications.empty?
               ws[r, 1] = "№№"
               ws[r, 2] = "№ личного дела"
@@ -226,13 +226,13 @@ namespace :priem do
                 ws[r, 1] = n
                 ws[r, 2] = "%04d" % application.application_number
                 ws[r, 3] = application.fio
-                ws[r, 4] = "да" if values[:paid_agr] == competitive_group.id
+                ws[r, 4] = "да" if application.paid_agr == competitive_group.id
                 ws[r, 5] = values[:full_summa]
-                ws[r, 6] = values[:chemistry]
-                ws[r, 7] = values[:biology]
-                ws[r, 8] = values[:russian]
+                ws[r, 6] = values[:marks][0]
+                ws[r, 7] = values[:marks][1]
+                ws[r, 8] = values[:marks][2]
                 ws[r, 9] = values[:summa]
-                ws[r, 10] = values[:achievement]
+                ws[r, 10] = values[:achievements_sum]
                 ws[r, 11] = all_competitive_groups.find(application.enrolled).name if application.enrolled && application.exeptioned != application.enrolled
                 ws[r, 12] = "да" if application.benefit
               end
@@ -242,18 +242,18 @@ namespace :priem do
             ws.save
           when 20
             r = 1
-            applications = applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
+            applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
             unless applications.empty?
               ws[r, 1] = "№№"
               ws[r, 2] = "№ личного дела"
               ws[r, 3] = "Ф.И.О."
               ws[r, 4] = "Наличие согласия на зачисление"
-              ws[r, 5] = "Сумма баллов за вступительные испытания"
+              ws[r, 5] = "Сумма конкурсных баллов"
               ws[r, 6] = "Химия"
               ws[r, 7] = "Биология"
               ws[r, 8] = "Русский язык"
-              ws[r, 9] = "Баллы за индивидуальные достижения"
-              ws[r, 10] = "Сумма конкурсных баллов"
+              ws[r, 9] = "Сумма баллов за вступительные испытания"
+              ws[r, 10] = "Баллы за индивидуальные достижения"
               n = 0
               applications.each do |application, values|
                 r += 1
@@ -261,13 +261,13 @@ namespace :priem do
                 ws[r, 1] = n
                 ws[r, 2] = "%04d" % application.application_number
                 ws[r, 3] = application.fio
-                ws[r, 4] = "да" if values[:budget_agr] == competitive_group.id && values[:original_received]
+                ws[r, 4] = "да" if application.budget_agr == competitive_group.id && values[:original_received]
                 ws[r, 5] = values[:full_summa]
-                ws[r, 6] = values[:chemistry]
-                ws[r, 7] = values[:biology]
-                ws[r, 8] = values[:russian]
+                ws[r, 6] = values[:marks][0]
+                ws[r, 7] = values[:marks][1]
+                ws[r, 8] = values[:marks][2]
                 ws[r, 9] = values[:summa]
-                ws[r, 10] = values[:achievement]
+                ws[r, 10] = values[:achievements_sum]
               end
             end
             ws.max_cols = 10
