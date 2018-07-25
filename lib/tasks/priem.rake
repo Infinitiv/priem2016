@@ -72,7 +72,7 @@ namespace :priem do
       title_production = "Приемная кампания #{campaign.name}. Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%F %T")}"
       title_development = [title_production, "(тестовая)"].join(" ")
       admission_volume_hash = EntrantApplication.admission_volume_hash(campaign)
-      entrant_applications_hash = EntrantApplication.entrant_applications_hash(campaign).select{|k, v| v[:summa] > 0}.sort_by{|k, v| [v[:full_summa].to_i, v[:summa].to_i, v[:marks], v[:benefit]]}.reverse
+      entrant_applications_hash = EntrantApplication.entrant_applications_hash(campaign).select{|k, v| v[:summa] > 0 && k.status_id == 4}.sort_by{|k, v| [v[:full_summa].to_i, v[:summa].to_i, v[:marks], v[:benefit]]}.reverse
       target_organizations = TargetOrganization.order(:target_organization_name)
       all_competitive_groups = campaign.competitive_groups
 
