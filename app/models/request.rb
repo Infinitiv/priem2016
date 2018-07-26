@@ -378,7 +378,7 @@ class Request < ActiveRecord::Base
                       od.DocumentDate olympic_document.olympic_document_date if olympic_document.olympic_document_date
                       od.DiplomaTypeID olympic_document.diploma_type_id
                       od.OlympicID olympic_document.olympic_id
-                      od.ProfileID olympic_document.profile_id
+                      od.ProfileID olympic_document.olympic_profile_id
                       od.ClassNumber  olympic_document.class_number
                       od.OlympicSubjectID olympic_document.olympic_subject_id if olympic_document.olympic_subject_id
                       od.EgeSubjectID olympic_document.ege_subject_id if olympic_document.ege_subject_id
