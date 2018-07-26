@@ -720,7 +720,7 @@ namespace :priem do
   
   def self.applications_del(pd, params)
     campaign = Campaign.find(params[:campaign_id])
-    applications = campaign.entrant_applications.joins(:institution_achievements)
+    applications = campaign.entrant_applications
     
     pd.Applications do |as|
       applications.each do |item|
