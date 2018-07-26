@@ -52,6 +52,7 @@ Rails.application.routes.draw do
       get 'competition_lists'
       get 'ord_export'
       get 'ord_marks_request'
+      get 'competition_lists_to_html'
     end
     member do
       get 'touch'
