@@ -385,6 +385,7 @@ class Request < ActiveRecord::Base
                     end
                   end
                   acb.BenefitKindID olympic_document.benefit_type_id
+                end
               end
             end
           end
