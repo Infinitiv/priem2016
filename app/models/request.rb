@@ -363,7 +363,7 @@ class Request < ActiveRecord::Base
                   acb.BenefitKindID benefit_document.benefit_type_id
                 end
               end
-              if olympic_documents
+              unless olympic_documents.empty?
                 acbs.ApplicationCommonBenefit do |acb|
                   acb.UID ["olympic", campaign.year_start, item.application_number].join('-')
                   acb.CompetitiveGroupUID item.budget_agr
