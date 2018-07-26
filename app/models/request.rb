@@ -320,7 +320,7 @@ class Request < ActiveRecord::Base
           end
           benefit_competitive_groups = item.competitive_groups.where(education_source_id: 20)
           olympic_documents = item.olympic_documents
-          unless benefit_competitive_groups.empty? || olympic_documents
+          unless benefit_competitive_groups.empty? || olympic_documents.empty?
             a.ApplicationCommonBenefits do |acbs|
               benefit_competitive_groups.each do |sub_item|
                 acbs.ApplicationCommonBenefit do |acb|
@@ -492,7 +492,7 @@ class Request < ActiveRecord::Base
                       when 8
                         cd.UID ["ach", campaign.year_start, item.application_number, 'gto'].join('-')
                         cd.DocumentName "Удоствоверение о награждении золотым значком ГТО"
-                        cd.DocumentDate '2016-04-20'
+                        cd.DocumentDate '2018-04-20'
                         cd.DocumentOrganization 'Министерство спорта Российской Федерации'
                       end
                     end
