@@ -324,7 +324,7 @@ class Request < ActiveRecord::Base
             a.ApplicationCommonBenefits do |acbs|
               benefit_competitive_groups.each do |sub_item|
                 acbs.ApplicationCommonBenefit do |acb|
-                  acb.UID ["benefit", campaign.year_start, item.application_number].join('-')
+                  acb.UID ["benefit", campaign.year_start, item.application_number, sub_item.id].join('-')
                   acb.CompetitiveGroupUID sub_item.id
                   benefit_document = item.benefit_documents.last
                   acb.DocumentTypeID benefit_document.benefit_document_type_id
