@@ -319,7 +319,8 @@ class Request < ActiveRecord::Base
             end
           end
           benefit_competitive_groups = item.competitive_groups.where(education_source_id: 20)
-          unless benefit_competitive_groups.empty?
+          olympic_documents = item.olympic_documents
+          unless benefit_competitive_groups.empty? || olympic_documents
             a.ApplicationCommonBenefits do |acbs|
               benefit_competitive_groups.each do |sub_item|
                 acbs.ApplicationCommonBenefit do |acb|
@@ -359,8 +360,31 @@ class Request < ActiveRecord::Base
                       end
                     end
                   end
-                  acb.BenefitKindID 4
+                  acb.BenefitKindID benefit_document.benefit_type_id
                 end
+              end
+              if olympic_documents
+                acbs.ApplicationCommonBenefit do |acb|
+                  acb.UID ["olympic", campaign.year_start, item.application_number].join('-')
+                  acb.CompetitiveGroupUID item.budget_agr
+                  olympic_document = olympic_documents.last
+                  acb.DocumentTypeID 9
+                  acb.DocumentReason do |dr|
+                    dr.OlympicDocument do |od|
+                      od.UID ["olympic", campaign.year_start, item.application_number, olympic_document.id].join('-')
+                      od.OriginalReceivedDate item.education_document.original_received_date
+                      od.DocumentSeries olympic_document.olympic_document_series if olympic_document.olympic_document_series
+                      od.DocumentNumber olympic_document.olympic_document_number if olympic_document.olympic_document_number
+                      od.DocumentDate olympic_document.olympic_document_date if olympic_document.olympic_document_date
+                      od.DiplomaTypeID olympic_document.olympic_document_diploma_type_id
+                      od.OlympicID olympic_document.olympic_id
+                      od.ProfileID olympic_document.profile_id
+                      od.ClassNumber  olympic_document.class_number
+                      od.OlympicSubjectID olympic_document.olympic_subject_id if olympic_document.olympic_subject_id
+                      od.EgeSubjectID olympic_document.ege_subject_id if olympic_document.ege_subject_id
+                    end
+                  end
+                  acb.BenefitKindID olympic_document.benefit_type_id
               end
             end
           end
@@ -498,14 +522,14 @@ class Request < ActiveRecord::Base
                       rd.InstitutionDocument do |id|
                         case sub_item.subject.subject_id
                         when 11
-                          id.DocumentNumber "2016-1"
-                          id.DocumentDate "2016-07-14"
+                          id.DocumentNumber "2018-1"
+                          id.DocumentDate "2018-07-13"
                         when 4
-                          id.DocumentNumber "2016-2"
-                          id.DocumentDate "2016-07-19"
+                          id.DocumentNumber "2018-2"
+                          id.DocumentDate "2018-07-18"
                         when 1
-                          id.DocumentNumber "2016-3"
-                          id.DocumentDate "2016-07-22"
+                          id.DocumentNumber "2018-3"
+                          id.DocumentDate "2018-07-20"
                         end
                         id.DocumentTypeID 1
                       end

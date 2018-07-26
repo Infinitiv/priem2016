@@ -77,3 +77,7 @@
       h3 Документы на льготу
       - @entrant_application.benefit_documents.each do |b|
         dd= b.benefit_document_data
+    dt
+      h3 Диплом победителя/призера олимпиады
+      - @entrant_application.olympic_documents.each do |o|
+        dd= o.olympic_document_data

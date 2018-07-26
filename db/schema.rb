@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180719064239) do
+ActiveRecord::Schema.define(version: 20180726095722) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -259,6 +259,24 @@ ActiveRecord::Schema.define(version: 20180719064239) do
   add_index "marks", ["entrant_application_id"], name: "index_marks_on_entrant_application_id", using: :btree
   add_index "marks", ["subject_id"], name: "index_marks_on_subject_id", using: :btree
 
+  create_table "olympic_documents", force: :cascade do |t|
+    t.integer  "benefit_type_id"
+    t.integer  "entrant_application_id"
+    t.integer  "olympic_id"
+    t.integer  "diploma_type_id"
+    t.integer  "olympic_profile_id"
+    t.integer  "class_number"
+    t.string   "olympic_document_series"
+    t.string   "olympic_document_number"
+    t.date     "olympic_document_date"
+    t.integer  "olympic_subject_id"
+    t.integer  "ege_subject_id"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  add_index "olympic_documents", ["entrant_application_id"], name: "index_olympic_documents_on_entrant_application_id", using: :btree
+
   create_table "requests", force: :cascade do |t|
     t.string   "query"
     t.text     "input"
@@ -298,6 +316,7 @@ ActiveRecord::Schema.define(version: 20180719064239) do
   add_foreign_key "achievements", "institution_achievements"
   add_foreign_key "benefit_documents", "entrant_applications"
   add_foreign_key "identity_documents", "entrant_applications"
+  add_foreign_key "olympic_documents", "entrant_applications"
   add_foreign_key "target_numbers", "competitive_groups"
   add_foreign_key "target_numbers", "target_organizations"
 end

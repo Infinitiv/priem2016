@@ -9,6 +9,7 @@ class EntrantApplication < ActiveRecord::Base
   has_and_belongs_to_many :competitive_groups
   belongs_to :target_organization
   has_many :achievements
+  has_many :olympic_documents
   
 #   validates :application_number, :campaign_id, :entrant_last_name, :entrant_first_name, :gender_id, :birth_date, :registration_date, :status_id, :data_hash, presence: true
   
@@ -80,6 +81,7 @@ class EntrantApplication < ActiveRecord::Base
         case true
         when campaign.education_levels.include?(5)
           BenefitDocument.import_from_row(row, entrant_application) if row.keys.include? 'benefit_document_type_id'
+          OlympicDocument.import_from_row(row, entrant_application) if row.keys.include? 'olympic_id'
           Mark.import_from_row(row, entrant_application) if row.keys.include?('chemistry') || row.keys.include?('biology') || row.keys.include?('russian')
           Achievement.import_from_row(row, entrant_application)
           entrant_application.competitive_groups.each{|c| entrant_application.competitive_groups.delete(c)} if row.keys.include? 'Лечебное дело. Бюджет.'
@@ -208,7 +210,7 @@ class EntrantApplication < ActiveRecord::Base
   
 
   def self.entrant_applications_hash(campaign)
-    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :target_organization_id, :budget_agr, :paid_agr, :enrolled]).order(:application_number).includes(:achievements, :education_document, :competitive_groups)
+    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :target_organization_id, :budget_agr, :paid_agr, :enrolled]).order(:application_number).includes(:achievements, :education_document, :competitive_groups, :benefit_documents, :olympic_documents)
     
     entrance_test_items = campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     
