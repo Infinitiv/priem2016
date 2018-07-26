@@ -95,7 +95,6 @@ namespace :priem do
             campaign.update_attributes(google_key_production: s.key)
           end
       end
-      
       admission_volume_hash.each do |direction_id, competitive_groups|
         competitive_groups.select{|cg| [14, 15, 16, 20].include? cg.education_source_id}.each do |competitive_group, numbers|
           s.worksheet_by_title(competitive_group.name).delete if s.worksheet_by_title(competitive_group.name)
@@ -111,7 +110,7 @@ namespace :priem do
                 ws[r + 1, 1] = "№№"
                 ws[r + 1, 2] = "№ личного дела"
                 ws[r + 1, 3] = "Ф.И.О."
-                ws[r + 1, 4] = "Наличие согласия на зачисление"
+                ws[r + 1, 4] = "Оригинал и согласие на зачисление"
                 ws[r + 1, 5] = "Сумма конкурсных баллов"
                 ws[r + 1, 6] = "Химия"
                 ws[r + 1, 7] = "Биология"
@@ -169,11 +168,15 @@ namespace :priem do
             
             applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
             unless applications.empty?
-              ws[r, 1] = "Общий конкурс"
+              if r == 1
+                r = 0
+              else
+                ws[r, 1] = "Общий конкурс"
+              end
               ws[r + 1, 1] = "№№"
               ws[r + 1, 2] = "№ личного дела"
               ws[r + 1, 3] = "Ф.И.О."
-              ws[r + 1, 4] = "Наличие согласия на зачисление"
+              ws[r + 1, 4] = "Оригинал и согласие на зачисление"
               ws[r + 1, 5] = "Сумма конкурсных баллов"
               ws[r + 1, 6] = "Химия"
               ws[r + 1, 7] = "Биология"
@@ -210,7 +213,7 @@ namespace :priem do
               ws[r, 1] = "№№"
               ws[r, 2] = "№ личного дела"
               ws[r, 3] = "Ф.И.О."
-              ws[r, 4] = "Наличие согласия на зачисление"
+              ws[r, 4] = "Оригинал и согласие на зачисление"
               ws[r, 5] = "Сумма конкурсных баллов"
               ws[r, 6] = "Химия"
               ws[r, 7] = "Биология"
@@ -247,7 +250,7 @@ namespace :priem do
               ws[r, 1] = "№№"
               ws[r, 2] = "№ личного дела"
               ws[r, 3] = "Ф.И.О."
-              ws[r, 4] = "Наличие согласия на зачисление"
+              ws[r, 4] = "Оригинал и согласие на зачисление"
               ws[r, 5] = "Сумма конкурсных баллов"
               ws[r, 6] = "Химия"
               ws[r, 7] = "Биология"

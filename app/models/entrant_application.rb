@@ -234,6 +234,7 @@ class EntrantApplication < ActiveRecord::Base
       entrant_applications_hash[entrant_application][:summa] > 0 ? entrant_applications_hash[entrant_application][:full_summa] = [entrant_applications_hash[entrant_application][:summa], entrant_applications_hash[entrant_application][:achievements_sum]].sum : entrant_applications_hash[entrant_application][:full_summa] = 0
       entrant_applications_hash[entrant_application][:original_received] = true if entrant_application.education_document.original_received_date
       entrant_applications_hash[entrant_application][:benefit] = entrant_application.benefit ? 1 : 0
+      entrant_applications_hash[entrant_application][:examless] = true if entrant_application.olympic_documents.map(&:benefit_type_id).include?(1)
     end
     entrant_applications_hash
   end
