@@ -1,5 +1,9 @@
 h1= "Приемная кампания #{@campaign.name}." 
 h2= "Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%F %T")}"
+p 
+  span Зеленым цветом выделены абитуриенты гарантированно поступающие на обучение при 
+  strong наличии 
+  span в академии оригинала документа об образовании и заявления о согласии на зачисление на данный конкурс
 - @admission_volume_hash.each do |direction_id, competitive_groups|
   - competitive_groups.select{|k, v| k.is_for_krym == false}.each do |competitive_group, numbers|
     .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
