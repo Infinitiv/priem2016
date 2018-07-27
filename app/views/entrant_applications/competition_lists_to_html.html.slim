@@ -46,7 +46,7 @@ h2= "Конкурсные списки по состоянию на #{Time.now.t
                       td.text-center= "+" if application.benefit
         - else
           - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
-          - examless_applications = applications.select{|k, v| v[:examless]}
+          - examless_applications = applications.select{|k, v| v[:examless] && competitive_group.id == k.budget_agr}
           - n = 0
           - unless examless_applications.empty?
             h3 Зачисление без вступительных испытаний
