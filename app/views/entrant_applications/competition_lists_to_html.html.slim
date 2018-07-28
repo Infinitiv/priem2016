@@ -5,7 +5,7 @@ p
   strong наличии 
   span в академии оригинала документа об образовании и заявления о согласии на зачисление на данный конкурс
 - @admission_volume_hash.each do |direction_id, competitive_groups|
-  - competitive_groups.select{|k, v| k.is_for_krym == false}.each do |competitive_group, numbers|
+  - competitive_groups.select{|k, v| k.is_for_krym == false && [14, 15].include?(k.education_source_id)}.each do |competitive_group, numbers|
     .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
       .panel.panel-default
         .panel-heading(role="tab" id="heading#{competitive_group.id}")
@@ -49,7 +49,7 @@ p
                       td= values[:achievements_sum] if values[:achievements_sum] > 0
                       td.text-center= "+" if application.benefit
         - else
-          - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
+          - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
           - examless_applications = applications.select{|k, v| v[:examless] && competitive_group.id == k.budget_agr}
           - n = 0
           - unless examless_applications.empty?
@@ -88,6 +88,7 @@ p
                 th(scope="col") Сумма баллов за вступительные испытания
                 th(scope="col") Баллы за индивидуальные достижения
                 th(scope="col") Наличие преимущественного права на зачисление
+                th(scope='col') Зачислен по другому конкурсу
             tbody
               - applications.each do |application, values|
                 - n += 1
@@ -96,10 +97,17 @@ p
                   td(scope="row")= n
                   td= "%04d" % application.application_number
                   td= application.fio
-                  td.text-center= "+" if values[:original_received] && (application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id)
+                  td.text-center
+                    - if values[:original_received] && (application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id)
+                      span.glyphicon.glyphicon-plus(aria-hidden="true")
                   td= values[:full_summa]
                   - values[:marks].each do |mark|
                         td= mark
                   td= values[:summa]
                   td= values[:achievements_sum] if values[:achievements_sum] > 0
-                  td.text-center= "+" if application.benefit
+                  td.text-center
+                    - if application.benefit
+                      span.glyphicon.glyphicon-plus(aria-hidden="true")
+                  td.text-center
+                    - if application.enrolled
+                      span.glyphicon.glyphicon-plus(aria-hidden="true")
