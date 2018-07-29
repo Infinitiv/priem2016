@@ -51,6 +51,7 @@ Rails.application.routes.draw do
       get 'ege_to_txt'
       get 'competition_lists'
       get 'ord_export'
+      get 'ord_return_export'
       get 'ord_marks_request'
       get 'competition_lists_to_html'
     end

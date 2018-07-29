@@ -53,6 +53,7 @@ body
               li= link_to "Ошибки #{campaign.name} #{campaign.year_start}", errors_entrant_applications_url + "?campaign_id=#{campaign.id}"
               li= link_to "Конкурс #{campaign.name} #{campaign.year_start}", competition_lists_entrant_applications_url + "?campaign_id=#{campaign.id}"
               li= link_to "Выгрузка в ИАС #{campaign.name} #{campaign.year_start}", ord_export_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+              li= link_to "Выгрузка в ИАС (отзыв заявлений) #{campaign.name} #{campaign.year_start}", ord_return_export_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
               li= link_to "Запрос оценок из ИАС #{campaign.name} #{campaign.year_start}", ord_marks_request_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
               li= link_to "Конкурсные списки в html #{campaign.name} #{campaign.year_start}", competition_lists_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}"
         li.dropdown

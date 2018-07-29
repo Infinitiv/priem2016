@@ -296,6 +296,41 @@ class EntrantApplication < ActiveRecord::Base
     end
   end
   
+  def self.ord_return_export(applications)
+    oid = '1.2.643.5.1.13.13.12.4.37.21'
+    headers = [
+      'snils',
+      'oid',
+      'compaignId',
+      'dateOfBirth',
+      'specialty',
+      'financingType',
+      'applicationDate',
+      'targetReception',
+      'initiative'
+    ]
+
+    CSV.generate(headers: true, col_sep: ';') do |csv|
+      csv << headers
+      applications.each do |application|
+        application.competitive_groups.each do |competitive_group|
+          row = [
+            application.snils,
+            oid,
+            1,
+            application.birth_date.strftime("%d.%m.%Y"),
+            competitive_group.edu_programs.last.code,
+            (competitive_group.education_source_id == 15 ? 'договор' : 'бюджет'),
+            application.registration_date.strftime("%d.%m.%Y"),
+            (competitive_group.education_source_id == 16 ? 'да' : 'нет'),
+            1
+            ]
+          csv << row
+        end
+      end
+    end
+  end
+  
   def self.ord_marks_request(applications)
     oid = '1.2.643.5.1.13.13.12.4.37.21'
     headers = [
