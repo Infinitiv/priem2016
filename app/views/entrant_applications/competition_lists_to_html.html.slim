@@ -10,7 +10,7 @@ p
       .panel.panel-default
         .panel-heading(role="tab" id="heading#{competitive_group.id}")
           .panel-title
-            = link_to "#{competitive_group.name} (мест в конкурсе - #{numbers})", "#collapse#{competitive_group.id}", data: {toggle: "collapse", parent: "#accordion"}, aria: {expanded: "false", controls: "#collapse#{competitive_group.id}"}
+            = link_to "#{competitive_group.name} (всего мест в конкурсе - #{numbers})", "#collapse#{competitive_group.id}", data: {toggle: "collapse", parent: "#accordion"}, aria: {expanded: "false", controls: "#collapse#{competitive_group.id}"}
     .panel-collapse.collapse(id="collapse#{competitive_group.id}" role="tabpanel" aria-labelledby="heading#{competitive_group.id}")
       .panel-body
         - if competitive_group.education_source_id == 16
@@ -50,6 +50,7 @@ p
                       td.text-center= "+" if application.benefit
         - else
           - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
+          - enrolled_applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled == competitive_group.id}
           - examless_applications = applications.select{|k, v| v[:examless] && competitive_group.id == k.budget_agr}
           - n = 0
           - unless examless_applications.empty?
@@ -75,6 +76,8 @@ p
                     td= values[:achievements_sum] if values[:achievements_sum] > 0
                     td.text-center= "+" if application.benefit
           h3 Общий конкурс
+          p
+            strong= "осталось вакантных мест в конкурсе - #{numbers - enrolled_applications.count}"
           table.table
             thead
               tr
@@ -92,7 +95,7 @@ p
             tbody
               - applications.each do |application, values|
                 - n += 1
-                - label_class = "success" if n <= numbers
+                - label_class = "success" if n <= (numbers - enrolled_applications.count)
                 tr class=label_class
                   td(scope="row")= n
                   td= "%04d" % application.application_number
