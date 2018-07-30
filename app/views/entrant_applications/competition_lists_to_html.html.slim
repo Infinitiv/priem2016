@@ -50,7 +50,7 @@ p
                       td.text-center= "+" if application.benefit
         - else
           - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
-          - enrolled_applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled == competitive_group.id}
+          - enrolled_applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
           - examless_applications = applications.select{|k, v| v[:examless] && competitive_group.id == k.budget_agr}
           - n = 0
           - unless examless_applications.empty?
