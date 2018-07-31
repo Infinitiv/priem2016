@@ -4,8 +4,15 @@ class Report
     campaign.admission_volumes.each do |admission_volume|
       direction_id = admission_volume.direction_id
       points[direction_id] = {}
+      points[direction_id][:f1_2] = {}
       points[direction_id][:f2_2] = {}
       points[direction_id][:f2_3] = {}
+      
+      competitive_groups = campaign.competitive_groups.where(direction_id: direction_id, education_source_id: 14)
+      entrant_applications = campaign.entrant_applications.joins(:competitive_groups).where(competitive_groups: {id: competitive_groups.map(&:id)})
+      entrant_applications_examless = entrant_applications.joins(:olympic_documents).where(olympic_documents: {benefit_type_id: 1})
+      points[direction_id][:f1_2][:p12_2] = entrant_applications_examless.count
+      
       competitive_groups = campaign.competitive_groups.where(direction_id: direction_id, education_source_id: 20)
       entrant_applications = campaign.entrant_applications.where(enrolled: competitive_groups.map(&:id))
       marks = Mark.joins(:entrant_application).where(entrant_applications: {id: campaign.entrant_applications.map(&:id)}, form: 'ЕГЭ')

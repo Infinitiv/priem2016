@@ -117,5 +117,5 @@ p
                     - if application.benefit
                       span.glyphicon.glyphicon-plus(aria-hidden="true")
                   td.text-center
-                    - if application.enrolled
+                    - if application.enrolled && application.exeptioned != application.enrolled
                       span.glyphicon.glyphicon-plus(aria-hidden="true")
