@@ -4,6 +4,10 @@ p
   span Зеленым цветом выделены абитуриенты гарантированно поступающие на обучение при 
   strong наличии 
   span в академии оригинала документа об образовании и заявления о согласии на зачисление на данный конкурс
+.checkbox
+  label
+    = check_box_tag 'tr-hide', 'yes', false, id: 'tr-hide'
+    span Показать только поступающих с оригиналами и согласиями
 - @admission_volume_hash.each do |direction_id, competitive_groups|
   - competitive_groups.select{|k, v| k.is_for_krym == false && [14, 15].include?(k.education_source_id)}.each do |competitive_group, numbers|
     .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
@@ -22,23 +26,23 @@ p
               table.table
                 thead
                   tr
-                    th(scope="col") №№
-                    th(scope="col") № личного дела
-                    th(scope="col") Ф.И.О
-                    th(scope="col") Оригинал и согласие на зачисление
-                    th(scope="col") Сумма конкурсных баллов
+                    th №№
+                    th № личного дела
+                    th Ф.И.О
+                    th Оригинал и согласие на зачисление
+                    th Сумма конкурсных баллов
                     - @entrance_test_items.each do |entrance_test_item|
                       th= entrance_test_item.subject.subject_name
-                    th(scope="col") Сумма баллов за вступительные испытания
-                    th(scope="col") Баллы за индивидуальные достижения
-                    th(scope="col") Наличие преимущественного права на зачисление
+                    th Сумма баллов за вступительные испытания
+                    th Баллы за индивидуальные достижения
+                    th Наличие преимущественного права на зачисление
                 tbody
                   - n = 0
                   - applications.each do |application, values|
                     - n += 1
                     - label_class = "success" if n <= number_target_o
                     tr class=label_class
-                      td(scope="row")= n
+                      td
                       td= "%04d" % application.application_number
                       td= application.fio
                       td.text-center= "+" if values[:original_received] && application.budget_agr == competitive_group.id
@@ -58,18 +62,18 @@ p
             table.table
               thead
                 tr
-                  th(scope="col") №№
-                  th(scope="col") № личного дела
-                  th(scope="col") Ф.И.О
-                  th(scope="col") Основание приема без испытаний
-                  th(scope="col") Баллы за индивидуальные достижения
-                  th(scope="col") Наличие преимущественного права на зачисление
+                  th №№
+                  th № личного дела
+                  th Ф.И.О
+                  th Основание приема без испытаний
+                  th Баллы за индивидуальные достижения
+                  th Наличие преимущественного права на зачисление
               tbody
                 - examless_applications.each do |application, values|
                   - n += 1
                   - label_class = "success" if n <= numbers
                   tr class=label_class
-                    td(scope="row")= n
+                    td
                     td= "%04d" % application.application_number
                     td= application.fio
                     td Олимпиада школьников
@@ -81,23 +85,24 @@ p
           table.table
             thead
               tr
-                th(scope="col") №№
-                th(scope="col") № личного дела
-                th(scope="col") Ф.И.О
-                th(scope="col") Оригинал и согласие на зачисление
-                th(scope="col") Сумма конкурсных баллов
+                th №№
+                th № личного дела
+                th Ф.И.О
+                th Оригинал и согласие на зачисление
+                th Сумма конкурсных баллов
                 - @entrance_test_items.each do |entrance_test_item|
                       th= entrance_test_item.subject.subject_name
-                th(scope="col") Сумма баллов за вступительные испытания
-                th(scope="col") Баллы за индивидуальные достижения
-                th(scope="col") Наличие преимущественного права на зачисление
+                th Сумма баллов за вступительные испытания
+                th Баллы за индивидуальные достижения
+                th Наличие преимущественного права на зачисление
                 th(scope='col') Зачислен по другому конкурсу
             tbody
               - applications.each do |application, values|
                 - n += 1
                 - label_class = "success" if n <= (numbers - enrolled_applications.count)
+                - label_class = [label_class, 'tr-hide'].compact.join(' ') unless values[:original_received] && (application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id)
                 tr class=label_class
-                  td(scope="row")= n
+                  td
                   td= "%04d" % application.application_number
                   td= application.fio
                   td.text-center
