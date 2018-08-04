@@ -7,14 +7,15 @@ h1 Мониторинг приемной кампании
       h2 Педиатрия
     - when 17247
       h2 Стоматология
-  - data.each do |forma, points|
-    table.table
-      caption= forma
-      thead
-        tr
-          - points.each do |p, v|
-            th= p
-      tbody
-        tr
-          - points.each do |p, v|
-            td= v
+  - data.each do |forma, sources|
+    - sources.each do |source, points|
+      table.table
+        caption= "#{forma} (#{source})"
+        thead
+          tr
+            - points.each do |p, v|
+              th= p
+        tbody
+          tr
+            - points.each do |p, v|
+              td= v

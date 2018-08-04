@@ -586,9 +586,9 @@ class Request < ActiveRecord::Base
                 ooa.EducationLevelID competitive_group.education_level_id
                 unless competitive_group.education_source_id == 15
                   case d.to_date.to_s
-                  when "2017-08-03"
+                  when "2018-08-03"
                     ooa.Stage 1
-                  when "2017-08-08"
+                  when "2018-08-08"
                     ooa.Stage 2
                   else
                     ooa.Stage 0
