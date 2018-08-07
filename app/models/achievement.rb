@@ -2,7 +2,7 @@ class Achievement < ActiveRecord::Base
   belongs_to :entrant_application
   belongs_to :institution_achievement
 
-  validates :value, numericality: {only_integer: true}
+  validates :value, numericality: true
   
   def self.import_from_row(row, entrant_application)
     institution_achievements = entrant_application.campaign.institution_achievements
@@ -12,7 +12,7 @@ class Achievement < ActiveRecord::Base
     row_achievements.each do |row_achievement_name, row_achievement_value|
       institution_achievement = institution_achievements.find_by_name(row_achievement_name)
       achievement = achievements.find_by_institution_achievement_id(institution_achievement.id) || achievements.new(institution_achievement_id: institution_achievement.id)
-      achievement.value = row_achievement_value.to_i < institution_achievement.max_value ? row_achievement_value.to_i : institution_achievement.max_value
+      achievement.value = row_achievement_value.to_f < institution_achievement.max_value ? row_achievement_value.to_f : institution_achievement.max_value
       achievement.save!
     end
   end
