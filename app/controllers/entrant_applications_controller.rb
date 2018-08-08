@@ -78,7 +78,7 @@ class EntrantApplicationsController < ApplicationController
   def competition_lists_to_html
     @entrance_test_items = @campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     @admission_volume_hash = EntrantApplication.admission_volume_hash(@campaign)
-    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign).select{|k, v| v[:summa] > 0 && k.status_id == 4}.select{|k, v| v[:summa] > 0}.sort_by{|k, v| [v[:full_summa].to_i, v[:summa].to_i, v[:marks], v[:benefit]]}.reverse
+    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign).select{|k, v| v[:summa] > 0 && k.status_id == 4}.select{|k, v| v[:summa] > 0}.sort_by{|k, v| [v[:full_summa].to_f, v[:summa].to_f, v[:marks], v[:benefit]]}.reverse
     @target_organizations = TargetOrganization.order(:target_organization_name)
     html = render_to_string layout: 'competition_lists_to_html'
     filename = "#{@campaign.id}-#{Time.now.to_datetime.strftime("%F %T")}.html".gsub(' ', '-')
@@ -90,7 +90,7 @@ class EntrantApplicationsController < ApplicationController
   def competition_lists_ord_to_html
     @entrance_test_items = @campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     @admission_volume_hash = EntrantApplication.admission_volume_hash(@campaign)
-    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign).select{|k, v| v[:summa] > 0 && k.status_id == 4}.select{|k, v| v[:summa] > 0}.sort_by{|k, v| [v[:full_summa].to_i, v[:summa].to_i, v[:marks], v[:benefit]]}.reverse
+    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign).select{|k, v| v[:summa] > 0 && k.status_id == 4}.select{|k, v| v[:summa] > 0}.sort_by{|k, v| [v[:full_summa].to_f, v[:summa].to_f, v[:marks], v[:benefit]]}.reverse
     @target_organizations = TargetOrganization.order(:target_organization_name)
     html = render_to_string layout: 'competition_lists_to_html'
     filename = "#{@campaign.id}-#{Time.now.to_datetime.strftime("%F %T")}.html".gsub(' ', '-')
