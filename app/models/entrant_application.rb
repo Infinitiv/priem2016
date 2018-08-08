@@ -66,9 +66,9 @@ class EntrantApplication < ActiveRecord::Base
       when campaign.education_levels.include?(18)
         if row['agreement']
           if row['agreement'] =~ /Внебюджет/
-            entrant_application.paid_agr = competitive_groups.find_by_name(row['agreement'])
+            entrant_application.paid_agr = competitive_groups.find_by_name(row['agreement']).id
           else
-            entrant_application.budget_agr = competitive_groups.find_by_name(row['agreement'])
+            entrant_application.budget_agr = competitive_groups.find_by_name(row['agreement']).id
           end
         end
           entrant_application.target_organization_id = row['target1'].to_i if row['target1']
