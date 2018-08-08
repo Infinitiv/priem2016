@@ -188,7 +188,7 @@ class EntrantApplication < ActiveRecord::Base
   
   def self.admission_volume_hash(campaign)
     admission_volume_hash = {}
-    campaign.competitive_groups.includes(:competitive_group_item).group_by(&:direction_id).each do |k, v|
+    campaign.competitive_groups.includes(:competitive_group_item).sort_by{|cg| cg.edu_programs.map(&:name)}.group_by(&:direction_id).each do |k, v|
       admission_volume_hash[k] = {}
       v.each do |competitive_group|
         admission_volume_hash[k][competitive_group] = [competitive_group.competitive_group_item.number_budget_o, 
