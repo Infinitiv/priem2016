@@ -214,19 +214,24 @@ class EntrantApplication < ActiveRecord::Base
     
     entrance_test_items = campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     
+    marks = Mark.joins(:entrant_application).where(entrant_applications: {id: entrant_applications.map(&:id)}).group_by(&:entrant_application_id)
+    mark_values = marks.map{|a, ms| {a => ms.map{|m| [m.subject_id => m.value].inject(:merge)}}}.inject(:merge)
     
-    marks = Mark.joins(:entrant_application).where(entrant_applications: {id: entrant_applications.map(&:id)}).group_by(&:entrant_application_id).map{|a, ms| {a => ms.map{|m| [m.subject_id => m.value].inject(:merge)}}}.inject(:merge)
+    mark_forms = marks.map{|a, ms| {a => ms.map{|m| [m.subject_id => m.form].inject(:merge)}}}.inject(:merge)
     
     entrant_applications_hash = {}
     entrant_applications.each do |entrant_application|
       entrant_applications_hash[entrant_application] = {}
       entrant_applications_hash[entrant_application][:competitive_groups] = entrant_application.competitive_groups.map(&:id)
-      entrant_applications_hash[entrant_application][:marks] = []
+      entrant_applications_hash[entrant_application][:mark_values] = []
+      entrant_applications_hash[entrant_application][:mark_forms] = []
       entrance_test_items.each do |entrance_test_item|
-        mark = marks[entrant_application.id].inject(:merge)[entrance_test_item.subject_id]
-        entrant_applications_hash[entrant_application][:marks] << mark if mark >= entrance_test_item.min_score
+        mark_value = mark_values[entrant_application.id].inject(:merge)[entrance_test_item.subject_id]
+        mark_form = mark_forms[entrant_application.id].inject(:merge)[entrance_test_item.subject_id]
+        entrant_applications_hash[entrant_application][:mark_values] << mark_value if mark_value >= entrance_test_item.min_score
+        entrant_applications_hash[entrant_application][:mark_forms] << mark_form
       end
-      entrant_applications_hash[entrant_application][:summa] = entrant_applications_hash[entrant_application][:marks].size == entrance_test_items.size ? entrant_applications_hash[entrant_application][:marks].sum : 0
+      entrant_applications_hash[entrant_application][:summa] = entrant_applications_hash[entrant_application][:mark_values].size == entrance_test_items.size ? entrant_applications_hash[entrant_application][:mark_values].sum : 0
       entrant_applications_hash[entrant_application][:achievements] = entrant_application.achievements.map(&:value)
       achievements_sum = entrant_applications_hash[entrant_application][:achievements].sum
       achievements_limit = 10 if campaign.education_levels.include?(5)

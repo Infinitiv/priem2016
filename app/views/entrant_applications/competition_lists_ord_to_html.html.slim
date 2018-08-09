@@ -51,7 +51,7 @@ p
                         - if application.budget_agr == competitive_group.id
                           span.glyphicon.glyphicon-plus(aria-hidden="true")
                       td= values[:full_summa]
-                      - values[:marks].each do |mark|
+                      - values[:mark_values].each do |mark|
                         td= mark
                       td= values[:achievements_sum] if values[:achievements_sum] > 0
         - else
@@ -90,7 +90,7 @@ p
                     - if (application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id)
                       span.glyphicon.glyphicon-plus(aria-hidden="true")
                   td= values[:full_summa]
-                  - values[:marks].each do |mark|
+                  - values[:mark_values].each do |mark|
                         td= mark
                   td= values[:achievements_sum] if values[:achievements_sum] > 0
                   td.text-center
