@@ -511,6 +511,8 @@ class Request < ActiveRecord::Base
                     etr.ResultSourceTypeID 1
                   when sub_item.form == "Экзамен"
                     etr.ResultSourceTypeID 2
+                  else
+                    etr.ResultSourceTypeID 3
                   end
                   etr.EntranceTestSubject do |ets|
                     ets.SubjectID sub_item.subject.subject_id
