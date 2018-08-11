@@ -9,7 +9,7 @@ p
     = check_box_tag 'tr-hide', 'yes', false, id: 'tr-hide'
     span Показать только поступающих с оригиналами и согласиями
 - @admission_volume_hash.each do |direction_id, competitive_groups|
-  - competitive_groups.select{|k, v| k.is_for_krym == false && [14, 15, 16].include?(k.education_source_id)}.sort_by{|k, v| k.name}.each do |competitive_group, numbers|
+  - competitive_groups.select{|k, v| k.is_for_krym == false && [14, 15].include?(k.education_source_id)}.sort_by{|k, v| k.name}.each do |competitive_group, numbers|
     .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
       .panel.panel-default
         .panel-heading(role="tab" id="heading#{competitive_group.id}")
@@ -55,7 +55,11 @@ p
                         td= mark
                       td= values[:achievements_sum] if values[:achievements_sum] > 0
         - else
-          - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
+          - case competitive_group.education_source_id
+            - when 14        
+              - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id && v[:original_received]}
+            -when 15
+              - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled != competitive_group.id}
           - enrolled_applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
           - n = 0
           h3 Общий конкурс
