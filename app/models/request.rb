@@ -471,12 +471,12 @@ class Request < ActiveRecord::Base
                   end
                 end
               end
-              achievements = item.institution_achievements
+              achievements = item.achievements
               unless achievements.empty?
                 ads.CustomDocuments do |cds|
                   achievements.each do |sub_item|
                       cds.CustomDocument do |cd|
-                        case sub_item.id_category
+                        case sub_item.institution_achievement.id_category
                         when 9
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                           cd.DocumentName "Аттестат о среднем общем образовании с отличием"
@@ -563,7 +563,7 @@ class Request < ActiveRecord::Base
               a.IndividualAchievements do |ias|
                 achievements.each do |sub_item|
                   ias.IndividualAchievement do |ia|
-                    ia.IAUID [campaign.year_start, "%04d" % item.application_number, postfix, sub_item.id_category].join('-')
+                    ia.IAUID [campaign.year_start, "%04d" % item.application_number, postfix, sub_item.institution_achievement.id_category].join('-')
                     ia.InstitutionAchievementUID sub_item.institution_achievement_id
                     ia.IAMark sub_item.value
                     case sub_item.institution_achievement.id_category
