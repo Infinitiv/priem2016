@@ -505,7 +505,7 @@ class Request < ActiveRecord::Base
                         else
                           cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'other'].join('-')
                           cd.DocumentName "Иной документ, подтверждающий индивидуальное достижение"
-                          cd.DocumentDate item.registration_date.to_datetime.to_s.gsub('+00', '+03')
+                          cd.DocumentDate item.registration_date.to_s
                           cd.DocumentOrganization 'Организация'
                         end
                       end
