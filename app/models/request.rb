@@ -283,10 +283,17 @@ class Request < ActiveRecord::Base
     pd.Applications do |as|
       applications.each do |item|
         as.Application do |a|
-          a.UID [campaign.year_start, "%04d" % item.application_number].join('-')
-          a.ApplicationNumber [campaign.year_start, "%04d" % item.application_number].join('-')
+          postfix = case true
+                    when campaign.education_levels.include?(5)
+                      's'
+                    when campaign.education_levels.include?(18)
+                      'o'
+                    end
+          application_number = [campaign.year_start, "%04d" % item.application_number, postfix].join('-')
+          a.UID application_number
+          a.ApplicationNumber application_number
           a.Entrant do |e|
-            e.UID [campaign.year_start, "%04d" % item.application_number].join('-')
+            e.UID application_number
             e.LastName item.entrant_last_name
             e.FirstName item.entrant_first_name
             e.MiddleName item.entrant_middle_name if item.entrant_middle_name
@@ -490,10 +497,15 @@ class Request < ActiveRecord::Base
                         cd.DocumentDate item.education_document.education_document_date
                         cd.DocumentOrganization "Организация СПО"
                       when 8
-                        cd.UID ["ach", campaign.year_start, item.application_number, 'gto'].join('-')
+                        cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'gto'].join('-')
                         cd.DocumentName "Удоствоверение о награждении золотым значком ГТО"
                         cd.DocumentDate '2018-04-20'
                         cd.DocumentOrganization 'Министерство спорта Российской Федерации'
+                      else
+                        cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'other'].join('-')
+                        cd.DocumentName "Иной документ, подтверждающий индивидуальное достижение"
+                        cd.DocumentDate item.registration_date.to_datetime.to_s.gsub('+00', '+03')
+                        cd.DocumentOrganization 'Организация'
                       end
                     end
                   end
@@ -533,6 +545,9 @@ class Request < ActiveRecord::Base
                         when 1
                           id.DocumentNumber "2018-3"
                           id.DocumentDate "2018-07-20"
+                        when 179
+                          id DocumentNumber "2018-1"
+                          id.DocumentDate "2018-08-07"
                         end
                         id.DocumentTypeID 1
                       end
@@ -542,24 +557,22 @@ class Request < ActiveRecord::Base
               end
             end
           end
-          achievements = item.institution_achievements
+          achievements = item.achievements.includes(:institution_achievement)
           unless achievements.empty?
             a.IndividualAchievements do |ias|
-              if achievements.length == 2
-              sub_item = achievements.where.not(id_category: 8).first
+              achievements.each do |sub_item|
                 ias.IndividualAchievement do |ia|
-                  ia.IAUID [campaign.year_start, "%04d" % item.application_number, sub_item.id_category].join('-')
-                  ia.InstitutionAchievementUID sub_item.id
-                  ia.IAMark sub_item.max_value
-                  ia.IADocumentUID ["ach", campaign.year_start, item.education_document.id].join('-')
-                end
-              else
-                sub_item = achievements.first
-                ias.IndividualAchievement do |ia|
-                  ia.IAUID [campaign.year_start, "%04d" % item.application_number, sub_item.id_category].join('-')
-                  ia.InstitutionAchievementUID sub_item.id
-                  ia.IAMark sub_item.max_value
-                  ia.IADocumentUID sub_item.id_category == 8 ? ["ach", campaign.year_start, item.application_number, 'gto'].join('-') : ["ach", campaign.year_start, item.education_document.id].join('-')
+                  ia.IAUID [campaign.year_start, "%04d" % item.application_number, postfix, sub_item.id_category].join('-')
+                  ia.InstitutionAchievementUID sub_item.institution_achievement_id
+                  ia.IAMark sub_item.value
+                  case sub_item.institution_achievement.id_category
+                  when 8
+                    ia.IADocumentUID ["ach", campaign.year_start, item.application_number, postfix, 'gto'].join('-')
+                  when 19
+                    ia.IADocumentUID ["ach", campaign.year_start, item.application_number, postfix, 'other'].join('-')
+                  else
+                    ia.IADocumentUID ["ach", campaign.year_start, item.education_document.id].join('-')
+                  end
                 end
               end
             end
