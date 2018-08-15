@@ -9,7 +9,7 @@ p
     = check_box_tag 'tr-hide', 'yes', false, id: 'tr-hide'
     span Показать только поступающих с оригиналами и согласиями
 - @admission_volume_hash.each do |direction_id, competitive_groups|
-  - competitive_groups.select{|k, v| k.is_for_krym == false && [14, 15].include?(k.education_source_id)}.sort_by{|k, v| k.name}.each do |competitive_group, numbers|
+  - competitive_groups.select{|k, v| k.is_for_krym == false && [15].include?(k.education_source_id)}.sort_by{|k, v| k.name}.each do |competitive_group, numbers|
     .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
       .panel.panel-default
         .panel-heading(role="tab" id="heading#{competitive_group.id}")
