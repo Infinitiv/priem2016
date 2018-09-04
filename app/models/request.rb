@@ -278,7 +278,8 @@ class Request < ActiveRecord::Base
   def self.applications(pd, params)
     campaign = Campaign.find(params[:campaign_id])
     last_import_date = Request.select(:query, :output, :created_at).where(query: 'import').select{|r| Nokogiri::XML(r.output).at_css('PackageID')}.last.created_at
-    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6]).where('updated_at > ?', last_import_date)
+    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6])
+#     .where('updated_at > ?', last_import_date)
     
     pd.Applications do |as|
       applications.each do |item|
@@ -474,43 +475,45 @@ class Request < ActiveRecord::Base
               achievements = item.achievements
               unless achievements.empty?
                 ads.CustomDocuments do |cds|
+                  n = 0
                   achievements.each do |sub_item|
-                      cds.CustomDocument do |cd|
-                        case sub_item.institution_achievement.id_category
-                        when 9
-                          cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
-                          cd.DocumentName "Аттестат о среднем общем образовании с отличием"
-                          cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization "Организация СО"
-                        when 15
-                          cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
-                          cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
-                          cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization "Организация СО"
-                        when 16
-                          cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
-                          cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
-                          cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization "Организация СО"
-                        when 17
-                          cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
-                          cd.DocumentName "Диплом о среднем профессиональном образовании с отличием"
-                          cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization "Организация СПО"
-                        when 8
-                          cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'gto'].join('-')
-                          cd.DocumentName "Удоствоверение о награждении золотым значком ГТО"
-                          cd.DocumentDate '2018-04-20'
-                          cd.DocumentOrganization 'Министерство спорта Российской Федерации'
-                        else
-                          cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'other'].join('-')
-                          cd.DocumentName "Иной документ, подтверждающий индивидуальное достижение"
-                          cd.DocumentDate item.registration_date.to_s
-                          cd.DocumentOrganization 'Организация'
-                        end
+                    n = += 1
+                    cds.CustomDocument do |cd|
+                      case sub_item.institution_achievement.id_category
+                      when 9
+                        cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
+                        cd.DocumentName "Аттестат о среднем общем образовании с отличием"
+                        cd.DocumentDate item.education_document.education_document_date
+                        cd.DocumentOrganization "Организация СО"
+                      when 15
+                        cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
+                        cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
+                        cd.DocumentDate item.education_document.education_document_date
+                        cd.DocumentOrganization "Организация СО"
+                      when 16
+                        cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
+                        cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
+                        cd.DocumentDate item.education_document.education_document_date
+                        cd.DocumentOrganization "Организация СО"
+                      when 17
+                        cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
+                        cd.DocumentName "Диплом о среднем профессиональном образовании с отличием"
+                        cd.DocumentDate item.education_document.education_document_date
+                        cd.DocumentOrganization "Организация СПО"
+                      when 8
+                        cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'gto'].join('-')
+                        cd.DocumentName "Удоствоверение о награждении золотым значком ГТО"
+                        cd.DocumentDate '2018-04-20'
+                        cd.DocumentOrganization 'Министерство спорта Российской Федерации'
+                      else
+                        cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'other', n].join('-')
+                        cd.DocumentName "Иной документ, подтверждающий индивидуальное достижение"
+                        cd.DocumentDate item.registration_date.to_s
+                        cd.DocumentOrganization 'Организация'
                       end
                     end
                   end
+                end
               end
             end
             a.EntranceTestResults do |etrs|
@@ -533,7 +536,8 @@ class Request < ActiveRecord::Base
                     end
                     etr.EntranceTestTypeID sub_item.subject.entrance_test_item.entrance_test_type_id
                     etr.CompetitiveGroupUID cg.id
-                    if sub_item.form == "Экзамен"
+                    case sub_item.form
+                    when "Экзамен"
                       etr.ResultDocument do |rd|
                         rd.InstitutionDocument do |id|
                           case sub_item.subject.subject_id
@@ -546,10 +550,15 @@ class Request < ActiveRecord::Base
                           when 1
                             id.DocumentNumber "2018-3"
                             id.DocumentDate "2018-07-20"
-                          when 179
-                            id DocumentNumber "2018-1"
-                            id.DocumentDate "2018-08-07"
                           end
+                          id.DocumentTypeID 1
+                        end
+                      end
+                    when "аккредитация" || "ординатура"
+                      etr.ResultDocument do |rd|
+                        rd.InstitutionDocument do |id|
+                          id DocumentNumber "2018-1"
+                          id.DocumentDate "2018-08-07"
                           id.DocumentTypeID 1
                         end
                       end
@@ -561,7 +570,9 @@ class Request < ActiveRecord::Base
             achievements = item.achievements.includes(:institution_achievement)
             unless achievements.empty?
               a.IndividualAchievements do |ias|
+                n = 0
                 achievements.each do |sub_item|
+                  n += 1
                   ias.IndividualAchievement do |ia|
                     ia.IAUID [campaign.year_start, "%04d" % item.application_number, postfix, sub_item.institution_achievement.id_category].join('-')
                     ia.InstitutionAchievementUID sub_item.institution_achievement_id
@@ -570,7 +581,7 @@ class Request < ActiveRecord::Base
                     when 8
                       ia.IADocumentUID ["ach", campaign.year_start, item.application_number, postfix, 'gto'].join('-')
                     when 19
-                      ia.IADocumentUID ["ach", campaign.year_start, item.application_number, postfix, 'other'].join('-')
+                      ia.IADocumentUID ["ach", campaign.year_start, item.application_number, postfix, 'other', n].join('-')
                     else
                       ia.IADocumentUID ["ach", campaign.year_start, item.education_document.id].join('-')
                     end
