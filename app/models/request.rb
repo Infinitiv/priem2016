@@ -536,8 +536,7 @@ class Request < ActiveRecord::Base
                     end
                     etr.EntranceTestTypeID sub_item.subject.entrance_test_item.entrance_test_type_id
                     etr.CompetitiveGroupUID cg.id
-                    case sub_item.form
-                    when "Экзамен"
+                    unless sub_item.form == "ЕГЭ"
                       etr.ResultDocument do |rd|
                         rd.InstitutionDocument do |id|
                           case sub_item.subject.subject_id
@@ -550,15 +549,10 @@ class Request < ActiveRecord::Base
                           when 1
                             id.DocumentNumber "2018-3"
                             id.DocumentDate "2018-07-20"
+                          else
+                            id.DocumentNumber "2018-1"
+                            id.DocumentDate "2018-08-07"
                           end
-                          id.DocumentTypeID 1
-                        end
-                      end
-                    when "аккредитация" || "ординатура"
-                      etr.ResultDocument do |rd|
-                        rd.InstitutionDocument do |id|
-                          id.DocumentNumber "2018-1"
-                          id.DocumentDate "2018-08-07"
                           id.DocumentTypeID 1
                         end
                       end
@@ -580,7 +574,7 @@ class Request < ActiveRecord::Base
                     case sub_item.institution_achievement.id_category
                     when 8
                       ia.IADocumentUID ["ach", campaign.year_start, item.application_number, postfix, 'gto'].join('-')
-                    when 19
+                    when 13
                       ia.IADocumentUID ["ach", campaign.year_start, item.application_number, postfix, 'other', n].join('-')
                     else
                       ia.IADocumentUID ["ach", campaign.year_start, item.education_document.id].join('-')
