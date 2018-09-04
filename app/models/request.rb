@@ -553,7 +553,7 @@ class Request < ActiveRecord::Base
                             id.DocumentNumber "2018-1"
                             id.DocumentDate "2018-08-07"
                           end
-                          id.DocumentTypeID 1
+                          id.DocumentTypeID 15
                         end
                       end
                     end
@@ -568,7 +568,7 @@ class Request < ActiveRecord::Base
                 achievements.each do |sub_item|
                   n += 1
                   ias.IndividualAchievement do |ia|
-                    ia.IAUID [campaign.year_start, "%04d" % item.application_number, postfix, sub_item.institution_achievement.id_category].join('-')
+                    ia.IAUID [campaign.year_start, "%04d" % item.application_number, postfix, sub_item.institution_achievement.id_category, n].join('-')
                     ia.InstitutionAchievementUID sub_item.institution_achievement_id
                     ia.IAMark sub_item.value
                     case sub_item.institution_achievement.id_category
