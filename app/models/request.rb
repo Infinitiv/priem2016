@@ -557,7 +557,7 @@ class Request < ActiveRecord::Base
                     when "аккредитация" || "ординатура"
                       etr.ResultDocument do |rd|
                         rd.InstitutionDocument do |id|
-                          id DocumentNumber "2018-1"
+                          id.DocumentNumber "2018-1"
                           id.DocumentDate "2018-08-07"
                           id.DocumentTypeID 1
                         end
