@@ -8,8 +8,8 @@ class EntrantApplication < ActiveRecord::Base
   has_many :benefit_documents, dependent: :destroy
   has_and_belongs_to_many :competitive_groups
   belongs_to :target_organization
-  has_many :achievements
-  has_many :olympic_documents
+  has_many :achievements, dependent: :destroy
+  has_many :olympic_documents, dependent: :destroy
   
 #   validates :application_number, :campaign_id, :entrant_last_name, :entrant_first_name, :gender_id, :birth_date, :registration_date, :status_id, :data_hash, presence: true
   
