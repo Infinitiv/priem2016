@@ -477,7 +477,7 @@ class Request < ActiveRecord::Base
                 ads.CustomDocuments do |cds|
                   n = 0
                   achievements.each do |sub_item|
-                    n = += 1
+                    n += 1
                     cds.CustomDocument do |cd|
                       case sub_item.institution_achievement.id_category
                       when 9
