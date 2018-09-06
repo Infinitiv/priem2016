@@ -553,7 +553,7 @@ class Request < ActiveRecord::Base
                             id.DocumentNumber "2018-1"
                             id.DocumentDate "2018-08-07"
                           end
-                          id.DocumentTypeID 15
+                          id.DocumentTypeID 1
                         end
                       end
                     end
