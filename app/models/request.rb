@@ -473,7 +473,7 @@ class Request < ActiveRecord::Base
                 end
               end
               achievements = item.achievements
-              unless achievements.sum(&:value) == 0
+              unless achievements.empty? || achievements.sum(&:value) == 0
                 ads.CustomDocuments do |cds|
                   n = 0
                   achievements.each do |sub_item|
@@ -564,7 +564,7 @@ class Request < ActiveRecord::Base
               end
             end
             achievements = item.achievements.includes(:institution_achievement)
-            unless achievements.sum(&:value) == 0
+            unless achievements.empty? || achievements.sum(&:value) == 0
               a.IndividualAchievements do |ias|
                 n = 0
                 achievements.each do |sub_item|
