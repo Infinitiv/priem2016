@@ -51,7 +51,6 @@ class AdmissionVolumesController < ApplicationController
   end
   
   def set_selects
-    @campaigns = Campaign.order(:created_at).select(:id, :name, :year_start)
     @education_levels = {'Специалитет' => 5,
                         'Кадры высшей квалификации' => 18
                        }
