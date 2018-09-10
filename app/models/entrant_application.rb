@@ -210,7 +210,7 @@ class EntrantApplication < ActiveRecord::Base
   
 
   def self.entrant_applications_hash(campaign)
-    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :target_organization_id, :budget_agr, :paid_agr, :enrolled, :exeptioned]).order(:application_number).includes(:achievements, :education_document, :competitive_groups, :benefit_documents, :olympic_documents)
+    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :target_organization_id, :budget_agr, :paid_agr, :enrolled, :enrolled_date, :exeptioned, :snils, :birth_date, :registration_date]).order(:application_number).includes(:achievements, :education_document, :competitive_groups, :benefit_documents, :olympic_documents)
     
     entrance_test_items = campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     
@@ -373,4 +373,70 @@ class EntrantApplication < ActiveRecord::Base
       end
     end
   end
+  
+  def self.ord_result_export(applications)
+    oid = '1.2.643.5.1.13.13.12.4.37.21'
+    headers = [
+      'snils',
+      'oid',
+      'compaignId',
+      'dateOfBirth',
+      'specialty',
+      'financingType',
+      'targetReception',
+      'applicationDate',
+      'amountScore',
+      'testResult',
+      'individualAchievements',
+      'applicationStatus',
+      'admissionOrderNumber',
+      'admissionOrderDate',
+      'regulationsParagraph',
+      'diplomaIssueDate',
+      'diplomaSpecialty'
+    ]
+
+    CSV.generate(headers: true, col_sep: ';') do |csv|
+      csv << headers
+      applications.each do |application, values|
+        application.competitive_groups.each do |competitive_group|
+          status = case application.status_id
+                    when 6
+                      3
+                    when 4
+                      application.enrolled && application.enrolled == competitive_group.id ? 1 : 2
+                    end
+          order_number = case application.enrolled_date
+                          when Date.new(2018, 8, 13)
+                            '111-ипо'
+                          when Date.new(2018, 8, 15)
+                            '112-ипо'
+                          when Date.new(2018, 8, 17)
+                            '114-ипо'
+                          end
+          row = [
+            application.snils,
+            oid,
+            1,
+            application.birth_date.strftime("%d.%m.%Y"),
+            competitive_group.edu_programs.last.code,
+            (competitive_group.education_source_id == 15 ? 'договор' : 'бюджет'),
+            (competitive_group.education_source_id == 16 ? 'да' : 'нет'),
+            application.registration_date.strftime("%d.%m.%Y"),
+            values[:full_summa],
+            values[:mark_values].sum,
+            ('а'..'г').zip(values[:achievements]).map{|i| i.join('-')}.join(','),
+            status,
+            (order_number if status == 1),
+            (application.enrolled_date.strftime("%d.%m.%Y") if status == 1),
+            '',
+            application.education_document.education_document_date.strftime("%d.%m.%Y"),
+            application.education_document.education_speciality_code
+            ]
+          csv << row
+        end
+      end
+    end
+  end
+  
 end

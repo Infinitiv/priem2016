@@ -2,7 +2,7 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
-  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export]
+  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export]
   
   def index
     @entrant_applications_hash = EntrantApplication.entrant_applications_hash(@campaign)
@@ -112,6 +112,11 @@ class EntrantApplicationsController < ApplicationController
   def ord_marks_request
     @entrant_applications = @campaign.entrant_applications.select(:id, :snils, :birth_date).includes(:marks, :education_document).joins(:marks).where(marks: {value: 0})
     send_data @entrant_applications.ord_marks_request(@entrant_applications), filename: "entrant_marks_request-#{Date.today}.csv", type: 'text/csv', disposition: "attachment"
+  end
+  
+  def ord_result_export
+    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign)
+    send_data EntrantApplication.ord_result_export(@applications_hash), filename: "entrant_marks_request-#{Date.today}.csv", type: 'text/csv', disposition: "attachment"
   end
   
   private
