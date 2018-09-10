@@ -615,13 +615,24 @@ class Request < ActiveRecord::Base
                 ooa.FinanceSourceID competitive_group.education_source_id
                 ooa.EducationLevelID competitive_group.education_level_id
                 unless competitive_group.education_source_id == 15
-                  case d.to_date.to_s
-                  when "2018-08-03"
-                    ooa.Stage 1
-                  when "2018-08-08"
-                    ooa.Stage 2
+                  if campaign.education_levels.include?(5)
+                    case d.to_date.to_s
+                    when "2018-08-03"
+                      ooa.Stage 1
+                    when "2018-08-08"
+                      ooa.Stage 2
+                    else
+                      ooa.Stage 0
+                    end
                   else
-                    ooa.Stage 0
+                    case d.to_date.to_s
+                    when "2018-08-15"
+                      ooa.Stage 1
+                    when "2018-08-17"
+                      ooa.Stage 2
+                    else
+                      ooa.Stage 0
+                    end
                   end
                 end
               end
