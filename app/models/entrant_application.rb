@@ -1,4 +1,6 @@
 class EntrantApplication < ActiveRecord::Base
+  require 'builder'
+  
   belongs_to :campaign
   has_many :marks, dependent: :destroy
   has_many :subjects, through: :marks
@@ -210,7 +212,7 @@ class EntrantApplication < ActiveRecord::Base
   
 
   def self.entrant_applications_hash(campaign)
-    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :target_organization_id, :budget_agr, :paid_agr, :enrolled, :enrolled_date, :exeptioned, :snils, :birth_date, :registration_date]).order(:application_number).includes(:achievements, :education_document, :competitive_groups, :benefit_documents, :olympic_documents)
+    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :target_organization_id, :budget_agr, :paid_agr, :enrolled, :enrolled_date, :exeptioned, :snils, :birth_date, :registration_date, :gender_id]).order(:application_number).includes(:achievements, :education_document, :competitive_groups, :benefit_documents, :olympic_documents)
     
     entrance_test_items = campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     
@@ -427,15 +429,316 @@ class EntrantApplication < ActiveRecord::Base
             application.registration_date.strftime("%d.%m.%Y"),
             values[:full_summa].round(),
             values[:mark_values].sum.round(),
-            (achievements_array - zero_array).join(','),
+            (achievements_array - zero_array).compact.join(','),
             status,
             (order_number if status == 1),
             (application.enrolled_date.strftime("%d.%m.%Y") if status == 1),
-            '',
+            nil,
             application.education_document.education_document_date.strftime("%d.%m.%Y"),
             application.education_document.education_speciality_code
             ]
           csv << row
+        end
+      end
+    end
+  end
+  
+  def self.target_report(applications)
+    target_competitive_groups = CompetitiveGroup.where(education_source_id: 16).map(&:id)
+    target_enrolled_applications = applications.select{|application, values| target_competitive_groups.include?(application.enrolled)}
+    xml = ::Builder::XmlMarkup.new
+    xml.root(id: 2277) do |root|
+      n = 0
+      target_enrolled_applications.each do |application, values|
+        n += 1
+        case CompetitiveGroup.find(application.enrolled).direction_id
+        when 17509
+          spec = 3073
+          duration = 6
+        when 17353
+          spec = 3074
+          duration = 6
+        when 17247
+          spec = 3075
+          duration = 5
+        end
+        year_start = application.campaign.year_start
+        p5_5 = application.target_organization.target_organization_name
+        case application.target_organization_id
+        when 2
+          p5_8 = 55908
+          p5_9 = 0
+          p5_10 = 1
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = 'предоставить гражданину в период его обучения меры социальной поддержки в соответствии с постановлением администрации Владимирской области от 07.11.2014 № 1143'
+          p5_15 = 12000
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 0
+          zak_type_1 = 0
+          zak_type_2 = 0
+          p5_32 = 2
+        when 3
+          p5_8 = 60696
+          p5_9 = 0
+          p5_10 = 0
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = 'ежемесячная денежная выплата в соответствии с законом Вологодской области от 6 мая 2013 года № 3035-ОЗ О мерах социальной поддержки, направленных на кадровое обеспечение системы здравоохранения области'
+          p5_15 = 0
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 0
+          zak_type_1 = 0
+          zak_type_2 = 0
+          p5_32 = 2
+        when 4
+          p5_8 = 74808
+          p5_9 = 0
+          p5_10 = 0
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = 'обеспечить предоставление гражданину в период его обучения меры социальной поддержки в сооответствии с Муниципальными программами (подпрограммами), принятыми в целях привлечения медицинских кадров для работы в учреждениях здравоохранения Ивановской области'
+          p5_15 = 0
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 0
+          zak_type_1 = 0
+          zak_type_2 = 0
+          p5_32 = 0
+        when 5
+          p5_8 = 94800
+          p5_9 = 0
+          p5_10 = 0
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = 'предоставить гражданину в период его обучения меры социальной поддержки в соответствии с действующим законодательством Костромской области, устанавливающим социальные гарантии для граждан, обучающихся в медицинских ВУЗах в рамках целевой контрактной подготовки от Костромской области'
+          p5_15 = 0
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 0
+          zak_type_1 = 0
+          zak_type_2 = 0
+          p5_32 = 3
+        when 6
+          p5_8 = 111446
+          p5_9 = 0
+          p5_10 = 2
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = ''
+          p5_15 = 16080
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 0
+          zak_type_1 = 0
+          zak_type_2 = 0
+          p5_32 = 2
+        when 8
+          p5_8 = 197660
+          p5_9 = 0
+          p5_10 = 3
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = ''
+          p5_15 = 36000
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 0
+          zak_type_1 = 0
+          zak_type_2 = 0
+          p5_32 = 2
+        when 9
+          p5_8 = 74808
+          p5_9 = 0
+          p5_10 = 0
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = 'выплата стипендии в размере, определяемом приказом руководителя Организации, принимаемым в установленном порядке до начала учебного года, при условии успешного освоения учебных дисциплин согласно учебному плану, подтвержденного результатами промежуточной аттестации со средним баллом не ниже 4,0; компенсация расходов, понесенных на обучение, повышение уровня знаний, совершенствование профессиональных компетенций'
+          p5_15 = 0
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 0
+          zak_type_1 = 0
+          zak_type_2 = 0
+          p5_32 = 3
+        when 42
+          p5_8 = 74808
+          p5_9 = 0
+          p5_10 = 0
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = ''
+          p5_15 = 0
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 0
+          zak_type_1 = 0
+          zak_type_2 = 0
+          p5_32 = 0
+        when 43
+          p5_8 = 215418
+          p5_9 = 0
+          p5_10 = 0
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = ''
+          p5_15 = 0
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 0
+          zak_type_1 = 0
+          zak_type_2 = 0
+          p5_32 = 0
+        when 20
+          p5_8 = 17406
+          p5_9 = 1
+          p5_10 = 0
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = ''
+          p5_15 = 6000
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 2
+          zak_type_1 = 0
+          zak_type_2 = 27
+          p5_32 = 2
+        when 22
+          p5_8 = 56978
+          p5_9 = 0
+          p5_10 = 1
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = 'предоставить гражданину в период его обучения меры социальной поддержки в соответствии с постановлением администрации Владимирской области от 07.11.2014 № 1143'
+          p5_15 = 6000
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 2
+          zak_type_1 = 0
+          zak_type_2 = 29
+          p5_32 = 2
+        when 23
+          p5_8 = 57448
+          p5_9 = 0
+          p5_10 = 0
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = 'поощрить денежной выплатой в размере 1000 рублей в случае получения диплома с отличием'
+          p5_15 = 0
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 2
+          zak_type_1 = 0
+          zak_type_2 = 30
+          p5_32 = 2
+        when 24
+          p5_8 = 56727
+          p5_9 = 0
+          p5_10 = 1
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = 'предоставить гражданину в период его обучения меры социальной поддержки в соответствии с муниципальной программой'
+          p5_15 = 10000
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 2
+          zak_type_1 = 0
+          zak_type_2 = 31
+          p5_32 = 2
+        when 25
+          p5_8 = 57582
+          p5_9 = 0
+          p5_10 = 0
+          p5_11 = 1
+          p5_12 = 0
+          p5_13 = 3
+          p5_14 = ''
+          p5_15 = 145000
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 2
+          zak_type_1 = 0
+          zak_type_2 = 32
+          p5_32 = 0
+        when 26
+          p5_8 = 58200
+          p5_9 = 0
+          p5_10 = 1
+          p5_11 = 0
+          p5_12 = 0
+          p5_13 = 0
+          p5_14 = ''
+          p5_15 = 4000
+          p5_16 = p5_5
+          p5_19 = p5_8
+          zak_type = 2
+          zak_type_1 = 0
+          zak_type_2 = 33
+          p5_32 = 2
+        end
+        ege = []
+        values[:mark_forms].each_with_index{|val, index| ege << values[:mark_values][index] if val == 'ЕГЭ'}
+        ege.size == 0 ? values[:mean] = nil : values[:mean] = ege.sum.to_f/ege.size
+        
+        root.lines(nom: n) do |lines|
+          lines.oo 2277
+          lines.spec spec
+          lines.fo 1
+          lines.if
+          lines.up
+          lines.id_kladr 74809
+          lines.p5_1 [year_start, "%04d" % application.application_number].join('-')
+          lines.p5_2 application.gender_id
+          lines.p5_3 year_start
+          lines.p5_4 year_start + duration
+          lines.p5_5 p5_5
+          lines.p5_8 p5_8
+          lines.p5_9 p5_9
+          lines.p5_10 p5_10
+          lines.p5_11 p5_11
+          lines.p5_12 p5_12
+          lines.p5_13 p5_13
+          lines.p5_14 p5_14
+          lines.p5_15 p5_15
+          lines.p5_16 p5_16
+          lines.p5_19 p5_19
+          lines.zak_type zak_type
+          lines.zak_type_1 zak_type_1
+          lines.zak_type_2 zak_type_2
+          lines.p5_22 0
+          lines.p5_23 0
+          lines.p5_24 0
+          lines.p5_25 0
+          lines.p5_26 0
+          lines.p5_27 0
+          lines.p5_28 0
+          lines.p5_29 
+          lines.p5_30 year_start
+          lines.p5_31 values[:mean]
+          lines.p5_32 p5_32
+#           lines.
+#           lines.
+#           lines.
+#           lines.
+#           lines.
+#           lines.
+#           lines.
+          
         end
       end
     end

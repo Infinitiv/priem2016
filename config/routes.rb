@@ -54,6 +54,7 @@ Rails.application.routes.draw do
       get 'ord_return_export'
       get 'ord_marks_request'
       get 'ord_result_export'
+      get 'target_report'
       get 'competition_lists_to_html'
       get 'competition_lists_ord_to_html'
     end

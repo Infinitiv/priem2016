@@ -2,7 +2,7 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
-  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export]
+  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export, :target_report]
   
   def index
     @entrant_applications_hash = EntrantApplication.entrant_applications_hash(@campaign)
@@ -117,6 +117,11 @@ class EntrantApplicationsController < ApplicationController
   def ord_result_export
     @applications_hash = EntrantApplication.entrant_applications_hash(@campaign)
     send_data EntrantApplication.ord_result_export(@applications_hash), filename: "entrant_ord_result_export-#{Date.today}.csv", type: 'text/csv', disposition: "attachment"
+  end
+  
+  def target_report
+    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign)
+    send_data EntrantApplication.target_report(@applications_hash), filename: "entrant_target_reslut_export-#{Date.today}.xml", type: 'text/xml', disposition: "attachment"
   end
   
   private
