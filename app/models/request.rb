@@ -527,7 +527,7 @@ class Request < ActiveRecord::Base
                     case true
                     when sub_item.form == "ЕГЭ"
                       etr.ResultSourceTypeID 1
-                    when sub_item.form == "Экзамен" || "аккредитация" || "ординатура"
+                    when sub_item.form == ("Экзамен" || "аккредитация" || "ординатура")
                       etr.ResultSourceTypeID 2
                     else
                       etr.ResultSourceTypeID 3
