@@ -531,7 +531,7 @@ class Request < ActiveRecord::Base
                       etr.ResultSourceTypeID 2
                     when sub_item.form == "аккредитация"
                       etr.ResultSourceTypeID 2
-                    when sub_item.form == "ординатура"
+                    when sub_item.form == "тест"
                       etr.ResultSourceTypeID 2
                     else
                       etr.ResultSourceTypeID 3
