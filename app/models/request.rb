@@ -682,7 +682,7 @@ class Request < ActiveRecord::Base
                           when campaign.education_levels.include?(18)
                             'o'
                           end
-                application_number = [campaign.year_start, "%04d" % item.application_number, postfix].join('-')
+                application_number = [campaign.year_start, "%04d" % application.application_number, postfix].join('-')
                 as.Application do |a|
                   a.ApplicationUID application_number
                   a.OrderUID "oa #{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
