@@ -676,8 +676,15 @@ class Request < ActiveRecord::Base
           unless competitive_group_enrolled_application.empty?
             competitive_group_enrolled_application.each do |d, a|
               a.each do |application|
+                postfix = case true
+                          when campaign.education_levels.include?(5)
+                            's'
+                          when campaign.education_levels.include?(18)
+                            'o'
+                          end
+                application_number = [campaign.year_start, "%04d" % item.application_number, postfix].join('-')
                 as.Application do |a|
-                  a.ApplicationUID [campaign.year_start, "%04d" % application.application_number].join('-')
+                  a.ApplicationUID application_number
                   a.OrderUID "oa #{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
                   a.OrderTypeID 1
                   a.CompetitiveGroupUID competitive_group.id
@@ -693,7 +700,7 @@ class Request < ActiveRecord::Base
             competitive_group_exeptioned_application.each do |d, a|
               a.each do |application|
                 as.Application do |a|
-                  a.ApplicationUID [campaign.year_start, "%04d" % application.application_number].join('-')
+                  a.ApplicationUID application_number
                   a.OrderUID "oe #{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
                   a.OrderTypeID 1
                   a.CompetitiveGroupUID competitive_group.id
