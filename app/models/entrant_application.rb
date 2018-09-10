@@ -414,6 +414,8 @@ class EntrantApplication < ActiveRecord::Base
                           when Date.new(2018, 8, 17)
                             '114-ипо'
                           end
+          zero_array = ('а'..'г').zip([0, 0, 0, 0]).map{|i| i.join('-')}
+          achievements_array = ('а'..'г').zip(values[:achievements].map{|a| a.round()}).map{|i| i.join('-')}
           row = [
             application.snils,
             oid,
@@ -425,7 +427,7 @@ class EntrantApplication < ActiveRecord::Base
             application.registration_date.strftime("%d.%m.%Y"),
             values[:full_summa].round(),
             values[:mark_values].sum.round(),
-            ('а'..'г').zip(values[:achievements].map{|a| a.round()}).map{|i| i.join('-')}.join(','),
+            (achievements_array - zero_array).join(','),
             status,
             (order_number if status == 1),
             (application.enrolled_date.strftime("%d.%m.%Y") if status == 1),

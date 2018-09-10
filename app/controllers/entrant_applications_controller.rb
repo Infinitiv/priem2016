@@ -116,7 +116,7 @@ class EntrantApplicationsController < ApplicationController
   
   def ord_result_export
     @applications_hash = EntrantApplication.entrant_applications_hash(@campaign)
-    send_data EntrantApplication.ord_result_export(@applications_hash), filename: "entrant_marks_request-#{Date.today}.csv", type: 'text/csv', disposition: "attachment"
+    send_data EntrantApplication.ord_result_export(@applications_hash), filename: "entrant_ord_result_export-#{Date.today}.csv", type: 'text/csv', disposition: "attachment"
   end
   
   private
