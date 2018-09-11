@@ -419,6 +419,8 @@ class EntrantApplication < ActiveRecord::Base
           zero_array = ('а'..'г').zip([0, 0, 0, 0]).map{|i| i.join('-')}
           values[:achievements] = values[:achievements].map{|a| a.round()}
           achievements_array = ('а'..'г').zip(values[:achievements].map{|a| a.round()}).map{|i| i.join('-')}
+          test_result = values[:mark_values].sum.round() == 0 ? application.marks.sum(:value).round() : values[:mark_values].sum.round()
+          full_summa = values[:full_summa].round() == 0 ? [test_result, values[:achievements].sum].sum : values[:full_summa].round()
           if (values[:achievements][2] - 10) % 5 == 0
             achievements_array[2] = achievements_array[2].sub('в-', 'в1-')
             zero_array[2] = zero_array[2].sub('в-', 'в1-')
@@ -436,8 +438,8 @@ class EntrantApplication < ActiveRecord::Base
             (competitive_group.education_source_id == 15 ? 'договор' : 'бюджет'),
             (competitive_group.education_source_id == 16 ? 'да' : 'нет'),
             application.registration_date.strftime("%d.%m.%Y"),
-            values[:full_summa].round(),
-            values[:mark_values].sum.round(),
+            full_summa,
+            test_result,
             achievements,
             status,
             (order_number if status == 1),
