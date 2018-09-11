@@ -234,7 +234,7 @@ class EntrantApplication < ActiveRecord::Base
         entrant_applications_hash[entrant_application][:mark_forms] << mark_form
       end
       entrant_applications_hash[entrant_application][:summa] = entrant_applications_hash[entrant_application][:mark_values].size == entrance_test_items.size ? entrant_applications_hash[entrant_application][:mark_values].sum : 0
-      entrant_applications_hash[entrant_application][:achievements] = entrant_application.achievements.map(&:value)
+      entrant_applications_hash[entrant_application][:achievements] = entrant_application.achievements.order(:institution_achievement_id).map(&:value)
       achievements_sum = entrant_applications_hash[entrant_application][:achievements].sum
       achievements_limit = 10 if campaign.education_levels.include?(5)
       entrant_applications_hash[entrant_application][:achievements_sum] = achievements_limit ? (achievements_sum > achievements_limit ? achievements_limit : achievements_sum) : achievements_sum
@@ -417,7 +417,16 @@ class EntrantApplication < ActiveRecord::Base
                             '114-ипо'
                           end
           zero_array = ('а'..'г').zip([0, 0, 0, 0]).map{|i| i.join('-')}
+          values[:achievements] = values[:achievements].map{|a| a.round()}
           achievements_array = ('а'..'г').zip(values[:achievements].map{|a| a.round()}).map{|i| i.join('-')}
+          if (values[:achievements][2] - 10) % 5 == 0
+            achievements_array[2] = achievements_array[2].sub('в-', 'в1-')
+            zero_array[2] = zero_array[2].sub('в-', 'в1-')
+          else
+            achievements_array[2] = achievements_array[2].sub('в-', 'в2-')
+            zero_array[2] = zero_array[2].sub('в-', 'в2-')
+          end
+          achievements = (achievements_array - zero_array).compact.size == 0 ? nil : (achievements_array - zero_array).compact.join(',')
           row = [
             application.snils,
             oid,
@@ -429,7 +438,7 @@ class EntrantApplication < ActiveRecord::Base
             application.registration_date.strftime("%d.%m.%Y"),
             values[:full_summa].round(),
             values[:mark_values].sum.round(),
-            (achievements_array - zero_array).compact.join(','),
+            achievements,
             status,
             (order_number if status == 1),
             (application.enrolled_date.strftime("%d.%m.%Y") if status == 1),
