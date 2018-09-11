@@ -439,7 +439,7 @@ class EntrantApplication < ActiveRecord::Base
             (competitive_group.education_source_id == 16 ? 'да' : 'нет'),
             application.registration_date.strftime("%d.%m.%Y"),
             full_summa,
-            test_result,
+            (test_result if test_result > 0),
             achievements,
             status,
             (order_number if status == 1),
