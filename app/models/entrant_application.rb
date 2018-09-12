@@ -710,8 +710,8 @@ class EntrantApplication < ActiveRecord::Base
           lines.oo 2277
           lines.spec spec
           lines.fo 1
-          lines.if
-          lines.up
+          lines.if 1
+          lines.up 3
           lines.id_kladr 74809
           lines.p5_1 [year_start, "%04d" % application.application_number].join('-')
           lines.p5_2 application.gender_id
