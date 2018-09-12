@@ -744,9 +744,20 @@ class EntrantApplication < ActiveRecord::Base
           lines.p5_31 values[:mean]
           lines.p5_32 p5_32
           lines.p5_33 0
-          (1..14).each do |point|
-            lines.p5_21_"#{point}"
-          end
+          lines.p5_21_1
+          lines.p5_21_2
+          lines.p5_21_3
+          lines.p5_21_4
+          lines.p5_21_5
+          lines.p5_21_6
+          lines.p5_21_7
+          lines.p5_21_8
+          lines.p5_21_9
+          lines.p5_21_10
+          lines.p5_21_11
+          lines.p5_21_12
+          lines.p5_21_13
+          lines.p5_21_14
           lines.prim1
         end
       end
