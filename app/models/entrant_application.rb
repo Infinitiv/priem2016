@@ -742,14 +742,6 @@ class EntrantApplication < ActiveRecord::Base
           lines.p5_30 year_start
           lines.p5_31 values[:mean]
           lines.p5_32 p5_32
-#           lines.
-#           lines.
-#           lines.
-#           lines.
-#           lines.
-#           lines.
-#           lines.
-          
         end
       end
     end
