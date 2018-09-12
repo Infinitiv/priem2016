@@ -459,7 +459,7 @@ class EntrantApplication < ActiveRecord::Base
     target_enrolled_applications = applications.select{|application, values| target_competitive_groups.include?(application.enrolled)}
     xml = ::Builder::XmlMarkup.new
     xml.root(id: 2277) do |root|
-      n = 0
+      n = 342
       target_enrolled_applications.each do |application, values|
         n += 1
         case CompetitiveGroup.find(application.enrolled).direction_id
@@ -713,6 +713,7 @@ class EntrantApplication < ActiveRecord::Base
           lines.if 1
           lines.up 3
           lines.id_kladr 74809
+          lines.fio
           lines.p5_1 [year_start, "%04d" % application.application_number].join('-')
           lines.p5_2 application.gender_id
           lines.p5_3 year_start
@@ -742,6 +743,11 @@ class EntrantApplication < ActiveRecord::Base
           lines.p5_30 year_start
           lines.p5_31 values[:mean]
           lines.p5_32 p5_32
+          lines.p5_33 0
+          (1..14).each do |point|
+            lines.p5_21_"#{point}"
+          end
+          lines.prim1
         end
       end
     end
