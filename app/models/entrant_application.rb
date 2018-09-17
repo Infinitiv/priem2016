@@ -612,7 +612,7 @@ class EntrantApplication < ActiveRecord::Base
           zak_type_2 = 0
           p5_32 = 0
         when 20
-          p5_8 = 17406
+          p5_8 = 56483
           p5_9 = 1
           p5_10 = 0
           p5_11 = 0
