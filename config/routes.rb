@@ -18,6 +18,7 @@ Rails.application.routes.draw do
         get 'campaigns'
       end
     end
+    resources :dictionaries, only: [:index]
   end
   
   resources :requests, only: [:index, :show, :new, :create, :destroy]

@@ -419,31 +419,23 @@ namespace :priem do
     # загружаем список направлений подготовки и объемов приема
     file = open_spreadsheet('admission_volumes.csv')
     # получаем список направлений подготовки и кодов
-    case Rails.env
-      when 'development'
-        url = 'priem.edu.ru:8000'
-        proxy_ip = nil
-        proxy_port = nil
-      when 'production' 
-        url = '127.0.0.1:8080'
-        proxy_ip = nil
-        proxy_port = nil
-    end
     method = '/dictionarydetails'
-    request = '<Root><AuthData><Login>priem@isma.ivanovo.ru</Login><Pass>FdW5jz7e</Pass></AuthData><GetDictionaryContent><DictionaryCode>10</DictionaryCode></GetDictionaryContent></Root>'
-    uri = URI.parse('http://' + url + '/import/importservice.svc')
-    http = Net::HTTP.new(uri.host, uri.port, proxy_ip, proxy_port)
+    request = Request.data(method, nil)
+    http_params = http_params()
+    http = Net::HTTP.new(http_params[:uri_host], http_params[:uri_port], http_params[:proxy_ip], http_params[:proxy_port])
     headers = {'Content-Type' => 'text/xml'}
-    response = http.post(uri.path + method, request, headers)
-    body = Nokogiri::XML(response.body)
+    puts 'Подключаюсь к серверу'
+    response = http.post(http_params[:uri_path] + method, request, headers)
+    puts 'Получаю ответ'
+    xml = Nokogiri::XML(response.body)
     header = file.row(1)
     admissions = {}
     (2..file.last_row).to_a.each do |i|
       row = Hash[[header, file.row(i)].transpose]
       code = row["Код направления подготовки"]
-      if body.at("NewCode:contains('#{code}')")
-        direction_id = body.at("NewCode:contains('#{code}')").parent.at_css("ID").text
-        name = body.at("NewCode:contains('#{code}')").parent.at_css("Name").text
+      if xml.at("NewCode:contains('#{code}')")
+        direction_id = xml.at("NewCode:contains('#{code}')").parent.at_css("ID").text
+        name = xml.at("NewCode:contains('#{code}')").parent.at_css("Name").text
         admissions[code] = {}
         admissions[code]['direction_id'] = direction_id
         admissions[code]['name'] = name
@@ -522,7 +514,63 @@ namespace :priem do
     end
   end
   
+  desc "Fill dictionaries"
+  task fill_dictionaries: :environment do
+    method = '/dictionary'
+    request = Request.data(method, nil)
+    http_params = http_params()
+    http = Net::HTTP.new(http_params[:uri_host], http_params[:uri_port], http_params[:proxy_ip], http_params[:proxy_port])
+    headers = {'Content-Type' => 'text/xml'}
+    puts 'Подключаюсь к серверу'
+    response = http.post(http_params[:uri_path] + method, request, headers)
+    puts 'Получаю ответ'
+    xml = Nokogiri::XML(response.body)
+    if xml.css('Dictionary').empty?
+      puts 'Что-то пошло не так!'
+      puts response.code
+      puts response.body
+      puts request
+    else
+      dictionaries_list = {}
+      xml.css('Dictionary').each{ |i| dictionaries_list[i.at('Name').text] = i.at('Code').text.to_i }
+      method = '/dictionarydetails'
+      dictionaries_list.each do |name, code|
+        request = Request.data('/dictionarydetails', {dictionary_number: code})
+        response = http.post(http_params[:uri_path] + method, request, headers)
+        xml = Nokogiri::XML(response.body)
+        dictionary_items_list = {}
+        xml.css('DictionaryItem').each{ |i| dictionary_items_list[i.at('ID').text.to_i] = i.at('Name').text if i.at('Name')}
+        unless dictionary_items_list.empty?
+          dictionary = Dictionary.find_by_code(code) || Dictionary.new
+          puts dictionary.id ? "Обновляем справочник #{code} #{name}" : "Добавляем справочник #{code} #{name}"
+          dictionary.attributes = {name: name, code: code, items: dictionary_items_list.sort.to_h.as_json}
+          if dictionary.save!
+            puts "Успешно!"
+          else
+            puts "Что-то пошло не так!"
+            puts dictionary
+          end
+        end
+      end
+    end
+  end
+  
   private
+  
+  def http_params
+    case Rails.env
+      when 'development'
+        url = 'priem.edu.ru:8000'
+        proxy_ip = nil
+        proxy_port = nil
+      when 'production' 
+        url = '127.0.0.1:8080'
+        proxy_ip = nil
+        proxy_port = nil
+    end
+    uri = URI.parse('http://' + url + '/import/importservice.svc')
+    return {uri_host: uri.host, uri_path: uri.path, uri_port: uri.port, proxy_ip: proxy_ip, proxy_port: proxy_port}
+  end
   
   def request(options = {})
     case Rails.env

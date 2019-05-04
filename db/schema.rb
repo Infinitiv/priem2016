@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180807124106) do
+ActiveRecord::Schema.define(version: 20190503175817) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -125,6 +125,14 @@ ActiveRecord::Schema.define(version: 20180807124106) do
   create_table "competitive_groups_entrant_applications", id: false, force: :cascade do |t|
     t.integer "entrant_application_id", null: false
     t.integer "competitive_group_id",   null: false
+  end
+
+  create_table "dictionaries", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "code"
+    t.json     "items"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "distributed_admission_volumes", force: :cascade do |t|
