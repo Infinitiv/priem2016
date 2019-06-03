@@ -18,11 +18,17 @@ Rails.application.routes.draw do
         get 'campaigns'
       end
     end
-    resources :dictionaries, only: [:index]
+    resources :dictionaries, only: [:index, :show]
+    resources :campaigns, only: [:index, :show]
   end
   
   resources :requests, only: [:index, :show, :new, :create, :destroy]
-  resources :campaigns
+  resources :campaigns do
+    member do
+      post 'import_admission_volume'
+      post 'import_institution_achievements'
+    end
+  end
   resources :admission_volumes
   resources :distributed_admission_volumes do
     member do

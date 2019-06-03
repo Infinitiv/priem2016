@@ -411,144 +411,54 @@ namespace :priem do
     File.open('public/target.xml', "w"){|f| f.write xml}
   end
   
-  desc "Import common information of campaign from csv files"
-  task import_admission_volume: :environment do
-    # 2018
-    year = 2018
-    
-    # загружаем список направлений подготовки и объемов приема
-    file = open_spreadsheet('admission_volumes.csv')
-    # получаем список направлений подготовки и кодов
-    method = '/dictionarydetails'
-    request = Request.data(method, nil)
-    http_params = http_params()
-    http = Net::HTTP.new(http_params[:uri_host], http_params[:uri_port], http_params[:proxy_ip], http_params[:proxy_port])
-    headers = {'Content-Type' => 'text/xml'}
-    puts 'Подключаюсь к серверу'
-    response = http.post(http_params[:uri_path] + method, request, headers)
-    puts 'Получаю ответ'
-    xml = Nokogiri::XML(response.body)
-    header = file.row(1)
-    admissions = {}
-    (2..file.last_row).to_a.each do |i|
-      row = Hash[[header, file.row(i)].transpose]
-      code = row["Код направления подготовки"]
-      if xml.at("NewCode:contains('#{code}')")
-        direction_id = xml.at("NewCode:contains('#{code}')").parent.at_css("ID").text
-        name = xml.at("NewCode:contains('#{code}')").parent.at_css("Name").text
-        admissions[code] = {}
-        admissions[code]['direction_id'] = direction_id
-        admissions[code]['name'] = name
-        admissions[code]['number_budget_o'] = row["Количество бюджетных мест"] if row["Количество бюджетных мест"].to_i > 0 
-        admissions[code]['number_paid_o'] = row["Количество внебюджетных мест"] if row["Количество внебюджетных мест"].to_i > 0
-        admissions[code]['number_target_o'] = row["Количество целевых мест"] if row["Количество целевых мест"].to_i > 0
-      end
-    end
-
-    # заполняем справочники
-    # добавляем образовательные программы
-    admissions.each do |code, values|
-      EduProgram.create(name: values['name'], code: code) unless EduProgram.find_by_code(code)
-    end
-
-    # добавляем вступительные испытания
-    #subject = Subject.create(subject_name: "Здравоохранение")
-    #EntranceTestItem.create(entrance_test_type_id: 1, min_score: 70, entrance_test_priority: 1, subject_id: subject.id)
-
-    # добавялем приемную кампанию
-    campaign = Campaign.last
-
-    admissions.each do |code, values|
-      # добавляем объемы приема
-      attrib = {education_level_id: 18, direction_id: values['direction_id']}
-      attrib.merge!(values.select{|i| i =~ /number/})
-      admission_volume = campaign.admission_volumes.new
-      admission_volume.attributes = attrib
-      if admission_volume.save!
-        # распределяем места по источникам финансирования
-        attrib = {level_budget_id: 1}
-        attrib.merge!(values.select{|i| i =~ /budget|target/})
-        distributed_admission_volume = admission_volume.distributed_admission_volumes.new
-        distributed_admission_volume.attributes = attrib
-        distributed_admission_volume.save!
-        if values['number_budget_o']
-          # добавляем конкурсные группы (Бюджет)
-          competitive_group = campaign.competitive_groups.create(name: "#{values['name']}. Бюджет.", education_level_id: 18, education_source_id: 14, education_form_id: 11, direction_id: values['direction_id'])
-          # добавляем элементы конкурсных групп
-          CompetitiveGroupItem.create(number_budget_o: values['number_budget_o'], competitive_group_id: competitive_group.id)
-          # прикрепляем образовательные программы
-          competitive_group.edu_programs << EduProgram.find_by_code(code)
-        end
-        if values['number_paid_o']
-          # добавляем конкурсные группы (Внебюджет)
-          competitive_group = campaign.competitive_groups.create(name: "#{values['name']}. Внебюджет.", education_level_id: 18, education_source_id: 15, education_form_id: 11, direction_id: values['direction_id'])
-          # добавляем элементы конкурсных групп
-          CompetitiveGroupItem.create(number_paid_o: values['number_paid_o'], competitive_group_id: competitive_group.id)
-          # прикрепляем образовательные программы
-          competitive_group.edu_programs << EduProgram.find_by_code(code)
-        end
-        if values['number_target_o']
-          # добавляем конкурсные группы (Целевой прием)
-          competitive_group = campaign.competitive_groups.create(name: "#{values['name']}. Целевые места.", education_level_id: 18, education_source_id: 16, education_form_id: 11, direction_id: values['direction_id'])
-          # добавляем элементы конкурсных групп
-          CompetitiveGroupItem.create(number_target_o: values['number_target_o'], competitive_group_id: competitive_group.id)
-          # прикрепляем образовательные программы
-          competitive_group.edu_programs << EduProgram.find_by_code(code)
-        end
-      end
-    end
-
-    # прикрепляем вступительные испытания к конкурсным группам
-    campaign.competitive_groups.each{|cg| cg.entrance_test_items << EntranceTestItem.where(min_score: 70)}
-  end
-
-  desc "Import common information of campaign from csv files"
-  task import_achievements: :environment do
-    campaign = Campaign.last
-    file = open_spreadsheet('achievements.csv')
-    header = file.row(1)
-    achievements = {}
-    (2..file.last_row).to_a.each do |i|
-      row = Hash[[header, file.row(i)].transpose]
-      campaign.institution_achievements.create(name: row['Название достижения'], id_category: 13, max_value: row['Максимальный балл'])
-    end
-  end
-  
   desc "Fill dictionaries"
   task fill_dictionaries: :environment do
+    log_path = [Rails.root, 'log', 'rake.log'].join('/')
     method = '/dictionary'
     request = Request.data(method, nil)
     http_params = http_params()
     http = Net::HTTP.new(http_params[:uri_host], http_params[:uri_port], http_params[:proxy_ip], http_params[:proxy_port])
     headers = {'Content-Type' => 'text/xml'}
-    puts 'Подключаюсь к серверу'
+    message = 'Подключаюсь к серверу'
+    %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")
     response = http.post(http_params[:uri_path] + method, request, headers)
-    puts 'Получаю ответ'
+    message = 'Получаю ответ'
+    %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")
     xml = Nokogiri::XML(response.body)
     if xml.css('Dictionary').empty?
-      puts 'Что-то пошло не так!'
-      puts response.code
-      puts response.body
-      puts request
+      message = 'Что-то пошло не так!'
+      %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")
+      message = response.code
+      %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")
+      message = response.body
+      %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")
+      message = request
+      %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")
     else
       dictionaries_list = {}
       xml.css('Dictionary').each{ |i| dictionaries_list[i.at('Name').text] = i.at('Code').text.to_i }
       method = '/dictionarydetails'
       dictionaries_list.each do |name, code|
-        request = Request.data('/dictionarydetails', {dictionary_number: code})
-        response = http.post(http_params[:uri_path] + method, request, headers)
-        xml = Nokogiri::XML(response.body)
-        dictionary_items_list = {}
-        xml.css('DictionaryItem').each{ |i| dictionary_items_list[i.at('ID').text.to_i] = i.at('Name').text if i.at('Name')}
-        unless dictionary_items_list.empty?
-          dictionary = Dictionary.find_by_code(code) || Dictionary.new
-          puts dictionary.id ? "Обновляем справочник #{code} #{name}" : "Добавляем справочник #{code} #{name}"
-          dictionary.attributes = {name: name, code: code, items: dictionary_items_list.sort.to_h.as_json}
-          if dictionary.save!
-            puts "Успешно!"
-          else
-            puts "Что-то пошло не так!"
-            puts dictionary
+        dictionary = Dictionary.find_by_code(code) || Dictionary.new
+        if !dictionary.id || dictionary.updated_at < Time.now.to_date - 1
+          request = Request.data('/dictionarydetails', {dictionary_number: code})
+          response = http.post(http_params[:uri_path] + method, request, headers)
+          xml = Nokogiri::XML(response.body)
+          dictionary_items_list = {}
+          xml.css('DictionaryItem').each{ |i| dictionary_items_list[i.at('Name').text] = i.at('ID').text.to_i if i.at('Name')}
+          unless dictionary_items_list.empty?
+            message = dictionary.id ? "Обновляем справочник #{code} #{name}" : "Добавляем справочник #{code} #{name}"
+            %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")
+            dictionary.attributes = {name: name, code: code, items: dictionary_items_list.sort.to_h.as_json}
+            if dictionary.save!
+              message = "Успешно!"
+              %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")
+            else
+              message = "Что-то пошло не так!"
+              %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")
+              message = dictionary
+              %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")
+            end
           end
         end
       end

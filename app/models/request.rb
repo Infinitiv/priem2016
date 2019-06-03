@@ -1,6 +1,21 @@
 class Request < ActiveRecord::Base
   require 'builder'
 #   validates :query, :input, :output, :status, presence: true
+
+def self.http_params
+  case Rails.env
+    when 'development'
+      url = 'priem.edu.ru:8000'
+      proxy_ip = nil
+      proxy_port = nil
+    when 'production' 
+      url = '127.0.0.1:8080'
+      proxy_ip = nil
+      proxy_port = nil
+  end
+  uri = URI.parse('http://' + url + '/import/importservice.svc')
+  return {uri_host: uri.host, uri_path: uri.path, uri_port: uri.port, proxy_ip: proxy_ip, proxy_port: proxy_port}
+end
   
   def self.data(method, params)
     case method

@@ -2,6 +2,7 @@ class CampaignsController < ApplicationController
   before_action :set_select, only: [:new, :edit, :update, :create]
   before_action :campaign_params, only: [:create]
   before_action :set_campaign, only: [:show, :edit, :update, :destroy]
+  before_action :import_params, only: [:import_admission_volume, :import_institution_achievements]
   
   def index
     @campaigns = Campaign.order(:name)
@@ -36,6 +37,16 @@ class CampaignsController < ApplicationController
     @campaign.destroy
     redirect_to campaigns_path
   end
+
+  def import_admission_volume
+    Campaign.import_admission_volumes(import_params)
+    redirect_to :back
+  end
+
+  def import_institution_achievements
+    Campaign.import_institution_achievements(import_params)
+    redirect_to :back
+  end
   
   private
   def set_select
@@ -56,6 +67,10 @@ class CampaignsController < ApplicationController
   
   def campaign_params
     params.require(:campaign).permit(:name, :year_start, :year_end, :status_id, :campaign_type_id, education_forms: [], education_levels: [])
+  end
+
+  def import_params
+    params.permit(:campaign_id, :file)
   end
   
   def set_campaign

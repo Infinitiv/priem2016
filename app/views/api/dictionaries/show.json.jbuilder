@@ -1,0 +1,1 @@
+json.dictionary @dictionary, :items
