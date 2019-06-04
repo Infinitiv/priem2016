@@ -61,7 +61,7 @@ class Campaign < ActiveRecord::Base
       if admission_volume.save!
         # распределяем места по источникам финансирования
         attrib = {level_budget_id: 1}
-        attrib.merge!(values.select{|i| i =~ /budget|target/})
+        attrib.merge!(values.select{|i| i =~ /budget|target|quota/})
         distributed_admission_volume = admission_volume.distributed_admission_volumes.find_by_level_budget_id(1) || admission_volume.distributed_admission_volumes.new
         distributed_admission_volume.attributes = attrib
         distributed_admission_volume.save!
@@ -96,13 +96,13 @@ class Campaign < ActiveRecord::Base
 
     # прикрепляем вступительные испытания к конкурсным группам
     if campaign.education_levels.include?(5)
-      campaign.competitive_groups.each{|cg| cg.entrance_test_items = []; cg.entrance_test_items << EntranceTestItem.where(min_score: 42)}
+      campaign.competitive_groups.each{|cg| cg.entrance_test_items = []; cg.entrance_test_items << EntranceTestItem.where(min_score: 42).select{|i| i.created_at.year == campaign.year_start}}
     else
-      campaign.competitive_groups.each{|cg| cg.entrance_test_items = []; cg.entrance_test_items << EntranceTestItem.where(min_score: 70)}
+      campaign.competitive_groups.each{|cg| cg.entrance_test_items = []; cg.entrance_test_items << EntranceTestItem.where(min_score: 70).select{|i| i.created_at.year == campaign.year_start}}
     end
   end
 
-  def self.import_institution_achievements
+  def self.import_institution_achievements(params)
     # определяем приемную кампанию
     campaign = Campaign.find(params[:campaign_id]) 
     
