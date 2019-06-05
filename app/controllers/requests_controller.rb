@@ -12,7 +12,7 @@ class RequestsController < ApplicationController
   
   def new
     @request = Request.new
-    @campaigns = Campaign.order(:name)
+    @campaign_names = Campaign.order(:year_start, :name).map{|i| ["#{i.name} #{i.year_start}", i.id]}
   end
   
   def create

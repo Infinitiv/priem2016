@@ -2,7 +2,7 @@ h1 Отправить запрос
 = form_for @request, html: {class: 'form-horizontal'} do |f|
   .form-group
     .col-sm-4
-      = select_tag :campaign_id, options_from_collection_for_select(@campaigns, :id, :name), include_blank: true, class: 'form-control' if @campaigns
+      = select_tag :campaign_id, options_for_select(@campaign_names), include_blank: true, class: 'form-control' if @campaigns
   .form-group
     = f.label 'Запрос', class: 'control-label col-sm-1'
     .col-sm-3
