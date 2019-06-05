@@ -4,7 +4,7 @@ class InstitutionAchievementsController < ApplicationController
   before_action :set_selects, only: [:new, :edit]
   
   def index
-    @institution_achievements = InstitutionAchievement.order(:name)
+    @institution_achievements = InstitutionAchievement.order(:created_at)
   end
   
   def show
