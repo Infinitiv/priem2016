@@ -440,16 +440,16 @@ namespace :priem do
       method = '/dictionarydetails'
       dictionaries_list.each do |name, code|
         dictionary = Dictionary.find_by_code(code) || Dictionary.new
-        if !dictionary.id || dictionary.updated_at < Time.now.to_date - 1
+        if !dictionary.id || true #dictionary.updated_at < Time.now.to_date - 1
           request = Request.data('/dictionarydetails', {dictionary_number: code})
           response = http.post(http_params[:uri_path] + method, request, headers)
           xml = Nokogiri::XML(response.body)
-          dictionary_items_list = {}
-          xml.css('DictionaryItem').each{ |i| dictionary_items_list[i.at('Name').text] = i.at('ID').text.to_i if i.at('Name')}
+          dictionary_items_list = []
+          xml.css('DictionaryItem').each{|i| dictionary_items_list.push({name: i.at('Name').text, id: i.at('ID').text.to_i}) if i.at('Name')}
           unless dictionary_items_list.empty?
             message = dictionary.id ? "Обновляем справочник #{code} #{name}" : "Добавляем справочник #{code} #{name}"
             %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")
-            dictionary.attributes = {name: name, code: code, items: dictionary_items_list.sort.to_h.as_json}
+            dictionary.attributes = {name: name, code: code, items: dictionary_items_list.as_json}
             if dictionary.save!
               message = "Успешно!"
               %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")

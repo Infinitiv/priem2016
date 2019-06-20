@@ -1,7 +1,7 @@
 class Api::CampaignsController < ApplicationController
   before_filter :set_campaign, only: [:show]
   def index
-    @campaigns = Campaign.where(status_id: 0)
+    @campaigns = Campaign.includes(:admission_volumes, :competitive_groups).where(status_id: 0)
   end
   
   def show
