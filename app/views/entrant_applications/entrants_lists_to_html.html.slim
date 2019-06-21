@@ -1,0 +1,69 @@
+h1= "Приемная кампания #{@campaign.name} #{@campaign.year_start}" 
+h2= "Заявления, принятые по состоянию на #{Time.now.to_datetime.strftime("%F")}"
+- @admission_volume_hash.each do |direction_id, competitive_groups|
+  - competitive_groups.each do |competitive_group, numbers|
+    - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
+    - examless_applications = applications.select{|k, v| v[:examless] && competitive_group.id == k.budget_agr}
+    - applications = applications - examless_applications
+    .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
+      .panel.panel-default
+        .panel-heading(role="tab" id="heading#{competitive_group.id}")
+          .panel-title
+            = link_to "#{competitive_group.name} (всего мест в конкурсе - #{numbers}, подано заявлений - #{applications.count})", "#collapse#{competitive_group.id}", data: {toggle: "collapse", parent: "#accordion"}, aria: {expanded: "false", controls: "#collapse#{competitive_group.id}"}
+    .panel-collapse.collapse(id="collapse#{competitive_group.id}" role="tabpanel" aria-labelledby="heading#{competitive_group.id}")
+      .panel-body
+        - unless examless_applications.empty?
+          h3 Зачисление без вступительных испытаний
+          table.table
+            thead
+              tr
+                th №№
+                th № личного дела
+                th Ф.И.О
+                th Основание приема без испытаний
+                th Баллы за индивидуальные достижения
+                th Наличие преимущественного права на зачисление
+            tbody
+              - examless_applications.each do |application, values|
+                tr
+                  td
+                  td= "%04d" % application.application_number
+                  td= application.fio
+                  td Олимпиада школьников
+                  td= values[:achievements_sum] if values[:achievements_sum] > 0
+                  td.text-center= "+" if application.benefit
+          h3 Общий конкурс
+          p
+            strong= "мест без учета абитуриентов, имеющих право поступления без вступительных испытаний - #{numbers - examless_applications.count}" 
+        table.table
+          thead
+            tr
+              th №№
+              th № личного дела
+              th Ф.И.О
+              th Подан оригинал
+              th Сумма конкурсных баллов
+              - @entrance_test_items.each do |entrance_test_item|
+                th= entrance_test_item.subject.subject_name
+              th Сумма баллов за вступительные испытания
+              th Баллы за индивидуальные достижения
+              th Наличие преимущественного права на зачисление
+              th= "Заказчик целевого приема" if competitive_group.education_source_id == 16
+          tbody
+            - applications.each do |application, values|
+              tr
+                td
+                td= "%04d" % application.application_number
+                td= application.fio
+                td.text-center= "+" if values[:original_received]
+                td= values[:full_summa] if values[:full_summa] > 0
+                - unless values[:mark_values].empty?
+                  - values[:mark_values].each do |mark|
+                    td= mark
+                - else
+                  - values[:mark_forms].each do |mark_form|
+                    td= mark_form
+                td= values[:summa] if values[:summa] > 0
+                td= values[:achievements_sum] if values[:achievements_sum] > 0
+                td.text-center= "+" if application.benefit
+                td= @target_organizations.find(application.target_organization_id).target_organization_name if application.target_organization_id if competitive_group.education_source_id == 16

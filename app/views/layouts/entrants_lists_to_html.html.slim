@@ -1,0 +1,22 @@
+doctype html
+html(lang='ru-RU')
+head
+  meta(charset='utf-8')
+  title= "Приемная кампания #{@campaign.name}. Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%F %T")}"
+  = stylesheet_link_tag 'https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'
+  = javascript_include_tag 'https://code.jquery.com/jquery-3.3.1.slim.min.js', {integrity: 'sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo', crossorigin: 'anonymous'}
+  = javascript_include_tag 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', {integrity: 'sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin: 'anonymous'}
+  css:
+    .table tr:not(.fble_htr) {
+      counter-increment: rowNumber;
+    }
+
+    .table tr:not(.fble_htr) td:first-child::before {
+      content: counter(rowNumber);
+      min-width: 1em;
+      margin-right: 0.5em;
+    }
+body
+  .container
+    .row
+      = yield

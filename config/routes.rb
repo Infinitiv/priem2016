@@ -64,6 +64,8 @@ Rails.application.routes.draw do
       get 'target_report'
       get 'competition_lists_to_html'
       get 'competition_lists_ord_to_html'
+      get 'entrants_lists_to_html'
+      get 'entrants_lists_ord_to_html'
     end
     member do
       get 'touch'
