@@ -16,6 +16,8 @@ class Api::StatsController < ApplicationController
               42
             when 2018
               42
+            when 2019
+              42
             end
     @marks = Mark.select(:id, 
                          :value, 
