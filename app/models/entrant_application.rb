@@ -230,7 +230,7 @@ class EntrantApplication < ActiveRecord::Base
       entrance_test_items.each do |entrance_test_item|
         mark_value = mark_values[entrant_application.id].inject(:merge)[entrance_test_item.subject_id]
         mark_form = mark_forms[entrant_application.id].inject(:merge)[entrance_test_item.subject_id]
-        entrant_applications_hash[entrant_application][:mark_values] << mark_value if mark_value >= entrance_test_item.min_score
+        entrant_applications_hash[entrant_application][:mark_values] << mark_value
         entrant_applications_hash[entrant_application][:mark_forms] << mark_form
       end
       entrant_applications_hash[entrant_application][:summa] = entrant_applications_hash[entrant_application][:mark_values].size == entrance_test_items.size ? entrant_applications_hash[entrant_application][:mark_values].sum : 0
