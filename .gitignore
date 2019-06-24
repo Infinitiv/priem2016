@@ -15,3 +15,4 @@
 /config/secrets.yml
 lib/tasks/data
 public/competitions
+public/entrants

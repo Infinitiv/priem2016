@@ -18,12 +18,12 @@
     - @entrant_application.competitive_groups.order(:name).each do |competitive_group|
       li
         = competitive_group.name
-        - if competitive_group.education_source_id == 16
-          = " #{@entrant_application.target_organization.target_organization_name}."
-          - sub_entrant_applications_hash = @entrant_applications_hash.select{|a, v| a.target_organization_id == @entrant_application.target_organization_id && v[:competitive_groups].include?(competitive_group.id)}
-          - place = sub_entrant_applications_hash.to_h.keys.index(@entrant_application)
-          = " (место #{place} из #{sub_entrant_applications_hash.count})" 
-        - else
+        - if @full_summa
+          - if competitive_group.education_source_id == 16
+            = " #{@entrant_application.target_organization.target_organization_name}."
+            - sub_entrant_applications_hash = @entrant_applications_hash.select{|a, v| a.target_organization_id == @entrant_application.target_organization_id && v[:competitive_groups].include?(competitive_group.id)}
+            - place = sub_entrant_applications_hash.to_h.keys.index(@entrant_application)
+            = " (место #{place} из #{sub_entrant_applications_hash.count})" 
           - sub_entrant_applications_hash = @entrant_applications_hash.select{|a, v| v[:competitive_groups].include?(competitive_group.id)}
           - place = sub_entrant_applications_hash.to_h.keys.index(@entrant_application) + 1
           = " (место #{place} из #{sub_entrant_applications_hash.count})"
@@ -33,20 +33,21 @@
         span.label.label-success= "зачислен #{@entrant_application.enrolled_date}" if @entrant_application.enrolled == competitive_group.id
         span &nbsp;
         span.label.label-warning= "отказ #{@entrant_application.exeptioned_date}" if @entrant_application.exeptioned == competitive_group.id
-  h2 Конкурсные баллы
-  table.table
-    thead
-      tr
-        - @marks.each do |mark|
-          th = mark.subject.subject_name
-        th Сумма
-        th С учетом достижений
-    tbody
-      tr
-        - @marks.each do |mark|
-         td= "#{mark.value} (#{mark.form})"
-        td= @entrant_applications_hash[@entrant_application][:summa]
-        td= @full_summa
+  - if @full_summa
+    h2 Конкурсные баллы
+    table.table
+      thead
+        tr
+          - @marks.each do |mark|
+            th = mark.subject.subject_name
+            th Сумма
+            th С учетом достижений
+      tbody
+        tr
+          - @marks.each do |mark|
+            td= "#{mark.value} (#{mark.form})"
+            td= @entrant_applications_hash[@entrant_application][:summa]
+            td= @full_summa
   h2= "Льготы" if @entrant_application.olympionic || @entrant_application.benefit
   p= "Олимпиада" if @entrant_application.olympionic
   p= "Особое право поступления" if @entrant_application.benefit
