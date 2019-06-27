@@ -40,14 +40,14 @@
         tr
           - @marks.each do |mark|
             th = mark.subject.subject_name
-            th Сумма
-            th С учетом достижений
+          th Сумма
+          th С учетом достижений
       tbody
         tr
           - @marks.each do |mark|
             td= "#{mark.value} (#{mark.form})"
-            td= @entrant_applications_hash[@entrant_application][:summa]
-            td= @full_summa
+          td= @entrant_applications_hash[@entrant_application][:summa]
+          td= @full_summa
   h2= "Льготы" if @entrant_application.olympionic || @entrant_application.benefit
   p= "Олимпиада" if @entrant_application.olympionic
   p= "Особое право поступления" if @entrant_application.benefit
