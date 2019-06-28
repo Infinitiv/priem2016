@@ -58,7 +58,12 @@ h2= "Заявления, принятые по состоянию на #{Time.no
                 td.text-center= "+" if values[:original_received]
                 td= values[:full_summa] unless values[:mark_values].include?(0)
                 - values[:mark_values].each_with_index do |mark_value, index|
-                      td= mark_value > 0 ? mark_value : values[:mark_forms][index]
+                  td
+                    - if mark_value > 0
+                      span= mark_value
+                      sup= values[:mark_forms][index]
+                    - else
+                      span= values[:mark_forms][index]
                 td= values[:summa] unless values[:mark_values].include?(0)
                 td= values[:achievements_sum] if values[:achievements_sum] > 0
                 td.text-center= "+" if application.benefit
