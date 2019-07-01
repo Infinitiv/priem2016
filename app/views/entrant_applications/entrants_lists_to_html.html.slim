@@ -1,5 +1,6 @@
 h1= "Приемная кампания #{@campaign.name} #{@campaign.year_start}" 
 h2= "Заявления, принятые по состоянию на #{Time.now.to_datetime.strftime("%F")}"
+p Обращаем Ваше внимание, что до 26 июля возможны изменения в списках, связанные с проверкой результатов ЕГЭ, апелляциями, а также изменениями, вносимыми абитуриентами в личные дела
 - @admission_volume_hash.each do |direction_id, competitive_groups|
   - competitive_groups.each do |competitive_group, numbers|
     - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
