@@ -7,7 +7,7 @@ h2= "Заявления, принятые по состоянию на #{Time.no
     - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
     - foreign_applications = applications.select{|k, v| k.nationality_type_id != 1}
     - applications = applications - foreign_applications
-    - slots_string = competitive_group.education_source_id == 15 ? "(мест для граждан России - #{numbers}, подано заявлений на места для граждан России - #{applications.count}, для иностранных граждан #{foreign_applications.count})" : "(мест в конкурсе - #{numbers}, подано заявлений - #{applications.count})"
+    - slots_string = competitive_group.education_source_id == 15 ? "(мест для граждан России - #{numbers}, подано заявлений на места для граждан России - #{applications.count}, для иностранных граждан - #{foreign_applications.count})" : "(мест в конкурсе - #{numbers}, подано заявлений - #{applications.count})"
     .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
       .panel.panel-default
         .panel-heading(role="tab" id="heading#{competitive_group.id}")
