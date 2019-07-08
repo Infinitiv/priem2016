@@ -4,7 +4,7 @@ h1= "#{@campaign.name} #{@campaign.year_start}"
 h2= "Заявления, принятые по состоянию на #{Time.now.to_datetime.strftime("%F")}"
 - @admission_volume_hash.each do |direction_id, competitive_groups|
   - competitive_groups.each do |competitive_group, numbers|
-    - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
+    - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.status_id == 4}
     - foreign_applications = applications.select{|k, v| k.nationality_type_id != 1}
     - applications = applications - foreign_applications
     - slots_string = competitive_group.education_source_id == 15 ? "(мест для граждан России - #{numbers}, подано заявлений на места для граждан России - #{applications.count}, для иностранных граждан - #{foreign_applications.count})" : "(мест в конкурсе - #{numbers}, подано заявлений - #{applications.count})"

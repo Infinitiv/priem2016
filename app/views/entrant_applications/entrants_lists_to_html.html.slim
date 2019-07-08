@@ -5,7 +5,7 @@ h2= "Заявления, принятые по состоянию на #{Time.no
 p Обращаем Ваше внимание, что до 26 июля возможны изменения в списках, связанные с проверкой результатов ЕГЭ, апелляциями, а также изменениями, вносимыми абитуриентами в личные дела
 - @admission_volume_hash.each do |direction_id, competitive_groups|
   - competitive_groups.each do |competitive_group, numbers|
-    - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
+    - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.status_id == 4}
     - examless_applications = applications.select{|k, v| v[:examless] && competitive_group.id == k.budget_agr}
     - applications = applications - examless_applications
     .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
