@@ -2,7 +2,7 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
-  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export, :target_report, :entrants_lists_to_html]
+  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export, :target_report, :entrants_lists_to_html, :entrants_lists_ord_to_html]
   
   def index
     @entrant_applications_hash = EntrantApplication.entrant_applications_hash(@campaign)
@@ -96,6 +96,17 @@ class EntrantApplicationsController < ApplicationController
     filename = "#{@campaign.id}-#{Time.now.to_datetime.strftime("%F %T")}.html".gsub(' ', '-')
     File.open(Rails.root.join('public', 'entrants', filename), 'w').write(html)
     FileUtils.mv(Rails.root.join('public', 'entrants', filename), Rails.root.join('public', 'entrants', 'current_entrants_spec.html'))
+    redirect_to :root
+  end
+  
+  def entrants_lists_ord_to_html
+    @admission_volume_hash = EntrantApplication.admission_volume_hash(@campaign)
+    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign).sort_by{|k, v| k.application_number}
+    @target_organizations = TargetOrganization.order(:target_organization_name)
+    html = render_to_string layout: 'entrants_lists_to_html'
+    filename = "#{@campaign.id}-#{Time.now.to_datetime.strftime("%F %T")}.html".gsub(' ', '-')
+    File.open(Rails.root.join('public', 'entrants', filename), 'w').write(html)
+    FileUtils.mv(Rails.root.join('public', 'entrants', filename), Rails.root.join('public', 'entrants', 'current_entrants_ord.html'))
     redirect_to :root
   end
   

@@ -1,0 +1,48 @@
+- content_for :title do
+  = "#{@campaign.name} #{@campaign.year_start}. Заявления, принятые по состоянию на #{Time.now.to_datetime.strftime("%F")}"
+h1= "#{@campaign.name} #{@campaign.year_start}" 
+h2= "Заявления, принятые по состоянию на #{Time.now.to_datetime.strftime("%F")}"
+- @admission_volume_hash.each do |direction_id, competitive_groups|
+  - competitive_groups.each do |competitive_group, numbers|
+    - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
+    - foreign_applications = applications.select{|k, v| k.nationality_type_id != 1}
+    - applications = applications - foreign_applications
+    - slots_string = competitive_group.education_source_id == 15 ? "(мест для граждан России - #{numbers}, подано заявлений на места для граждан России - #{applications.count}, для иностранных граждан #{foreign_applications.count})" : "(мест в конкурсе - #{numbers}, подано заявлений - #{applications.count})"
+    .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
+      .panel.panel-default
+        .panel-heading(role="tab" id="heading#{competitive_group.id}")
+          .panel-title
+            = link_to "#{competitive_group.name}", "#collapse#{competitive_group.id}", data: {toggle: "collapse", parent: "#accordion"}, aria: {expanded: "false", controls: "#collapse#{competitive_group.id}"}
+            .small= slots_string
+    .panel-collapse.collapse(id="collapse#{competitive_group.id}" role="tabpanel" aria-labelledby="heading#{competitive_group.id}")
+      .panel-body
+        - unless foreign_applications.empty?
+          h3 Поступающие на места для иностранных граждан
+          table.table
+            thead
+              tr
+                th №№
+                th № личного дела
+                th Ф.И.О
+            tbody
+              - foreign_applications.each do |application, values|
+                tr
+                  td
+                  td= "%04d" % application.application_number
+                  td= application.fio
+          h3 Общий конкурс
+          p
+        table.table
+          thead
+            tr
+              th №№
+              th № личного дела
+              th Ф.И.О.
+              th= "Заказчик целевого приема" if competitive_group.education_source_id == 16
+          tbody
+            - applications.each do |application, values|
+              tr
+                td
+                td= "%04d" % application.application_number
+                td= application.fio
+                td= @target_organizations.find(application.target_organization_id).target_organization_name if application.target_organization_id if competitive_group.education_source_id == 16

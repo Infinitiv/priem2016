@@ -1,3 +1,5 @@
+- content_for :title do
+  = "Приемная кампания #{@campaign.name}. Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%F %T")}"
 h1= "Приемная кампания #{@campaign.name}." 
 h2= "Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%F %T")}"
 p 
