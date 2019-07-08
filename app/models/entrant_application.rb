@@ -274,11 +274,11 @@ class EntrantApplication < ActiveRecord::Base
           test_result_type = application.marks.map(&:form).include?('аккредитация') ? 'аккредитация' : 'ординатура'
           test_result_year = case true
                               when test_result_type == 'ординатура'
-                                2018
-                              when test_result_type == 'аккредитация' && application.education_document.education_document_date.year == 2018
-                                2018
+                                2019
+                              when test_result_type == 'аккредитация' && application.education_document.education_document_date.year == 2019
+                                2019
                               else
-                                2017
+                                2018
                               end
           row = [
             application.snils,
@@ -286,7 +286,7 @@ class EntrantApplication < ActiveRecord::Base
             application.entrant_first_name,
             application.entrant_middle_name,
             oid,
-            1,
+            2,
             application.birth_date.strftime("%d.%m.%Y"),
             citizenship,
             competitive_group.edu_programs.last.code,
