@@ -221,6 +221,9 @@ class EntrantApplication < ActiveRecord::Base
     
     mark_forms = marks.map{|a, ms| {a => ms.map{|m| [m.subject_id => m.form].inject(:merge)}}}.inject(:merge)
     
+    achievements = Achievement.joins(:entrant_application).where(entrant_applications: {id: entrant_applications.map(&:id)}).group_by(&:entrant_application_id)
+    achievement_values = achievements.map{|a, achs| {a => achs.sort_by(&:institution_achievement_id).map(&:value)}}.inject(:merge)
+    
     entrant_applications_hash = {}
     entrant_applications.each do |entrant_application|
       entrant_applications_hash[entrant_application] = {}
@@ -234,7 +237,7 @@ class EntrantApplication < ActiveRecord::Base
         entrant_applications_hash[entrant_application][:mark_forms] << mark_form
       end
       entrant_applications_hash[entrant_application][:summa] = entrant_applications_hash[entrant_application][:mark_values].size == entrance_test_items.size ? entrant_applications_hash[entrant_application][:mark_values].sum : 0
-      entrant_applications_hash[entrant_application][:achievements] = entrant_application.achievements.order(:institution_achievement_id).map(&:value)
+      entrant_applications_hash[entrant_application][:achievements] = achievement_values[entrant_application.id]
       achievements_sum = entrant_applications_hash[entrant_application][:achievements].sum
       achievements_limit = 10 if campaign.education_levels.include?(5)
       entrant_applications_hash[entrant_application][:achievements_sum] = achievements_limit ? (achievements_sum > achievements_limit ? achievements_limit : achievements_sum) : achievements_sum
