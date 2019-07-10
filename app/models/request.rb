@@ -396,7 +396,7 @@ end
                     acb.DocumentReason do |dr|
                       dr.OlympicDocument do |od|
                         od.UID ["olympic", campaign.year_start, item.application_number, olympic_document.id].join('-')
-                        od.OriginalReceivedDate item.education_document.original_received_date
+                        od.OriginalReceivedDate item.education_document.original_received_date if item.education_document.original_received_date
                         od.DocumentSeries olympic_document.olympic_document_series if olympic_document.olympic_document_series
                         od.DocumentNumber olympic_document.olympic_document_number if olympic_document.olympic_document_number
                         od.DocumentDate olympic_document.olympic_document_date if olympic_document.olympic_document_date
