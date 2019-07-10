@@ -1,2 +1,2 @@
-TargetOrganization.create(id: 45, target_organization_name: 'Министерство здравоохранения Тверской области')
+TargetOrganization.create(id: 46, target_organization_name: 'Управление здравоохранения Тамбовской области')
 
