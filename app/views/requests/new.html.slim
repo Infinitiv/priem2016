@@ -56,6 +56,10 @@ h1 Отправить запрос
       = f.label '', class: 'checkbox-inline'
         = check_box_tag :applications
         = label_tag 'сведения о заявлениях'
+    .col-sm-4.all-applications.hidden
+      = f.label '', class: 'checkbox-inline'
+        = check_box_tag :all_applications
+        = label_tag 'передать все заявления'
   .form-group
     .col-sm-4
       = f.label '', class: 'checkbox-inline'

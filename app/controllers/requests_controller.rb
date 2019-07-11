@@ -100,8 +100,4 @@ class RequestsController < ApplicationController
                      'Тип диплома в области спорта' => 43,
                      'Тип документа, подтверждающего принадлежность к соотечественникам' => 44}
   end
-  
-  def requst_params
-    params.require(:request).permit(:query, :input, :output, :status, :custor_request)
-  end
 end

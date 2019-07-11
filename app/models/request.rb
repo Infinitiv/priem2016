@@ -294,7 +294,7 @@ end
     campaign = Campaign.find(params[:campaign_id])
     last_import_date = Request.select(:query, :output, :created_at).where(query: 'import').select{|r| Nokogiri::XML(r.output).at_css('PackageID')}.last.created_at
     applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6])
-    .where('updated_at > ?', last_import_date)
+    applications = applications.where('updated_at > ?', last_import_date) if params[:all_applications]
     
     pd.Applications do |as|
       applications.each do |item|

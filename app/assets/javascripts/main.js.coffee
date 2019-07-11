@@ -8,6 +8,11 @@ $ ->
       $('.application-number').removeClass('hidden')
     else
       $('.application-number').addClass('hidden')
+  $('#applications').change ->
+    if $('#request_query').val() == 'import' & $('#applications:checked').length == 1
+      $('.all-applications').removeClass('hidden')
+    else
+      $('.all-applications').addClass('hidden')
   $('#distributed_admission_volume_admission_volume_id').change ->
     $.getJSON('/distributed_admission_volumes/'+$(this).val()+'/admission_volume_to_json').done (data) ->
       data = data[0]
