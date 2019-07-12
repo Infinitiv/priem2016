@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       member do
         get 'entrants'
         get 'marks'
+        get 'regions'
       end
       collection do
         get 'campaigns'

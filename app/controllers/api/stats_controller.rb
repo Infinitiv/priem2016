@@ -1,7 +1,12 @@
 class Api::StatsController < ApplicationController
-  before_filter :set_campaign, only: [:entrants, :marks]
+  before_filter :set_campaign, only: [:entrants, :marks, :regions]
+  before_filter :set_entrant_applications, only: [:entrants, :regions]
   def entrants
-    @entrants = @campaign.entrant_applications.select(:id, :registration_date).map(&:registration_date)
+    @entrants = @entrant_applications.map(&:registration_date)
+  end
+  
+  def regions
+    @regions = @entrant_applications.map(&:region_id)
   end
   
   def campaigns
@@ -23,15 +28,21 @@ class Api::StatsController < ApplicationController
                          :value, 
                          :entrant_application_id, 
                          :form, 
-                         :subject_id).includes(:subject).joins(:entrant_application).where(entrant_applications: {
-                                                                                                                  campaign_id: @campaign
-                                                                                                                 }, 
-                                                                                           form: 'ЕГЭ').where("value >= ?", level).map{|m| [m.subject.subject_name, m.value]}
+                         :subject_id)
+    .includes(:subject)
+    .joins(:entrant_application)
+    .where(entrant_applications: {campaign_id: @campaign}, form: 'ЕГЭ')
+    .where("value >= ?", level)
+    .map{|m| [m.subject.subject_name, m.value]}
   end
   
   private
   
   def set_campaign
     @campaign = Campaign.where("5 = any(education_levels)").find_by_year_start(params[:id])
+  end
+  
+  def set_entrant_applications
+    @entrant_applications = @campaign.entrant_applications.select(:id, :registration_date, :region_id)
   end
 end
