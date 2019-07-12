@@ -61,7 +61,7 @@ p Обращаем Ваше внимание, что до 26 июля возмо
                 td= application.fio
                 td.text-center= "+" if values[:original_received]
                 td.text-center= "+" if [application.budget_agr, application.paid_agr].include?(competitive_group.id)
-                td= values[:full_summa] unless values[:mark_values].include?(0)
+                td= values[:full_summa] if values[:mark_values].select{|m| m > 41}.count == 3
                 - values[:mark_values].each_with_index do |mark_value, index|
                   - label_class = "bg-danger" if mark_value < 42 && mark_value > 0
                   td(class = label_class)
@@ -70,7 +70,7 @@ p Обращаем Ваше внимание, что до 26 июля возмо
                       sup= values[:mark_forms][index]
                     - else
                       span= values[:mark_forms][index]
-                td= values[:summa] unless values[:mark_values].include?(0)
+                td= values[:summa] if values[:mark_values].select{|m| m > 41}.count == 3
                 td= values[:achievements_sum] if values[:achievements_sum] > 0
                 td.text-center= "+" if application.benefit
                 td= @target_organizations.find(application.target_organization_id).target_organization_name if application.target_organization_id if competitive_group.education_source_id == 16
