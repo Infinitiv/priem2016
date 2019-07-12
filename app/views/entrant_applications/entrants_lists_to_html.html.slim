@@ -63,7 +63,8 @@ p Обращаем Ваше внимание, что до 26 июля возмо
                 td.text-center= "+" if [application.budget_agr, application.paid_agr].include?(competitive_group.id)
                 td= values[:full_summa] unless values[:mark_values].include?(0)
                 - values[:mark_values].each_with_index do |mark_value, index|
-                  td
+                  - label_class = "bg-danger" if mark_value < 42 && mark_value > 0
+                  td(class = label_class)
                     - if mark_value > 0
                       span= mark_value
                       sup= values[:mark_forms][index]
