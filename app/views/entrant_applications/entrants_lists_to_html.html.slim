@@ -73,4 +73,4 @@ p Обращаем Ваше внимание, что до 26 июля возмо
                 td= values[:summa] if values[:mark_values].select{|m| m > 41}.count == 3
                 td= values[:achievements_sum] if values[:achievements_sum] > 0
                 td.text-center= "+" if application.benefit
-                td= @target_organizations.find(application.target_organization_id).target_organization_name if application.target_organization_id if competitive_group.education_source_id == 16
+                td= application.target_contracts.where(competitive_group_id: competitive_group).map{|target_contract| target_contract.target_organization.target_organization_name}.join(', ') if competitive_group.education_source_id == 16

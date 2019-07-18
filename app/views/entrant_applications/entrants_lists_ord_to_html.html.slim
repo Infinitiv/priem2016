@@ -45,4 +45,4 @@ h2= "Заявления, принятые по состоянию на #{Time.no
                 td
                 td= "%04d" % application.application_number
                 td= application.fio
-                td= @target_organizations.find(application.target_organization_id).target_organization_name if application.target_organization_id if competitive_group.education_source_id == 16
+                td= application.target_contracts.where(competitive_group_id: competitive_group).map{|target_contract| target_contract.target_organization.target_organization_name}.join(', ') if competitive_group.education_source_id == 16

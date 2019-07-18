@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190503175817) do
+ActiveRecord::Schema.define(version: 20190715111819) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -301,6 +301,18 @@ ActiveRecord::Schema.define(version: 20190503175817) do
     t.datetime "updated_at",   null: false
   end
 
+  create_table "target_contracts", force: :cascade do |t|
+    t.integer  "entrant_application_id"
+    t.integer  "competitive_group_id"
+    t.integer  "target_organization_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "target_contracts", ["competitive_group_id"], name: "index_target_contracts_on_competitive_group_id", using: :btree
+  add_index "target_contracts", ["entrant_application_id"], name: "index_target_contracts_on_entrant_application_id", using: :btree
+  add_index "target_contracts", ["target_organization_id"], name: "index_target_contracts_on_target_organization_id", using: :btree
+
   create_table "target_numbers", force: :cascade do |t|
     t.integer  "target_organization_id"
     t.integer  "competitive_group_id"
@@ -325,6 +337,9 @@ ActiveRecord::Schema.define(version: 20190503175817) do
   add_foreign_key "benefit_documents", "entrant_applications"
   add_foreign_key "identity_documents", "entrant_applications"
   add_foreign_key "olympic_documents", "entrant_applications"
+  add_foreign_key "target_contracts", "competitive_groups"
+  add_foreign_key "target_contracts", "entrant_applications"
+  add_foreign_key "target_contracts", "target_organizations"
   add_foreign_key "target_numbers", "competitive_groups"
   add_foreign_key "target_numbers", "target_organizations"
 end
