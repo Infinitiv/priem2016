@@ -64,7 +64,7 @@ class EntrantApplication < ActiveRecord::Base
           Achievement.import_from_row(row, entrant_application)
         case true
         when campaign.education_levels.include?(5)
-          entrant_application.competitive_groups = []
+          entrant_application.competitive_groups = [] unless row.keys.include?('benefit_document_type_id') || row.keys.include?('alt_entrant_last_name') || row.keys.include?('olympic_id')
           competitive_groups.each do |competitive_group|
             entrant_application.competitive_groups << competitive_group if row[competitive_group.name]
           end
