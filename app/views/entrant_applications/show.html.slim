@@ -18,33 +18,32 @@
     - @entrant_application.competitive_groups.order(:name).each do |competitive_group|
       li
         = competitive_group.name
-        - if @full_summa
-          - if competitive_group.education_source_id == 16
-            = " #{@entrant_application.target_contracts.where(competitive_group_id: competitive_group.id).map{|target_contract| target_contract.target_organization.target_organization_name}.join(', ')}."
-          - sub_entrant_applications_hash = @entrant_applications_hash.select{|a, v| v[:competitive_groups].include?(competitive_group.id)}
-          - place = sub_entrant_applications_hash.to_h.keys.index(@entrant_application) + 1
-          = " (место #{place} из #{sub_entrant_applications_hash.count})"
         span &nbsp;
         span.label.label-success= "согласие" if @entrant_application.budget_agr == competitive_group.id || @entrant_application.paid_agr == competitive_group.id
         span &nbsp;
         span.label.label-success= "зачислен #{@entrant_application.enrolled_date}" if @entrant_application.enrolled == competitive_group.id
         span &nbsp;
         span.label.label-warning= "отказ #{@entrant_application.exeptioned_date}" if @entrant_application.exeptioned == competitive_group.id
-  - if @full_summa
-    h2 Конкурсные баллы
-    table.table
-      thead
-        tr
-          - @marks.each do |mark|
-            th = mark.subject.subject_name
-          th Сумма
-          th С учетом достижений
-      tbody
-        tr
-          - @marks.each do |mark|
-            td= "#{mark.value} (#{mark.form})"
-          td= @entrant_applications_hash[@entrant_application][:summa]
-          td= @full_summa
+  h2 Конкурсные баллы
+  table.table
+    thead
+      tr
+        - @marks.each do |mark|
+          th = mark.subject.subject_name
+        th Сумма
+        th С учетом достижений
+    tbody
+      tr
+        - @marks.each do |mark|
+          td= "#{mark.value} (#{mark.form})"
+        td= @sum
+        td= @full_sum
+  - if @achievements_sum > 0
+    h2 Индивидуальные достижения
+    ul
+      - @achievements.each do |achievement|
+        - if achievement.value > 0
+          li= achievement.institution_achievement.name 
   h2= "Льготы" if @entrant_application.olympionic || @entrant_application.benefit
   p= "Олимпиада" if @entrant_application.olympionic
   p= "Особое право поступления" if @entrant_application.benefit
@@ -55,7 +54,7 @@
     dt Дата рождения
     dh= @entrant_application.birth_date
     dt Страна
-    dh= @entrant_application.nationality_type_id
+    dh= @citizenship
     dt Регион
     dh= @entrant_application.region_id
   h2 Документы
@@ -66,16 +65,27 @@
         dd= i.identity_document_data
     dt
       h3 Документ об образовании
-      = @entrant_application.education_document.education_document_type if @entrant_application.education_document.education_document_type
+      - if @entrant_application.education_document.education_document_type
+        - education_document_name = case @entrant_application.education_document.education_document_type
+        - when 'HighEduDiplomaDocument'
+          - 'Диплом о высшем профессиональном образовании'
+        - when 'MiddleEduDiplomaDocument'
+          - 'Диплом о среднем специальном образовании'
+        - when 'SchoolCertificateDocument'
+          - 'Аттестат о среднем общем образовании'
+        = education_document_name
     dd
       = @entrant_application.education_document.education_document_data
+      span &nbsp;
       span.label.label-success= @entrant_application.education_document.original_received_date if @entrant_application.education_document.original_received_date
       p= @entrant_application.education_document.education_speciality_code
-    dt
-      h3 Документы на льготу
-      - @entrant_application.benefit_documents.each do |b|
-        dd= b.benefit_document_data
-    dt
-      h3 Диплом победителя/призера олимпиады
-      - @entrant_application.olympic_documents.each do |o|
-        dd= o.olympic_document_data
+    - if  @entrant_application.benefit
+      dt
+        h3 Документы на льготу
+        - @entrant_application.benefit_documents.each do |b|
+          dd= b.benefit_document_data
+    - if @entrant_application.olympionic
+      dt
+        h3 Диплом победителя/призера олимпиады
+        - @entrant_application.olympic_documents.each do |o|
+          dd= o.olympic_document_data

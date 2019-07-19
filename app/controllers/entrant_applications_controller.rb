@@ -6,17 +6,23 @@ class EntrantApplicationsController < ApplicationController
   
   def index
     @entrant_applications = EntrantApplication.includes(:education_document, :marks).select(:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :status_id, :campaign_id).where(campaign_id: @campaign)
-#     @entrant_applications_hash = EntrantApplication.entrant_applications_hash(@campaign)
   end
   
   def show
-    @entrant_applications_hash = EntrantApplication.entrant_applications_hash(@entrant_application.campaign).select{|k, v| v[:summa] > 0 && k.status_id == 4}.sort_by{|k, v| [v[:full_summa].to_f, v[:summa].to_f, v[:mark_values], v[:benefit]]}.reverse.to_h
     entrant_applications = @entrant_application.campaign.entrant_applications.select(:id, :application_number)
     @previous_entrant = entrant_applications.find_by_application_number(@entrant_application.application_number - 1)
     @next_entrant = entrant_applications.find_by_application_number(@entrant_application.application_number + 1)
-    @marks = @entrant_application.marks
-    @full_summa = @entrant_applications_hash[@entrant_application] ? @entrant_applications_hash[@entrant_application][:full_summa] : nil
-    @entrance_test_items_count = @entrant_application.campaign.entrance_test_items.select(:subject_id, :min_score).uniq.size
+    @marks = @entrant_application.marks.order(:subject_id).includes(:subject)
+    @sum = @marks.pluck(:value).sum
+    @achievements = @entrant_application.achievements.includes(:institution_achievement)
+    @achievements_sum = @achievements.pluck(:value).sum
+    achievements_limit = 10 if @entrant_application.campaign.campaign_type_id == 1
+    if achievements_limit
+      @achievements_sum = @achievements_sum > achievements_limit ? 10 : @achievements_sum
+    end
+    @full_sum = @sum + @achievements_sum
+    @entrance_test_items = @entrant_application.campaign.entrance_test_items.select(:id, :subject_id, :min_score).uniq
+    @citizenship = Dictionary.find_by_code(21).items.select{|country| country.key(@entrant_application.nationality_type_id)}.first['name']
   end
   
   def new
