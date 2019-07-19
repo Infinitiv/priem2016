@@ -8,26 +8,22 @@ table.table.datatable
   thead
     th Номер заявления
     th Ф.И.О.
-    th Сумма баллов
     th Форма вступительного испытания
   tbody
-    - @entrant_applications_hash.each do |entrant_application, data|
+    - @entrant_applications.each do |entrant_application|
       - case
         - when entrant_application.status_id == 6
           - label_class = "label label-danger"
-        - when data[:original_received]
+        - when entrant_application.education_document.original_received_date
           - label_class = "label label-success"
         - else
           - label_class = "label label-default"
       tr
         td= link_to "%04d" % entrant_application.application_number, entrant_application, class: label_class
         td= entrant_application.fio
-        - data[:achievements_sum] > 0 ? summa_class = 'label label-success' : 'label label-default'
-        td 
-          span class=summa_class = data[:full_summa]
         - case @campaign.campaign_type_id
           - when 1
-            td= data[:mark_forms].include?('Экзамен') ? 'Экзамен' : 'ЕГЭ'
+            td= entrant_application.marks.map(&:form).include?('Экзамен') ? 'Экзамен' : 'ЕГЭ'
           - when 4
-            td= data[:mark_forms].include?('тест') ? 'Экзамен' : 'Аккредитация'
+            td= entrant_application.marks.map(&:form).include?('тест') ? 'Экзамен' : 'Аккредитация'
             
