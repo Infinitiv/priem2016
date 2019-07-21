@@ -53,4 +53,5 @@ gem 'roo'
 gem 'jquery-datatables-rails'
 gem 'prawn'
 gem 'google_drive'
-
+gem 'devise'
+gem 'cancancan'

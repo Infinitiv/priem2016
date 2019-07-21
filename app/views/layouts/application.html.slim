@@ -68,6 +68,10 @@ body
           ul.dropdown-menu
             - @campaigns.each do |campaign|
               li= link_to "Мониторинг приемной кампании #{campaign.name} #{campaign.year_start}", reports_mon_url + "?campaign_id=#{campaign.id}"
+    - if notice || alert
+      .row
+        .notice= notice
+        .alert= alert
     .row
       = yield
   = javascript_include_tag 'datatable'
