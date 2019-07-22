@@ -68,6 +68,8 @@ body
           ul.dropdown-menu
             - @campaigns.each do |campaign|
               li= link_to "Мониторинг приемной кампании #{campaign.name} #{campaign.year_start}", reports_mon_url + "?campaign_id=#{campaign.id}"
+      ul.nav.navbar-nav.pull-right
+        li= user_signed_in? ? (link_to 'Выйти', destroy_user_session_url, method: 'delete') : (link_to 'Войти', new_user_session_url)
     - if notice || alert
       .row
         .notice= notice
