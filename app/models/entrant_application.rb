@@ -50,11 +50,11 @@ class EntrantApplication < ActiveRecord::Base
             entrant_application.budget_agr = competitive_groups.find_by_name(row['agreement']).id
           end
         end
-        entrant_application.contracts = []
-        entrant_application.contracts << competitive_groups.find_by_name('Лечебное дело. Внебюджет.').id if row['contract_lech']
-        entrant_application.contracts << competitive_groups.find_by_name('Педиатрия. Внебюджет.') if row['contract_ped']
-        entrant_application.contracts << competitive_groups.find_by_name('Стоматология. Внебюджет.') if row['contract_stomat']
       end
+      entrant_application.contracts = []
+      entrant_application.contracts << competitive_groups.find_by_name('Лечебное дело. Внебюджет.') if row['contract_lech']
+      entrant_application.contracts << competitive_groups.find_by_name('Педиатрия. Внебюджет.') if row['contract_ped']
+      entrant_application.contracts << competitive_groups.find_by_name('Стоматология. Внебюджет.') if row['contract_stomat']
       if entrant_application.save!
           IdentityDocument.import_from_row(row, entrant_application) if row.keys.include? 'identity_document_type'
           EducationDocument.import_from_row(row, entrant_application) if row.keys.include? 'education_document_type'

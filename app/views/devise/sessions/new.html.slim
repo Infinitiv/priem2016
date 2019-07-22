@@ -1,0 +1,13 @@
+- content_for :title do
+  = "Вход"
+h2 Вход
+= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
+  .row.col-sm-3
+    .form-group
+      = f.label :login, 'Имя пользователя'
+      = f.text_field :login, autofocus: true, autocomplete: "login", class: 'form-control'
+    .form-group
+      = f.label :password, 'Пароль'
+      = f.password_field :password, autocomplete: "off", class: 'form-control'
+    .actions
+      = f.submit "Отправить", class: 'btn btn-primary'
