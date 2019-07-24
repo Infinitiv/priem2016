@@ -71,8 +71,11 @@ Rails.application.routes.draw do
     end
     member do
       get 'touch'
+      put 'toggle_original'
     end
   end
+  
+  put 'entrant_applications/:id/competitive_groups/:competitive_group_id/toggle_agreement' => 'entrant_applications#toggle_agreement'
   
   get 'reports/mon'
   

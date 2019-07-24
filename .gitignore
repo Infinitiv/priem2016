@@ -16,3 +16,4 @@
 lib/tasks/data
 public/competitions
 public/entrants
+db/seed.rb

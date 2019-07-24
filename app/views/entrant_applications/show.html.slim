@@ -14,16 +14,27 @@
   h1= @entrant_application.fio
   = link_to "Обновлено #{@entrant_application.updated_at.strftime("%Y-%m-%d")}", touch_entrant_application_url(@entrant_application), class: "pull-right label label-default"
   h2 Перечень конкурсов
-  ol
-    - @entrant_application.competitive_groups.order(:name).each do |competitive_group|
-      li
-        = competitive_group.name
-        span &nbsp;
-        span.label.label-success= "согласие" if @entrant_application.budget_agr == competitive_group.id || @entrant_application.paid_agr == competitive_group.id
-        span &nbsp;
-        span.label.label-success= "зачислен #{@entrant_application.enrolled_date}" if @entrant_application.enrolled == competitive_group.id
-        span &nbsp;
-        span.label.label-warning= "отказ #{@entrant_application.exeptioned_date}" if @entrant_application.exeptioned == competitive_group.id
+  table
+    tbody
+      - @entrant_application.competitive_groups.order(:name).each do |competitive_group|
+        - agreement_exists = @entrant_application.budget_agr == competitive_group.id || @entrant_application.paid_agr == competitive_group.id
+        - agreement_sign = ''
+        - if agreement_exists
+          - agreement_sign = ' x'
+          - agreement_class = 'pull-right label label-warning'
+        - else
+          - agreement_sign = ' +' unless  @entrant_application.exeptioned == competitive_group.id
+          - agreement_class = 'pull-right label label-success'
+        tr
+          td
+            = competitive_group.name
+          td
+            span.label.label-success= "согласие" if agreement_exists
+            stron= link_to agreement_sign, [@entrant_application.id, 'competitive_groups', competitive_group.id, 'toggle_agreement'].join('/'), method: 'put', class: agreement_class
+            span &nbsp;
+            span.label.label-success= "зачислен #{@entrant_application.enrolled_date}" if @entrant_application.enrolled == competitive_group.id
+            span &nbsp;
+            span.label.label-warning= "отказ #{@entrant_application.exeptioned_date}" if @entrant_application.exeptioned == competitive_group.id
   h2 Конкурсные баллы
   table.table
     thead
@@ -65,6 +76,12 @@
         dd= i.identity_document_data
     dt
       h3 Документ об образовании
+      - if @entrant_application.education_document.original_received_date
+        - orininal_sign =  ' x'
+        - original_class = 'label label-warning'
+      - else
+        - orininal_sign =  ' +'
+        - original_class = 'label label-success'
       - if @entrant_application.education_document.education_document_type
         - education_document_name = case @entrant_application.education_document.education_document_type
         - when 'HighEduDiplomaDocument'
@@ -78,6 +95,7 @@
       = @entrant_application.education_document.education_document_data
       span &nbsp;
       span.label.label-success= @entrant_application.education_document.original_received_date if @entrant_application.education_document.original_received_date
+      strong= link_to orininal_sign, toggle_original_entrant_application_url(@entrant_application), method: :put, class: original_class
       p= @entrant_application.education_document.education_speciality_code
     - unless @target_contracts.empty?
       dt

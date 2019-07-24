@@ -1,6 +1,7 @@
 class EntrantApplicationsController < ApplicationController
   load_and_authorize_resource
-  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch]
+  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original]
+  before_action :set_competitive_group, only: [:toggle_agreement]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
   before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export, :target_report, :entrants_lists_to_html, :entrants_lists_ord_to_html]
@@ -60,6 +61,44 @@ class EntrantApplicationsController < ApplicationController
   def touch
     @entrant_application.touch
     redirect_to :back
+  end
+  
+  def toggle_agreement
+    unless @competitive_group.id == @entrant_application.exeptioned
+      if @entrant_application.budget_agr == @competitive_group.id || @entrant_application.paid_agr == @competitive_group.id
+        @entrant_application.budget_agr = nil
+        @entrant_application.paid_agr = nil
+      else
+        @entrant_application.budget_agr = nil
+        @entrant_application.paid_agr = nil
+        if @competitive_group.name =~ /Внебюджет/ 
+          @entrant_application.paid_agr = @competitive_group.id
+        else
+          @entrant_application.budget_agr = @competitive_group.id
+        end
+      end
+      unless @entrant_application.enrolled.nil?
+        @entrant_application.exeptioned = @entrant_application.enrolled
+        @entrant_application.exeptioned_date = Time.now.to_date
+        @entrant_application.enrolled = nil
+        @entrant_application.enrolled_date = nil
+      end
+    end
+    if @entrant_application.save!
+      redirect_to @entrant_application
+    end
+  end
+  
+  def toggle_original
+    education_document = @entrant_application.education_document
+    if education_document.original_received_date
+      education_document.original_received_date = nil
+    else
+      education_document.original_received_date = Time.now.to_date
+    end
+    if education_document.save!
+      redirect_to @entrant_application
+    end
   end
   
   def import
@@ -173,5 +212,9 @@ class EntrantApplicationsController < ApplicationController
     @target_organizations = TargetOrganization.order(:target_organization_name)
     @application_statuses = Dictionary.find_by_code(4).items
     @countries = Dictionary.find_by_code(7).items
+  end
+  
+  def set_competitive_group
+    @competitive_group = CompetitiveGroup.find(params[:competitive_group_id])
   end
 end
