@@ -72,6 +72,7 @@ Rails.application.routes.draw do
     member do
       get 'touch'
       put 'toggle_original'
+      put 'entrant_application_recall'
     end
   end
   

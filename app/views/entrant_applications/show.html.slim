@@ -11,6 +11,8 @@
 .row
   h1.pull-left class=label_class
     = "#{"%04d" % @entrant_application.application_number}"
+  h3.pull-right
+    = link_to 'x', entrant_application_recall_entrant_application_url(@entrant_application), method: :put, class: 'label label-warning', title: 'Отозвать документы'
   h1= @entrant_application.fio
   = link_to "Обновлено #{@entrant_application.updated_at.strftime("%Y-%m-%d")}", touch_entrant_application_url(@entrant_application), class: "pull-right label label-default"
   h2 Перечень конкурсов
@@ -30,7 +32,7 @@
             = competitive_group.name
           td
             span.label.label-success= "согласие" if agreement_exists
-            stron= link_to agreement_sign, [@entrant_application.id, 'competitive_groups', competitive_group.id, 'toggle_agreement'].join('/'), method: 'put', class: agreement_class
+            stron= link_to agreement_sign, [@entrant_application.id, 'competitive_groups', competitive_group.id, 'toggle_agreement'].join('/'), method: 'put', class: agreement_class, title: 'Изменить согласие на зачисление'
             span &nbsp;
             span.label.label-success= "зачислен #{@entrant_application.enrolled_date}" if @entrant_application.enrolled == competitive_group.id
             span &nbsp;
@@ -95,7 +97,7 @@
       = @entrant_application.education_document.education_document_data
       span &nbsp;
       span.label.label-success= @entrant_application.education_document.original_received_date if @entrant_application.education_document.original_received_date
-      strong= link_to orininal_sign, toggle_original_entrant_application_url(@entrant_application), method: :put, class: original_class
+      strong= link_to orininal_sign, toggle_original_entrant_application_url(@entrant_application), method: :put, class: original_class, title: 'Изменить оригинал'
       p= @entrant_application.education_document.education_speciality_code
     - unless @target_contracts.empty?
       dt
@@ -112,3 +114,29 @@
         h3 Диплом победителя/призера олимпиады
         - @entrant_application.olympic_documents.each do |o|
           dd= o.olympic_document_data
+- unless @journal_entries.empty?
+  .row
+    h2 Лист изменений
+    ul
+      - @journal_entries.each do |journal_entry|
+        - method_name = case journal_entry.method
+        - when 'toggle_agreement'
+          - 'Изменение согласия на зачисление'
+        - when 'enrolled_recall'
+          - "Отказ от зачисления #{@entrant_application.competitive_groups.find(@entrant_application.exeptioned).name}"
+        - when 'toggle_original'
+          - journal_entry.old_value ? 'Отзыв оригинала' : 'Подача оригинала'
+        - when 'entrant_application_recall'
+          - 'Отзыв пакета документов'
+        - value_name = case journal_entry.value_name
+        - when 'budget_arg'
+          - 'бюджет'
+        - when 'paid_agr'
+          - 'внебюджет'
+        li 
+          span= "#{journal_entry.created_at.strftime("%d.%m.%Y %H:%M")} "
+          span= "#{journal_entry.user.login} "
+          span= "#{method_name}"
+          - if journal_entry.method == 'toggle_agreement'
+            span= journal_entry.old_value ? " c #{@entrant_application.competitive_groups.find(journal_entry.old_value).name}" : ' c "нет"'
+            span= journal_entry.new_value ? " на #{@entrant_application.competitive_groups.find(journal_entry.new_value).name}" : ' на "нет"'

@@ -5,7 +5,7 @@ class Ability
     return unless user.present?
     can :read, Campaign
     return unless user.clerk?
-    can [:read, :toggle_agreement, :toggle_original], EntrantApplication
+    can [:read, :toggle_agreement, :toggle_original, :entrant_application_recall], EntrantApplication
     return unless user.super?
     can :read, Report
     return unless user.admin?

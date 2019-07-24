@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190723072142) do
+ActiveRecord::Schema.define(version: 20190724192807) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -264,6 +264,20 @@ ActiveRecord::Schema.define(version: 20190723072142) do
 
   add_index "institution_achievements", ["campaign_id"], name: "index_institution_achievements_on_campaign_id", using: :btree
 
+  create_table "journals", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "entrant_application_id"
+    t.string   "method"
+    t.string   "value_name"
+    t.string   "old_value"
+    t.string   "new_value"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "journals", ["entrant_application_id"], name: "index_journals_on_entrant_application_id", using: :btree
+  add_index "journals", ["user_id"], name: "index_journals_on_user_id", using: :btree
+
   create_table "marks", force: :cascade do |t|
     t.integer  "entrant_application_id"
     t.integer  "subject_id"
@@ -356,6 +370,8 @@ ActiveRecord::Schema.define(version: 20190723072142) do
   add_foreign_key "achievements", "institution_achievements"
   add_foreign_key "benefit_documents", "entrant_applications"
   add_foreign_key "identity_documents", "entrant_applications"
+  add_foreign_key "journals", "entrant_applications"
+  add_foreign_key "journals", "users"
   add_foreign_key "olympic_documents", "entrant_applications"
   add_foreign_key "target_contracts", "competitive_groups"
   add_foreign_key "target_contracts", "entrant_applications"

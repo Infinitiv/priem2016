@@ -1,6 +1,6 @@
 class EntrantApplicationsController < ApplicationController
   load_and_authorize_resource
-  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original]
+  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall]
   before_action :set_competitive_group, only: [:toggle_agreement]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
@@ -26,6 +26,7 @@ class EntrantApplicationsController < ApplicationController
     @entrance_test_items = @entrant_application.campaign.entrance_test_items.select(:id, :subject_id, :min_score).uniq
     @citizenship = Dictionary.find_by_code(21).items.select{|country| country.key(@entrant_application.nationality_type_id)}.first['name']
     @target_contracts = @entrant_application.target_contracts
+    @journal_entries = Journal.includes(:user).where(entrant_application_id: @entrant_application.id)
   end
   
   def new
@@ -65,7 +66,12 @@ class EntrantApplicationsController < ApplicationController
   
   def toggle_agreement
     unless @competitive_group.id == @entrant_application.exeptioned
+      unless @entrant_application.enrolled.nil?
+        enrolled_recall
+      end
+      old_value = @entrant_application.budget_agr || @entrant_application.paid_agr
       if @entrant_application.budget_agr == @competitive_group.id || @entrant_application.paid_agr == @competitive_group.id
+        value_name = ('budget_arg' if @entrant_application.budget_agr) || ('paid_agr' if @entrant_application.paid_agr)
         @entrant_application.budget_agr = nil
         @entrant_application.paid_agr = nil
       else
@@ -73,30 +79,44 @@ class EntrantApplicationsController < ApplicationController
         @entrant_application.paid_agr = nil
         if @competitive_group.name =~ /Внебюджет/ 
           @entrant_application.paid_agr = @competitive_group.id
+          value_name = 'paid_agr'
         else
           @entrant_application.budget_agr = @competitive_group.id
+          value_name = 'budget_arg'
         end
       end
-      unless @entrant_application.enrolled.nil?
-        @entrant_application.exeptioned = @entrant_application.enrolled
-        @entrant_application.exeptioned_date = Time.now.to_date
-        @entrant_application.enrolled = nil
-        @entrant_application.enrolled_date = nil
-      end
+      new_value = @entrant_application.budget_agr || @entrant_application.paid_agr
+      Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
     end
     if @entrant_application.save!
       redirect_to @entrant_application
     end
   end
   
+  def entrant_application_recall
+    old_value = @entrant_application.status_id
+    @entrant_application.status_id = 6
+    @entrant_application.return_documents_date = Time.now.to_date
+    value_name = 'entrant_application_recall'
+    new_value = @entrant_application.status_id
+    if @entrant_application.save!
+      Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+      redirect_to @entrant_application
+    end
+  end
+  
   def toggle_original
     education_document = @entrant_application.education_document
+    value_name = 'original'
+    old_value = education_document.original_received_date
     if education_document.original_received_date
       education_document.original_received_date = nil
     else
       education_document.original_received_date = Time.now.to_date
     end
+    new_value = education_document.original_received_date
     if education_document.save!
+      Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
       redirect_to @entrant_application
     end
   end
@@ -216,5 +236,17 @@ class EntrantApplicationsController < ApplicationController
   
   def set_competitive_group
     @competitive_group = CompetitiveGroup.find(params[:competitive_group_id])
+  end
+  
+  def enrolled_recall
+    value_name = 'enrolled'
+    old_value = @entrant_application.enrolled
+    new_value = nil
+    @entrant_application.exeptioned = @entrant_application.enrolled
+    @entrant_application.exeptioned_date = Time.now.to_date
+    @entrant_application.enrolled = nil
+    @entrant_application.enrolled_date = nil
+    Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, old_value: old_value, new_value: new_value)
+    return @entrant_application
   end
 end
