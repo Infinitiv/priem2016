@@ -24,6 +24,7 @@ class EntrantApplicationsController < ApplicationController
     @full_sum = @sum + @achievements_sum
     @entrance_test_items = @entrant_application.campaign.entrance_test_items.select(:id, :subject_id, :min_score).uniq
     @citizenship = Dictionary.find_by_code(21).items.select{|country| country.key(@entrant_application.nationality_type_id)}.first['name']
+    @target_contracts = @entrant_application.target_contracts
   end
   
   def new
@@ -157,7 +158,7 @@ class EntrantApplicationsController < ApplicationController
   private
   
   def set_entrant_application
-    @entrant_application = EntrantApplication.includes(:campaign, :competitive_groups, :marks, :achievements, :identity_documents, :education_document, :target_contracts).find(params[:id])
+    @entrant_application = EntrantApplication.includes(:campaign, :competitive_groups, :marks, :achievements, :identity_documents, :education_document, :target_contracts, :target_organizations).find(params[:id])
   end
   
   def entrant_application_params
