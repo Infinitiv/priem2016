@@ -1,4 +1,5 @@
 class EntranceTestItemsController < ApplicationController
+  load_and_authorize_resource
   before_action :set_entrance_test_item, only: [:show, :edit, :update, :destroy]
   before_action :entrance_test_item_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :create, :edit, :update]

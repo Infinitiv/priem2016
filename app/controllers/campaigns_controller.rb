@@ -1,4 +1,5 @@
 class CampaignsController < ApplicationController
+  load_and_authorize_resource
   before_action :set_select, only: [:new, :edit, :update, :create]
   before_action :campaign_params, only: [:create]
   before_action :set_campaign, only: [:show, :edit, :update, :destroy]

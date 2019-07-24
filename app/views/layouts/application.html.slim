@@ -10,64 +10,79 @@ body
   .container
     .nav.navbar.navbar-default
       ul.nav.navbar-nav
-        li.dropdown
-          = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
-            span Запросы
-            span.caret
-          ul.dropdown-menu
-            li= link_to "Новый запрос", new_request_path
-            li= link_to "Архив запросов", requests_path
-        li= link_to 'Приемные кампании', campaigns_path
-        li.dropdown
-          = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
-            span Заявления
-            span.caret
-          ul.dropdown-menu
-            - @campaigns.each do |campaign|
-              li= link_to "Заявления #{campaign.name} #{campaign.year_start}", entrant_applications_path + "?campaign_id=#{campaign.id}"
-        li.dropdown
-          = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
-            span Цифры приема
-            span.caret
-          ul.dropdown-menu
-            li= link_to 'Объем приема', admission_volumes_path
-            li= link_to 'Распределенный объем приема', distributed_admission_volumes_path
-            li= link_to 'Конкурсы', competitive_groups_url
-            li= link_to 'Испытания', entrance_test_items_url
-        li.dropdown
-          = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
-            span Справочники
-            span.caret
-          ul.dropdown-menu
-            li= link_to 'Образовательные программы', edu_programs_path
-            li= link_to 'Организации целевого приема', target_organizations_url
-            li= link_to 'Предметы', subjects_url
-            li= link_to 'Индивидуальные достижения', institution_achievements_url
-        li.dropdown
-          = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
-            span Выгрузки
-            span.caret
-          ul.dropdown-menu
-            - @campaigns.where(year_start: Time.now.year).each do |campaign|
-              li= link_to "Выгрузить ЕГЭ #{campaign.name} #{campaign.year_start}", ege_to_txt_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
-              li= link_to "Ошибки #{campaign.name} #{campaign.year_start}", errors_entrant_applications_url + "?campaign_id=#{campaign.id}"
-              li= link_to "Конкурс #{campaign.name} #{campaign.year_start}", competition_lists_entrant_applications_url + "?campaign_id=#{campaign.id}"
-              li= link_to "Выгрузка в ИАС #{campaign.name} #{campaign.year_start}", ord_export_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
-              li= link_to "Выгрузка в ИАС (отзыв заявлений) #{campaign.name} #{campaign.year_start}", ord_return_export_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
-              li= link_to "Отчет в ИАС #{campaign.name} #{campaign.year_start}", ord_result_export_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
-              li= link_to "Отчет по целевикам #{campaign.name} #{campaign.year_start}", target_report_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
-              li= link_to "Запрос оценок из ИАС #{campaign.name} #{campaign.year_start}", ord_marks_request_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
-              li= link_to "Cписки подавших документы в html #{campaign.name} #{campaign.year_start}", entrants_lists_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
-              li= link_to "Списки подавших документы в html #{campaign.name} #{campaign.year_start}", entrants_lists_ord_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
-              li= link_to "Конкурсные списки в html #{campaign.name} #{campaign.year_start}", competition_lists_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
-              li= link_to "Конкурсные списки в html #{campaign.name} #{campaign.year_start}", competition_lists_ord_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
-        li.dropdown
-          = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
-            span Отчеты
-            span.caret
-          ul.dropdown-menu
-            - @campaigns.each do |campaign|
-              li= link_to "Мониторинг приемной кампании #{campaign.name} #{campaign.year_start}", reports_mon_url + "?campaign_id=#{campaign.id}"
+        - if can? :read, Request
+          li.dropdown
+            = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
+              span Запросы
+              span.caret
+            ul.dropdown-menu
+              li= link_to "Новый запрос", new_request_path
+              li= link_to "Архив запросов", requests_path
+        - if can? :read, Campaign
+          li= link_to 'Приемные кампании', campaigns_path
+        - if can? :read, EntrantApplication
+          li.dropdown
+            = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
+              span Заявления
+              span.caret
+            ul.dropdown-menu
+              - @campaigns.each do |campaign|
+                li= link_to "Заявления #{campaign.name} #{campaign.year_start}", entrant_applications_path + "?campaign_id=#{campaign.id}"
+        - if can?(:read, AdmissionVolume) || can?(:read, DistributedAdmissionVolume) || can?(:read, CompetitiveGroup) || can?(:read, EntranceTestItem)
+          li.dropdown
+            = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
+              span Цифры приема
+              span.caret
+            ul.dropdown-menu
+              - if can? :read, AdmissionVolume
+                li= link_to 'Объем приема', admission_volumes_path
+              - if can? :read, DistributedAdmissionVolume
+                li= link_to 'Распределенный объем приема', distributed_admission_volumes_path
+              - if can? :read, CompetitiveGroup
+                li= link_to 'Конкурсы', competitive_groups_url
+              - if can? :read, EntranceTestItem
+                li= link_to 'Испытания', entrance_test_items_url
+        - if can?(:read, EduProgram) || can?(:read, TargetOrganization) || can?(:read, Subject) || can?(:read, InstitutionAchievement)
+          li.dropdown
+            = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
+              span Справочники
+              span.caret
+            ul.dropdown-menu
+              - if can? :read, EduProgram
+                li= link_to 'Образовательные программы', edu_programs_path
+              - if can? :read, TargetOrganization
+                li= link_to 'Организации целевого приема', target_organizations_url
+              - if can? :read, Subject
+                li= link_to 'Предметы', subjects_url
+              - if can? :read, InstitutionAchievement
+                li= link_to 'Индивидуальные достижения', institution_achievements_url
+        - if can? :read, EntrantApplication
+          li.dropdown
+            = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
+              span Выгрузки
+              span.caret
+            ul.dropdown-menu
+              - @campaigns.where(year_start: Time.now.year).each do |campaign|
+                li= link_to "Выгрузить ЕГЭ #{campaign.name} #{campaign.year_start}", ege_to_txt_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
+                li= link_to "Ошибки #{campaign.name} #{campaign.year_start}", errors_entrant_applications_url + "?campaign_id=#{campaign.id}"
+                li= link_to "Конкурс #{campaign.name} #{campaign.year_start}", competition_lists_entrant_applications_url + "?campaign_id=#{campaign.id}"
+                li= link_to "Выгрузка в ИАС #{campaign.name} #{campaign.year_start}", ord_export_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+                li= link_to "Выгрузка в ИАС (отзыв заявлений) #{campaign.name} #{campaign.year_start}", ord_return_export_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+                li= link_to "Отчет в ИАС #{campaign.name} #{campaign.year_start}", ord_result_export_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+                li= link_to "Отчет по целевикам #{campaign.name} #{campaign.year_start}", target_report_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
+                li= link_to "Запрос оценок из ИАС #{campaign.name} #{campaign.year_start}", ord_marks_request_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+                li= link_to "Cписки подавших документы в html #{campaign.name} #{campaign.year_start}", entrants_lists_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
+                li= link_to "Списки подавших документы в html #{campaign.name} #{campaign.year_start}", entrants_lists_ord_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+                li= link_to "Конкурсные списки в html #{campaign.name} #{campaign.year_start}", competition_lists_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
+                li= link_to "Конкурсные списки в html #{campaign.name} #{campaign.year_start}", competition_lists_ord_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+        - if can? :read, Report
+          li.dropdown
+            = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
+              span Отчеты
+              span.caret
+            ul.dropdown-menu
+              - @campaigns.each do |campaign|
+                li= link_to "Мониторинг приемной кампании #{campaign.name} #{campaign.year_start}", reports_mon_url + "?campaign_id=#{campaign.id}"
       ul.nav.navbar-nav.pull-right
         li= user_signed_in? ? (link_to 'Выйти', destroy_user_session_url, method: 'delete') : (link_to 'Войти', new_user_session_url)
     - if notice || alert

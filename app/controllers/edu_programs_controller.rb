@@ -1,4 +1,5 @@
 class EduProgramsController < ApplicationController
+  load_and_authorize_resource
   before_action :set_edu_program, only: [:show, :edit, :update, :destroy]
   before_action :edu_program_params, only: [:create, :update]
   

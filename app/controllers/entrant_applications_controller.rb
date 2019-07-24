@@ -1,4 +1,5 @@
 class EntrantApplicationsController < ApplicationController
+  load_and_authorize_resource
   before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]

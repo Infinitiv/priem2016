@@ -1,4 +1,5 @@
 class CompetitiveGroupsController < ApplicationController
+  load_and_authorize_resource
   before_action :set_competitive_group, only: [:show, :edit, :update, :destroy, :add_education_program, :remove_education_program, :add_entrance_test_item, :remove_entrance_test_item]
   before_action :competitive_group_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :update, :create]

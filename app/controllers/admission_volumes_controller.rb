@@ -1,4 +1,5 @@
 class AdmissionVolumesController < ApplicationController
+  load_and_authorize_resource
   before_action :set_admission_volume, only: [:show, :edit, :update, :destroy]
   before_action :admission_volume_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :create, :edit, :update]

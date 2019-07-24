@@ -1,4 +1,5 @@
 class TargetNumbersController < ApplicationController
+  load_and_authorize_resource
   before_action :set_target_number, only: [:show, :edit, :update, :destroy]
   before_action :target_number_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :create, :edit, :update]

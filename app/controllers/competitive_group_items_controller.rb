@@ -1,4 +1,5 @@
 class CompetitiveGroupItemsController < ApplicationController
+  load_and_authorize_resource
   before_action :set_competitive_group_item, only: [:show, :edit, :update, :destroy]
   before_action :competitive_group_item_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :create, :edit, :update]

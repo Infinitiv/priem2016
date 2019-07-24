@@ -1,4 +1,5 @@
 class TargetOrganizationsController < ApplicationController
+  load_and_authorize_resource
   before_action :set_target_organization, only: [:show, :edit, :update, :destroy]
   before_action :target_organization_params, only: [:create, :update]
   

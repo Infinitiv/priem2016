@@ -1,4 +1,5 @@
 class InstitutionAchievementsController < ApplicationController
+  load_and_authorize_resource
   before_action :set_institution_achievement, only: [:show, :edit, :update, :destroy]
   before_action :institution_achievement_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit]

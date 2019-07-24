@@ -1,4 +1,5 @@
 class DistributedAdmissionVolumesController < ApplicationController
+  load_and_authorize_resource
   before_action :set_distributed_admission_volume, only: [:show, :edit, :update, :destroy]
   before_action :distributed_admission_volume_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :create, :edit, :update]
