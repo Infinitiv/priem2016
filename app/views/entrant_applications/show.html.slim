@@ -11,8 +11,9 @@
 .row
   h1.pull-left class=label_class
     = "#{"%04d" % @entrant_application.application_number}"
-  h3.pull-right
-    = link_to 'x', entrant_application_recall_entrant_application_url(@entrant_application), method: :put, class: 'label label-warning', title: 'Отозвать документы'
+  - if @entrant_application.status_id == 4
+    h3.pull-right
+      = link_to 'x', entrant_application_recall_entrant_application_url(@entrant_application), method: :put, class: 'label label-warning', title: 'Отозвать документы'
   h1= @entrant_application.fio
   = link_to "Обновлено #{@entrant_application.updated_at.strftime("%Y-%m-%d")}", touch_entrant_application_url(@entrant_application), class: "pull-right label label-default"
   h2 Перечень конкурсов
