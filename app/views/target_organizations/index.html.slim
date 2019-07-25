@@ -3,7 +3,7 @@ h1 Организации целевого приема
 ul
   - @target_organizations.each do |target_organization|
     li
-      = target_organization.target_organization_name
+      = "#{target_organization.id target_organization.target_organization_name}"
       = link_to 'Удалить', target_organization, method: 'delete', class: 'pull-right'
       span.pull-right &nbsp;|&nbsp;
       = link_to 'Редактировать', edit_target_organization_path(target_organization), class: 'pull-right'
