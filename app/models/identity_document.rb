@@ -1,6 +1,6 @@
 #encoding: utf-8
 class IdentityDocument < ActiveRecord::Base
-  has_and_belongs_to_many :entrant_application
+  belongs_to :entrant_application
   
   def self.import_from_row(row, entrant_application)
     accessible_attributes = column_names

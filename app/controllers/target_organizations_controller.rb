@@ -4,7 +4,7 @@ class TargetOrganizationsController < ApplicationController
   before_action :target_organization_params, only: [:create, :update]
   
   def index
-    @target_organizations = TargetOrganization.order(:target_organization_name)
+    @target_organizations = TargetOrganization.order('created_at DESC')
   end
   
   def show

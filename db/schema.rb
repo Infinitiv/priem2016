@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190724192807) do
+ActiveRecord::Schema.define(version: 20190725075625) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -194,15 +194,14 @@ ActiveRecord::Schema.define(version: 20190724192807) do
     t.integer  "region_id"
     t.string   "email"
     t.date     "registration_date"
-    t.boolean  "need_hostel",            default: false
-    t.integer  "status_id",              default: 2
+    t.boolean  "need_hostel",           default: false
+    t.integer  "status_id",             default: 2
     t.integer  "nationality_type_id"
-    t.integer  "target_organization_id"
-    t.boolean  "special_entrant",        default: false
-    t.boolean  "olympionic",             default: false
-    t.boolean  "benefit",                default: false
+    t.boolean  "special_entrant",       default: false
+    t.boolean  "olympionic",            default: false
+    t.boolean  "benefit",               default: false
     t.string   "data_hash"
-    t.boolean  "checked",                default: false
+    t.boolean  "checked",               default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "budget_agr"
@@ -211,8 +210,8 @@ ActiveRecord::Schema.define(version: 20190724192807) do
     t.date     "enrolled_date"
     t.integer  "exeptioned"
     t.date     "exeptioned_date"
-    t.integer  "contracts",                              array: true
-    t.string   "snils",                  default: ""
+    t.integer  "contracts",                             array: true
+    t.string   "snils",                 default: ""
     t.date     "return_documents_date"
   end
 

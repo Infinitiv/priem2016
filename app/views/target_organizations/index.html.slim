@@ -1,9 +1,12 @@
 h1 Организации целевого приема
 = link_to 'Добавить', new_target_organization_url, class: 'btn btn-primary'
-ul
-  - @target_organizations.each do |target_organization|
-    li
-      = "#{target_organization.id target_organization.target_organization_name}"
-      = link_to 'Удалить', target_organization, method: 'delete', class: 'pull-right'
-      span.pull-right &nbsp;|&nbsp;
-      = link_to 'Редактировать', edit_target_organization_path(target_organization), class: 'pull-right'
+table.table
+  thead
+    tr
+      th ID
+      th Название
+  tbody
+    - @target_organizations.each do |target_organization|
+      tr
+        td= target_organization.id 
+        td= target_organization.target_organization_name

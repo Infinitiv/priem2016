@@ -11,7 +11,6 @@ class EntrantApplication < ActiveRecord::Base
   has_and_belongs_to_many :competitive_groups
   has_many :target_contracts
   has_many :target_organizations, through: :target_contracts
-  belongs_to :target_organization
   has_many :achievements, dependent: :destroy
   has_many :olympic_documents, dependent: :destroy
   
@@ -121,12 +120,12 @@ class EntrantApplication < ActiveRecord::Base
   
   def self.errors(campaign)
     errors = {}
-    applications = campaign.entrant_applications.includes(:identity_documents).where.not(status_id: 6)
+    applications = campaign.entrant_applications.where.not(status_id: 6)
     errors[:dups_numbers] = find_dups_numbers(applications)
     errors[:lost_numbers] = find_lost_numbers(applications)
     errors[:dups_entrants] = find_dups_entrants(applications)
-    target_competition_entrants_array = applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16})
-    errors[:empty_target_entrants] = find_empty_target_entrants(target_competition_entrants_array, applications.joins(:target_organization))
+    target_competition_entrants_array = applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).uniq
+    errors[:empty_target_entrants] = find_empty_target_entrants(target_competition_entrants_array, applications.joins(:target_organizations))
     errors[:not_original_target_entrants] = find_not_original_target_entrants(target_competition_entrants_array, applications.joins(:education_document).where.not(education_documents: {original_received_date: nil}))
     errors[:not_agreed_target_entrants] = find_not_agreed_entrants(applications)
     errors[:expired_passports] = find_expired_passports(applications)
@@ -148,7 +147,7 @@ class EntrantApplication < ActiveRecord::Base
   end
   
   def self.find_dups_entrants(applications)
-    IdentityDocument.includes(:entrant_application).where(entrant_applications: {id: applications}).where.not(entrant_applications: {status_id: 6}).group_by{|i| i.sn}.select{|k, v| v.size > 1}.map{|k, v| applications.joins(:identity_documents).where(identity_documents: {id: v})}.flatten
+    IdentityDocument.joins(:entrant_application).where(entrant_applications: {id: applications}).group_by{|i| i.sn}.select{|k, v| v.size > 1}.map{|k, v| applications.joins(:identity_documents).where(identity_documents: {id: v})}.flatten.uniq
     
   end
   
@@ -161,7 +160,7 @@ class EntrantApplication < ActiveRecord::Base
   end
   
   def self.find_not_agreed_entrants(applications)
-   applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).select{|a| a.competitive_groups.find_by_education_source_id(16).id != a.budget_agr}
+   applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).select{|a| a.competitive_groups.find_by_education_source_id(16).id != a.budget_agr}.uniq.sort_by(&:application_number)
   end
 
   def self.find_expired_passports(applications)
