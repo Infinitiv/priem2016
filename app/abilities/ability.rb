@@ -7,7 +7,8 @@ class Ability
     return unless user.clerk?
     can [:read, :toggle_agreement, :toggle_original, :entrant_application_recall], EntrantApplication
     return unless user.super?
-    can :read, Report
+    can [:read], Report
+    can [:competition_lists], EntrantApplication
     return unless user.admin?
     can :manage, :all
   end
