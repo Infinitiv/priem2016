@@ -1,7 +1,8 @@
 class RequestsController < ApplicationController
-  load_and_authorize_resource
+  load_and_authorize_resource param_method: :set_params
   before_action :set_request, only: [:show]
   before_action :set_selects, only: [:new]
+  before_action :set_params, only: [:create]
   
   def index
     @requests = Request.order(id: :desc).select(:id, :query, :created_at).paginate(:page => params[:page])
@@ -43,6 +44,10 @@ class RequestsController < ApplicationController
   end
   
   private
+  
+  def set_params
+    params.require(:request).permit(:query, :dictionary_number, :custom_request)
+  end
   
   def set_request
     @request = Request.find params[:id]
