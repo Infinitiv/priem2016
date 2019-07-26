@@ -335,7 +335,7 @@ end
               item.competitive_groups.each do |sub_item|
                 fsaefs.FinSourceEduForm do |fsef|
                   fsef.CompetitiveGroupUID sub_item.id
-                  fsef.TargetOrganizationUID item.target_organization_id if sub_item.education_source_id == 16 && item.target_organization_id
+                  fsef.TargetOrganizationUID item.target_contracts.where(competitive_group_id: sub_item.id).target_organization_id if sub_item.education_source_id == 16
                   if item.education_document.original_received_date
                     fsef.IsAgreedDate item.registration_date.to_datetime.to_s.gsub('+00', '+03') if item.budget_agr == sub_item.id || item.paid_agr == sub_item.id
                   end
@@ -519,7 +519,7 @@ end
                         when 8
                           cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'gto'].join('-')
                           cd.DocumentName "Удоствоверение о награждении золотым значком ГТО"
-                          cd.DocumentDate '2018-04-20'
+                          cd.DocumentDate '2019-04-20'
                           cd.DocumentOrganization 'Министерство спорта Российской Федерации'
                         else
                           cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'other', n].join('-')
@@ -562,17 +562,17 @@ end
                         rd.InstitutionDocument do |id|
                           case sub_item.subject.subject_id
                           when 11
-                            id.DocumentNumber "2018-1"
-                            id.DocumentDate "2018-07-13"
+                            id.DocumentNumber "2019-1"
+                            id.DocumentDate "2019-07-12"
                           when 4
-                            id.DocumentNumber "2018-2"
-                            id.DocumentDate "2018-07-18"
+                            id.DocumentNumber "2019-2"
+                            id.DocumentDate "2019-07-16"
                           when 1
-                            id.DocumentNumber "2018-3"
-                            id.DocumentDate "2018-07-20"
+                            id.DocumentNumber "2019-3"
+                            id.DocumentDate "2019-07-18"
                           else
-                            id.DocumentNumber "2018-1"
-                            id.DocumentDate "2018-08-07"
+                            id.DocumentNumber "2019-1"
+                            id.DocumentDate "2019-08-06"
                           end
                           id.DocumentTypeID 1
                         end
@@ -632,18 +632,18 @@ end
                 unless competitive_group.education_source_id == 15
                   if campaign.education_levels.include?(5)
                     case d.to_date.to_s
-                    when "2018-08-03"
+                    when "2019-08-03"
                       ooa.Stage 1
-                    when "2018-08-08"
+                    when "2019-08-08"
                       ooa.Stage 2
                     else
                       ooa.Stage 0
                     end
                   else
                     case d.to_date.to_s
-                    when "2018-08-15"
+                    when "2019-08-15"
                       ooa.Stage 1
-                    when "2018-08-17"
+                    when "2019-08-17"
                       ooa.Stage 2
                     else
                       ooa.Stage 0
@@ -671,9 +671,9 @@ end
                   ooa.EducationLevelID competitive_group.education_level_id
                   unless competitive_group.education_source_id == 15
                     case d.to_date.to_s
-                    when "2017-08-03"
+                    when "2019-08-03"
                       ooa.Stage 1
-                    when "2017-08-08"
+                    when "2019-08-08"
                       ooa.Stage 2
                     else
                       ooa.Stage 0
@@ -732,11 +732,17 @@ end
   def self.applications_del(pd, params)
     campaign = Campaign.find(params[:campaign_id])
     applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects)
+    postfix = case true
+              when campaign.education_levels.include?(5)
+                's'
+              when campaign.education_levels.include?(18)
+                'o'
+              end
     
     pd.Applications do |as|
       applications.each do |item|
         as.Application do |a|
-          a.ApplicationNumber [campaign.year_start, "%04d" % item.application_number].join('-')
+          a.ApplicationNumber [campaign.year_start, "%04d-s" % item.application_number, postfix].join('-')
           a.RegistrationDate item.registration_date.to_datetime.to_s.gsub('+00', '+03')
         end
       end
