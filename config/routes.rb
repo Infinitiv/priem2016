@@ -24,6 +24,8 @@ Rails.application.routes.draw do
     resources :campaigns, only: [:index, :show]
   end
   
+  resources :identity_documents, only: [:destroy]
+  
   resources :requests, only: [:index, :show, :new, :create, :destroy]
   resources :campaigns do
     member do

@@ -76,7 +76,10 @@
     dt
       h3 Документ, удостоверяющий личность
       - @entrant_application.identity_documents.order(:identity_document_date).each do |i|
-        dd= i.identity_document_data
+        dd 
+          = i.identity_document_data
+          span &nbsp;
+          strong= link_to 'x', identity_document_url(i), class: 'label label-warning', method: :delete
     dt
       h3 Документ об образовании
       - if @entrant_application.education_document.original_received_date
