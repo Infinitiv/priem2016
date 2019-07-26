@@ -117,6 +117,7 @@ class EntrantApplicationsController < ApplicationController
     new_value = education_document.original_received_date
     if education_document.save!
       Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+      @entrant_application.touch
       redirect_to @entrant_application
     end
   end
