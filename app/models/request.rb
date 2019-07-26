@@ -742,7 +742,7 @@ end
     pd.Applications do |as|
       applications.each do |item|
         as.Application do |a|
-          a.ApplicationNumber [campaign.year_start, "%04d-s" % item.application_number, postfix].join('-')
+          a.ApplicationNumber [campaign.year_start, "%04d" % item.application_number, postfix].join('-')
           a.RegistrationDate item.registration_date.to_datetime.to_s.gsub('+00', '+03')
         end
       end
