@@ -48,9 +48,9 @@ p Обращаем Ваше внимание, что возможны измен
           h3 Общий конкурс
           p
             strong= "мест без учета абитуриентов, имеющих право поступления без вступительных испытаний - #{numbers - examless_applications.count}"
-          - if enrolled_applications.count > 0
-            p
-              strong= "осталось вакантных мест в конкурсе - #{numbers - enrolled_applications.count}"
+        - if enrolled_applications.count > 0
+          p
+            strong= "осталось вакантных мест в конкурсе - #{numbers - enrolled_applications.count}"
         table.table
           thead
             tr
