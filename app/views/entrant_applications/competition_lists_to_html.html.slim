@@ -1,7 +1,7 @@
 - content_for :title do
-  = "Приемная кампания #{@campaign.name} #{@campaign.year_start}. Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%F %T")}"
+  = "Приемная кампания #{@campaign.name} #{@campaign.year_start}. Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%d.%m.%Y %T")}"
 h1= "Приемная кампания #{@campaign.name} #{@campaign.year_start}." 
-h2= "Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%F %T")}"
+h2= "Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%d.%m.%Y %T")}"
 p 
   span Зеленым цветом выделены абитуриенты гарантированно поступающие на обучение при 
   strong наличии 
