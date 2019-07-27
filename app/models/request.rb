@@ -294,7 +294,7 @@ end
     campaign = Campaign.find(params[:campaign_id])
     last_import_date = Request.select(:query, :output, :created_at).where(query: 'import').select{|r| Nokogiri::XML(r.output).at_css('PackageID')}.last.created_at
     applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6])
-    applications = applications.where('updated_at > ?', last_import_date) if params[:all_applications]
+    applications = applications.where('updated_at > ?', last_import_date) unless params[:all_applications]
     
     pd.Applications do |as|
       applications.each do |item|
@@ -496,11 +496,21 @@ end
                       n += 1
                       cds.CustomDocument do |cd|
                         case sub_item.institution_achievement.id_category
+                        when 8
+                          cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'gto'].join('-')
+                          cd.DocumentName "Удоствоверение о награждении золотым значком ГТО"
+                          cd.DocumentDate '2019-04-20'
+                          cd.DocumentOrganization 'Министерство спорта Российской Федерации'
                         when 9
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                           cd.DocumentName "Аттестат о среднем общем образовании с отличием"
                           cd.DocumentDate item.education_document.education_document_date
                           cd.DocumentOrganization "Организация СО"
+                        when 11
+                          cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
+                          cd.DocumentName "Документ установленного образца с отличием"
+                          cd.DocumentDate item.education_document.education_document_date
+                          cd.DocumentOrganization "Организация ВО"
                         when 15
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                           cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
@@ -516,11 +526,6 @@ end
                           cd.DocumentName "Диплом о среднем профессиональном образовании с отличием"
                           cd.DocumentDate item.education_document.education_document_date
                           cd.DocumentOrganization "Организация СПО"
-                        when 8
-                          cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'gto'].join('-')
-                          cd.DocumentName "Удоствоверение о награждении золотым значком ГТО"
-                          cd.DocumentDate '2019-04-20'
-                          cd.DocumentOrganization 'Министерство спорта Российской Федерации'
                         else
                           cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'other', n].join('-')
                           cd.DocumentName "Иной документ, подтверждающий индивидуальное достижение"
