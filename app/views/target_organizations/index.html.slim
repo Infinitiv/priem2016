@@ -5,8 +5,12 @@ table.table
     tr
       th ID
       th Название
+      th Действия
   tbody
     - @target_organizations.each do |target_organization|
       tr
-        td= target_organization.id 
-        td= target_organization.target_organization_name
+        td= target_organization.id
+        td
+          span= target_organization.target_organization_name
+          span= " (#{@regions.select{|i| i.value?(target_organization.region_id)}.first['name']})" if target_organization.region_id
+        td= link_to 'Редактировать', edit_target_organization_url(target_organization)

@@ -4,4 +4,8 @@
     .col-sm-5
       = f.text_field :target_organization_name, class: 'form-control'
   .form-group
+    = f.label :region_id, 'Регион', class: 'label-control col-sm-1'
+    .col-sm-5
+      = f.select :region_id, options_for_select = @regions.collect{|region| [region['name'], region['id']]}, {:include_blank => ''}, class: 'form-control'
+  .form-group
     = f.submit 'Отправить', class: 'btn btn-primary'
