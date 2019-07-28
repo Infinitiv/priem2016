@@ -13,7 +13,7 @@ p Обращаем Ваше внимание, что возможны измен
     span Показать только поступающих с оригиналами и согласиями
     
 - @admission_volume_hash.each do |direction_id, competitive_groups|
-  - competitive_groups.each do |competitive_group, numbers|
+  - competitive_groups.sort_by{|competitive_group, numbers| competitive_group.name}.select{|competitive_group, numbers| competitive_group.last_admission_date > Time.now.to_date}.each do |competitive_group, numbers|
     - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.status_id == 4 && v[:mark_values].select{|m| m > 41}.count == @entrance_test_items.size}
     - enrolled_applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
     - examless_applications = applications.select{|k, v| v[:examless] && competitive_group.id == k.budget_agr}
