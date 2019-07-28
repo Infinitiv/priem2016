@@ -27,7 +27,7 @@ table.table
     tr 
       td= "#{journal.created_at.strftime("%d.%m.%Y %H:%M")} "
       td= "#{journal.user.login} "
-      td= "#{entrant_application.application_number} "
+      td= link_to "#{entrant_application.application_number} ", entrant_application_url(entrant_application)
       td
         = "#{method_name}"
         - if journal.method == 'toggle_agreement'
