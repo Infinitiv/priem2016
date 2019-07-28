@@ -1,9 +1,10 @@
 h1 Приемные кампании
-= link_to 'Добавить', new_campaign_path, class: 'btn btn-primary'
+= link_to 'Добавить', new_campaign_path, class: 'btn btn-primary' if can? :manage, Campaign
 ul
   - @campaigns.each do |campaign|
     li
       = link_to "#{campaign.name} (#{campaign.year_start})", campaign
-      = link_to 'Удалить', campaign, method: 'delete', class: 'pull-right'
-      span.pull-right &nbsp;|&nbsp;
-      = link_to 'Редактировать', edit_campaign_path(campaign), class: 'pull-right'
+      -  if can? :manage, Campaign
+        = link_to 'Удалить', campaign, method: 'delete', class: 'pull-right'
+        span.pull-right &nbsp;|&nbsp;
+        = link_to 'Редактировать', edit_campaign_path(campaign), class: 'pull-right'

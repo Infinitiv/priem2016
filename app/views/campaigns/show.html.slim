@@ -12,13 +12,14 @@ dl
   dd= @campaign.status_id
   dt Тип
   dd= @campaign.campaign_type_id
-h2 Загрузить объемы приема
-= form_tag import_admission_volume_campaign_path, multipart: true do
-  = text_field_tag :campaign_id, @campaign.id, class: 'hidden'
-  = file_field_tag :file
-  = submit_tag "Загрузить", class: 'btn btn-primary'
-h2 Загрузить виды достижений
-= form_tag import_institution_achievements_campaign_path, multipart: true do
-  = text_field_tag :campaign_id, @campaign.id, class: 'hidden'
-  = file_field_tag :file
-  = submit_tag "Загрузить", class: 'btn btn-primary'
+-  if can? :manage, Campaign
+  h2 Загрузить объемы приема
+  = form_tag import_admission_volume_campaign_path, multipart: true do
+    = text_field_tag :campaign_id, @campaign.id, class: 'hidden'
+    = file_field_tag :file
+    = submit_tag "Загрузить", class: 'btn btn-primary'
+  h2 Загрузить виды достижений
+  = form_tag import_institution_achievements_campaign_path, multipart: true do
+    = text_field_tag :campaign_id, @campaign.id, class: 'hidden'
+    = file_field_tag :file
+    = submit_tag "Загрузить", class: 'btn btn-primary'

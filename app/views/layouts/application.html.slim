@@ -56,7 +56,7 @@ body
                 li= link_to 'Предметы', subjects_url
               - if can? :read, InstitutionAchievement
                 li= link_to 'Индивидуальные достижения', institution_achievements_url
-        - if can? :read, EntrantApplication
+        - if can?(:ege_to_txt, EntrantApplication) || can?(:errors, EntrantApplication) || can?(:competition_lists, EntrantApplication) || can?(:ord_export, EntrantApplication) || can?(:ord_return_export, EntrantApplication) || can?(:ord_result_export, EntrantApplication) || can?(:target_report, EntrantApplication) || can?(:ord_marks_request, EntrantApplication) || can?(:entrants_lists_to_html, EntrantApplication) || can?(:entrants_lists_ord_to_html, EntrantApplication) || can?(:competition_lists_to_html, EntrantApplication) || can?(:competition_lists_ord_to_html, EntrantApplication)
           li.dropdown
             = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
               span Выгрузки
@@ -75,7 +75,7 @@ body
                 li= link_to "Списки подавших документы в html #{campaign.name} #{campaign.year_start}", entrants_lists_ord_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
                 li= link_to "Конкурсные списки в html #{campaign.name} #{campaign.year_start}", competition_lists_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
                 li= link_to "Конкурсные списки в html #{campaign.name} #{campaign.year_start}", competition_lists_ord_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
-        - if can? :read, Report
+        - if can? :mon, Report
           li.dropdown
             = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
               span Отчеты
