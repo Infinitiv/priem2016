@@ -25,6 +25,11 @@ Rails.application.routes.draw do
   end
   
   resources :identity_documents, only: [:destroy]
+  resources :journals, only: [:index, :destroy] do
+    member do
+      put 'done'
+    end
+  end
   
   resources :requests, only: [:index, :show, :new, :create, :destroy]
   resources :campaigns do

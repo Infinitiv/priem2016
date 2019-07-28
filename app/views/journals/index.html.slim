@@ -1,0 +1,39 @@
+h1 Лист изменений
+table.table
+  thead
+    tr
+      th= 'Дата и время'
+      th= 'Автор'
+      th= 'Номер дела'
+      th= 'Изменение'
+      th= 'Действие'
+  tbody
+  - @journals.each do |journal|
+    - entrant_application = journal.entrant_application
+    - method_name = case journal.method
+    - when 'toggle_agreement'
+      - 'Изменение согласия на зачисление'
+    - when 'enrolled_recall'
+      - "Отказ от зачисления #{journal.entrant_application.competitive_groups.find(journal.entrant_application.exeptioned).name}"
+    - when 'toggle_original'
+      - journal.old_value ? 'Отзыв оригинала' : 'Подача оригинала'
+    - when 'entrant_application_recall'
+      - 'Отзыв пакета документов'
+    - value_name = case journal.value_name
+    - when 'budget_arg'
+      - 'бюджет'
+    - when 'paid_agr'
+      - 'внебюджет'
+    tr 
+      td= "#{journal.created_at.strftime("%d.%m.%Y %H:%M")} "
+      td= "#{journal.user.login} "
+      td= "#{entrant_application.application_number} "
+      td
+        = "#{method_name}"
+        - if journal.method == 'toggle_agreement'
+          span= journal.old_value ? " c #{journal.entrant_application.competitive_groups.find(journal.old_value).name}" : ' c "нет"'
+          span= journal.new_value ? " на #{journal.entrant_application.competitive_groups.find(journal.new_value).name}" : ' на "нет"'
+      td
+        span= link_to 'Выполнено', done_journal_url(journal), method: :put
+        span &nbsp;|&nbsp;
+        span= link_to 'Удалить', journal_url(journal), method: :delete
