@@ -147,3 +147,6 @@
           - if journal_entry.method == 'toggle_agreement'
             span= journal_entry.old_value ? " c #{@entrant_application.competitive_groups.find(journal_entry.old_value).name}" : ' c "нет"'
             span= journal_entry.new_value ? " на #{@entrant_application.competitive_groups.find(journal_entry.new_value).name}" : ' на "нет"'
+          - if can? :destroy, Journal
+            span &nbsp;
+            strong= link_to 'x', journal_url(journal_entry), class: 'label label-warning', method: :delete
