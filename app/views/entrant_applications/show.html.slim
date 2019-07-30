@@ -111,6 +111,12 @@
         h3 Целевые договоры
         - @target_contracts.each do |target_contract|
           dd= "#{target_contract.competitive_group.name} - #{target_contract.target_organization.target_organization_name}"
+    - unless @entrant_application.contracts.empty?
+      dt
+        h3 Договоры
+        - @entrant_application.contracts.each do |contract|
+          - competitive_group = @entrant_application.campaign.competitive_groups.find_by_id(contract)
+          dd= competitive_group.name if competitive_group
     - if  @entrant_application.benefit
       dt
         h3 Документы на льготу

@@ -51,19 +51,19 @@ class EntrantApplication < ActiveRecord::Base
         end
       end
       entrant_application.contracts = []
-      entrant_application.contracts << competitive_groups.find_by_name('Лечебное дело. Внебюджет.') if row['contract_lech']
-      entrant_application.contracts << competitive_groups.find_by_name('Педиатрия. Внебюджет.') if row['contract_ped']
-      entrant_application.contracts << competitive_groups.find_by_name('Стоматология. Внебюджет.') if row['contract_stomat']
+      entrant_application.contracts << competitive_groups.find_by_name('Лечебное дело. Внебюджет.').id if row['contract_lech']
+      entrant_application.contracts << competitive_groups.find_by_name('Педиатрия. Внебюджет.').id if row['contract_ped']
+      entrant_application.contracts << competitive_groups.find_by_name('Стоматология. Внебюджет.').id if row['contract_stomat']
       if entrant_application.save!
-          IdentityDocument.import_from_row(row, entrant_application) if row.keys.include? 'identity_document_type'
-          EducationDocument.import_from_row(row, entrant_application) if row.keys.include? 'education_document_type'
-          BenefitDocument.import_from_row(row, entrant_application) if row.keys.include? 'benefit_document_type_id'
-          OlympicDocument.import_from_row(row, entrant_application) if row.keys.include? 'olympic_id'
-          Mark.import_from_row(row, entrant_application) if row.keys.include?('chemistry') || row.keys.include?('biology') || row.keys.include?('russian') || row.keys.include?('test_result')
-          Achievement.import_from_row(row, entrant_application)
+        IdentityDocument.import_from_row(row, entrant_application) if row.keys.include? 'identity_document_type'
+        EducationDocument.import_from_row(row, entrant_application) if row.keys.include? 'education_document_type'
+        BenefitDocument.import_from_row(row, entrant_application) if row.keys.include? 'benefit_document_type_id'
+        OlympicDocument.import_from_row(row, entrant_application) if row.keys.include? 'olympic_id'
+        Mark.import_from_row(row, entrant_application) if row.keys.include?('chemistry') || row.keys.include?('biology') || row.keys.include?('russian') || row.keys.include?('test_result')
+        Achievement.import_from_row(row, entrant_application)
         case true
         when campaign.education_levels.include?(5)
-          unless row.keys.include?('benefit_document_type_id') || row.keys.include?('alt_entrant_last_name') || row.keys.include?('olympic_id') || row.keys.include?('enrolled')
+          unless row.keys.include?('benefit_document_type_id') || row.keys.include?('alt_entrant_last_name') || row.keys.include?('olympic_id') || row.keys.include?('enrolled') || row.keys.include?('contract_lech')
             entrant_application.competitive_groups = [] 
             competitive_groups.each do |competitive_group|
               entrant_application.competitive_groups << competitive_group if row[competitive_group.name]
@@ -191,7 +191,7 @@ class EntrantApplication < ActiveRecord::Base
   
 
   def self.entrant_applications_hash(campaign)
-    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :budget_agr, :paid_agr, :enrolled, :enrolled_date, :exeptioned, :snils, :birth_date, :registration_date, :gender_id, :nationality_type_id]).order(:application_number).includes(:achievements, :education_document, :competitive_groups, :benefit_documents, :olympic_documents)
+    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :budget_agr, :paid_agr, :enrolled, :enrolled_date, :exeptioned, :snils, :birth_date, :registration_date, :gender_id, :nationality_type_id, :contracts]).order(:application_number).includes(:achievements, :education_document, :competitive_groups, :benefit_documents, :olympic_documents)
     
     entrance_test_items = campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     
@@ -218,7 +218,7 @@ class EntrantApplication < ActiveRecord::Base
       entrant_applications_hash[entrant_application][:summa] = entrant_applications_hash[entrant_application][:mark_values].size == entrance_test_items.size ? entrant_applications_hash[entrant_application][:mark_values].sum : 0
       entrant_applications_hash[entrant_application][:achievements] = achievement_values[entrant_application.id]
       achievements_sum = entrant_applications_hash[entrant_application][:achievements].sum
-      achievements_limit = 10 if campaign.education_levels.include?(5)
+      achievements_limit = 10.to_f if campaign.education_levels.include?(5)
       entrant_applications_hash[entrant_application][:achievements_sum] = achievements_limit ? (achievements_sum > achievements_limit ? achievements_limit : achievements_sum) : achievements_sum
       entrant_applications_hash[entrant_application][:summa] > 0 ? entrant_applications_hash[entrant_application][:full_summa] = [entrant_applications_hash[entrant_application][:summa], entrant_applications_hash[entrant_application][:achievements_sum]].sum : entrant_applications_hash[entrant_application][:full_summa] = 0
       entrant_applications_hash[entrant_application][:original_received] = true if entrant_application.education_document.original_received_date

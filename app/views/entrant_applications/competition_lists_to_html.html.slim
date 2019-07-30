@@ -62,6 +62,8 @@ p Обращаем Ваше внимание, что возможны измен
               th Ф.И.О.
               th Наличие оригинала документа об образовании
               th Наличие согласия на зачисление
+              - if competitive_group.education_source_id == 15
+                th Наличие договора на обучение
               th Сумма конкурсных баллов
               - @entrance_test_items.each do |entrance_test_item|
                 th= entrance_test_item.subject.subject_name
@@ -87,6 +89,10 @@ p Обращаем Ваше внимание, что возможны измен
                   td.text-center
                     - if [application.budget_agr, application.paid_agr].include?(competitive_group.id)
                       span.glyphicon.glyphicon-plus(aria-hidden="true")
+                  - if competitive_group.education_source_id == 15
+                    td.text-center
+                      - if application.contracts.include?(competitive_group.id)
+                        span.glyphicon.glyphicon-plus(aria-hidden="true")
                   td= values[:full_summa] if values[:mark_values].select{|m| m > 41}.count == 3
                   - values[:mark_values].each_with_index do |mark_value, index|
                     td
