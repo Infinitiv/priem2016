@@ -506,11 +506,6 @@ end
                           cd.DocumentName "Аттестат о среднем общем образовании с отличием"
                           cd.DocumentDate item.education_document.education_document_date
                           cd.DocumentOrganization "Организация СО"
-                        when 11
-                          cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
-                          cd.DocumentName "Документ установленного образца с отличием"
-                          cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization "Организация ВО"
                         when 15
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                           cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
@@ -601,6 +596,8 @@ end
                       case sub_item.institution_achievement.id_category
                       when 8
                         ia.IADocumentUID ["ach", campaign.year_start, item.application_number, postfix, 'gto'].join('-')
+                      when 11
+                        ia.IADocumentUID ["ach", campaign.year_start, item.application_number, postfix, 'other', n].join('-')
                       when 13
                         ia.IADocumentUID ["ach", campaign.year_start, item.application_number, postfix, 'other', n].join('-')
                       else
