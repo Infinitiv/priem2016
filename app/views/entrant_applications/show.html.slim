@@ -158,7 +158,7 @@
         - when 'entrant_application_recall'
           - 'Отзыв пакета документов'
         - when 'toggle_contract'
-          - 'Измение договора:'
+          - 'Изменение договора:'
         - value_name = case journal_entry.value_name
         - when 'budget_arg'
           - 'бюджет'
@@ -174,7 +174,7 @@
             span= journal_entry.new_value ? " на #{@entrant_application.competitive_groups.find(journal_entry.new_value).name}" : ' на "нет"'
           - when 'toggle_contract'
             span= " расторжение договора на #{@entrant_application.competitive_groups.find(journal_entry.old_value).name}" if journal_entry.old_value
-            span= " заключени договора на #{@entrant_application.competitive_groups.find(journal_entry.new_value).name}" if journal_entry.new_value
+            span= " заключение договора на #{@entrant_application.competitive_groups.find(journal_entry.new_value).name}" if journal_entry.new_value
           - if can? :destroy, Journal
             span &nbsp;
             strong= link_to 'x', journal_url(journal_entry), class: 'label label-warning', method: :delete

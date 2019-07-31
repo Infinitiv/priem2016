@@ -19,6 +19,8 @@ table.table
       - journal.old_value ? 'Отзыв оригинала' : 'Подача оригинала'
     - when 'entrant_application_recall'
       - 'Отзыв пакета документов'
+    - when 'toggle_contract'
+      - 'Изменение договора:'
     - value_name = case journal.value_name
     - when 'budget_arg'
       - 'бюджет'
@@ -36,7 +38,7 @@ table.table
           span= journal.new_value ? " на #{entrant_application.competitive_groups.find(journal.new_value).name}" : ' на "нет"'
         - when 'toggle_contract'
           span= " расторжение договора на #{entrant_application.competitive_groups.find(journal.old_value).name}" if journal.old_value
-          span= " заключени договора на #{entrant_application.competitive_groups.find(journal.new_value).name}" if journal.new_value
+          span= " заключение договора на #{entrant_application.competitive_groups.find(journal.new_value).name}" if journal.new_value
       td
         span= link_to 'Выполнено', done_journal_url(journal), method: :put
         span &nbsp;|&nbsp;
