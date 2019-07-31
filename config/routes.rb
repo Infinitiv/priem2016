@@ -84,6 +84,7 @@ Rails.application.routes.draw do
   end
   
   put 'entrant_applications/:id/competitive_groups/:competitive_group_id/toggle_agreement' => 'entrant_applications#toggle_agreement'
+  put 'entrant_applications/:id/competitive_groups/:competitive_group_id/toggle_contract' => 'entrant_applications#toggle_contract'
   
   get 'reports/mon'
   

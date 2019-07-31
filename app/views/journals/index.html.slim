@@ -30,9 +30,13 @@ table.table
       td= link_to "#{"%04d" % entrant_application.application_number} #{entrant_application.entrant_last_name} ", entrant_application_url(entrant_application)
       td
         = "#{method_name}"
-        - if journal.method == 'toggle_agreement'
-          span= journal.old_value ? " c #{journal.entrant_application.competitive_groups.find(journal.old_value).name}" : ' c "нет"'
-          span= journal.new_value ? " на #{journal.entrant_application.competitive_groups.find(journal.new_value).name}" : ' на "нет"'
+        - case journal.method
+        - when 'toggle_agreement'
+          span= journal.old_value ? " c #{entrant_application.competitive_groups.find(journal.old_value).name}" : ' c "нет"'
+          span= journal.new_value ? " на #{entrant_application.competitive_groups.find(journal.new_value).name}" : ' на "нет"'
+        - when 'toggle_contract'
+          span= " расторжение договора на #{entrant_application.competitive_groups.find(journal.old_value).name}" if journal.old_value
+          span= " заключени договора на #{entrant_application.competitive_groups.find(journal.new_value).name}" if journal.new_value
       td
         span= link_to 'Выполнено', done_journal_url(journal), method: :put
         span &nbsp;|&nbsp;
