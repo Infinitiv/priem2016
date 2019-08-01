@@ -32,7 +32,7 @@ h1 Мониторинг приемной кампании
           h4= "Отозваны после зачисления - #{exceptioned_examless_entrant_applications.empty? ? 'NaN' : exceptioned_examless_entrant_applications.count}"
       - when 16
         - @target_organizations.each do |target_organization|
-          - target_entrant_applications = entrant_applications.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.target_organization_id == target_organization.id}
+          - target_entrant_applications = entrant_applications.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.target_organizations.map(&:id).include?(target_organization.id)}
           - if target_entrant_applications.count > 0
             h3= target_organization.target_organization_name
             h4= "Количество поданных заявлений - #{target_entrant_applications.count}"
