@@ -1,98 +1,145 @@
 h1 Мониторинг приемной кампании (#{@campaign.name} #{@campaign.year_start})
 - @admission_volume_hash.each do |direction_id, competitive_groups|
-  - competitive_groups.each do |competitive_group, numbers|
-    h2= competitive_group.name
-    - entrant_applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
-    h4= "Количество поданных заявлений - #{entrant_applications.count}"
-    - enrolled_entrant_applications = entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
-    h4= "Зачислено поступающих - #{enrolled_entrant_applications.count}"
-    - exceptioned_entrant_applications = entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
-    h4= "Отозваны после зачисления - #{exceptioned_entrant_applications.empty? ? 'NaN' : exceptioned_entrant_applications.count}"
-    - ege_enrolled_entrant_applications = enrolled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
-    h4= "Зачислено по результатам ЕГЭ - #{ege_enrolled_entrant_applications.count}"
-    - exam_enrolled_entrant_applications = enrolled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
-    h4= "Зачислено по результатам внутренних испытаний - #{exam_enrolled_entrant_applications.count}"
-    - enrolled_entrant_applications.each do |k, v|
-      - ege = []
-      - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
-      - ege.size == 0 ? v[:mean] = nil : v[:mean] = ege.sum.to_f/ege.size
-    - means = enrolled_entrant_applications.map{|k, v| v[:mean]}.compact
-    - mean = means.size == 0 ? 'NaN' : (means.sum.to_f/means.size).round(2)
-    h4= "Средний балл ЕГЭ - #{mean}"
-    h4= "Проходной балл - #{enrolled_entrant_applications.map{|k, v| v[:full_summa]}.min}"
-    - case competitive_group.education_source_id
-      - when 14 || 15
-        - examless_entrant_applications = entrant_applications.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.olympic_documents.map(&:benefit_type_id).include?(1)}
-        - if examless_entrant_applications.count > 0
-          h3 Без вступительных испытаний
-          h4= "Количество поданных заявлений - #{examless_entrant_applications.count}"
-          - enrolled_examless_entrant_applications = examless_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
-          h4= "Зачислено поступающих - #{enrolled_examless_entrant_applications.  count}"
-          - exceptioned_examless_entrant_applications = entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
-          h4= "Отозваны после зачисления - #{exceptioned_examless_entrant_applications.empty? ? 'NaN' : exceptioned_examless_entrant_applications.count}"
-      - when 16
-        - @target_organizations.each do |target_organization|
-          - target_entrant_applications = entrant_applications.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.target_organizations.map(&:id).include?(target_organization.id)}
-          - if target_entrant_applications.count > 0
-            h3= target_organization.target_organization_name
-            h4= "Количество поданных заявлений - #{target_entrant_applications.count}"
-            - enrolled_target_entrant_applications = target_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
-            h4= "Зачислено поступающих - #{enrolled_target_entrant_applications.  count}"
-            - exceptioned_target_entrant_applications = target_entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
-            h4= "Отозваны после зачисления - #{exceptioned_target_entrant_applications.empty? ? 'NaN' : exceptioned_target_entrant_applications.count}"
-            - ege_enrolled_target_entrant_applications = enrolled_target_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
-            h4= "Зачислено по результатам ЕГЭ - #{ege_enrolled_target_entrant_applications.count}"
-            - exam_enrolled_target_entrant_applications = enrolled_target_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
-            h4= "Зачислено по результатам внутренних испытаний - #{exam_enrolled_target_entrant_applications.count}"
-            - enrolled_target_entrant_applications.each do |k, v|
-              - ege = []
-              - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
-              - ege.size == 0 ? v[:mean] = nil : v[:mean] = ege.sum.to_f/ege.size
-            - means = enrolled_target_entrant_applications.map{|k, v| v[:mean]}.compact
-            - mean = means.size == 0 ? 'NaN' : (means.sum.to_f/means.size).round(2)
-            h4= "Средний балл ЕГЭ - #{mean}"
-            h4= "Проходной балл - #{enrolled_target_entrant_applications.map{|k, v| v[:full_summa]}.min}"
-      - when 20
-        - disabled_entrant_applications = entrant_applications.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.benefit_documents.map(&:benefit_document_type_id).include?(11)}
-        - if disabled_entrant_applications.count > 0
-          h3 Лица с ОВЗ и инвалиды
-          h4= "Количество поданных заявлений - #{disabled_entrant_applications.count}"
-          - enrolled_disabled_entrant_applications = disabled_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
-          h4= "Зачислено поступающих - #{enrolled_disabled_entrant_applications.  count}"
-          - exceptioned_disabled_entrant_applications = disabled_entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
-          h4= "Отозваны после зачисления - #{exceptioned_disabled_entrant_applications.empty? ? 'NaN' : exceptioned_disabled_entrant_applications.count}"
-          - ege_enrolled_disabled_entrant_applications = enrolled_disabled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
-          h4= "Зачислено по результатам ЕГЭ - #{ege_enrolled_disabled_entrant_applications.count}"
-          - exam_enrolled_disabled_entrant_applications = enrolled_disabled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
-          h4= "Зачислено по результатам внутренних испытаний - #{exam_enrolled_disabled_entrant_applications.count}"
-          - enrolled_disabled_entrant_applications.each do |k, v|
-            - ege = []
-            - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
-            - ege.size == 0 ? v[:mean] = nil : v[:mean] = ege.sum.to_f/ege.size
-          - means = enrolled_disabled_entrant_applications.map{|k, v| v[:mean]}.compact
-          - mean = means.size == 0 ? 'NaN' : (means.sum.to_f/means.size).round(2)
-          h4= "Средний балл ЕГЭ - #{mean}"
-          h4= "Проходной балл - #{enrolled_disabled_entrant_applications.map{|k, v| v[:full_summa]}.min}"
-          
-          - orphan_entrant_applications = entrant_applications.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.benefit_documents.map(&:benefit_document_type_id).include?(30)}
-          - if orphan_entrant_applications.count > 0
-            h3 Сироты и лица, оставшиеся без попечения родителей
-            h4= "Количество поданных заявлений - #{orphan_entrant_applications.count}"
-            - enrolled_orphan_entrant_applications = orphan_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
-            h4= "Зачислено поступающих - #{enrolled_orphan_entrant_applications.  count}"
-            - exceptioned_orphan_entrant_applications = orphan_entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
-            h4= "Отозваны после зачисления - #{exceptioned_orphan_entrant_applications.empty? ? 'NaN' : exceptioned_orphan_entrant_applications.count}"
-            - ege_enrolled_orphan_entrant_applications = enrolled_orphan_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
-            h4= "Зачислено по результатам ЕГЭ - #{ege_enrolled_orphan_entrant_applications.count}"
-            - exam_enrolled_orphan_entrant_applications = enrolled_orphan_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
-            h4= "Зачислено по результатам внутренних испытаний - #{exam_enrolled_orphan_entrant_applications.count}"
-            - enrolled_orphan_entrant_applications.each do |k, v|
-              - ege = []
-              - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
-              - ege.size == 0 ? v[:mean] = nil : v[:mean] = ege.sum.to_f/ege.size
-            - means = enrolled_orphan_entrant_applications.map{|k, v| v[:mean]}.compact
-            - mean = means.size == 0 ? 'NaN' : (means.sum.to_f/means.size).round(2)
-            h4= "Средний балл ЕГЭ - #{mean}"
-            h4= "Проходной балл - #{enrolled_orphan_entrant_applications.map{|k, v| v[:full_summa]}.min}"
-        
-        
+  table.table
+    thead
+      tr
+        th Конкурсная группа
+        th Количество поданных заявлений
+        th Зачислено поступающих
+        th Отозваны после зачисления
+        th Зачислено по результатам ЕГЭ
+        th Зачислено по результатам внутренних испытаний
+        th Средний балл ЕГЭ
+        th Проходной балл
+    tbody
+      - competitive_groups.each do |competitive_group, numbers|
+        - entrant_applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
+        - enrolled_entrant_applications = entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
+        - exceptioned_entrant_applications = entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
+        - ege_enrolled_entrant_applications = enrolled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
+        - exam_enrolled_entrant_applications = enrolled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
+        - enrolled_entrant_applications.each do |k, v|
+          - ege = []
+          - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
+          - ege.size == 0 ? v[:mean] = nil : v[:mean] = ege.sum.to_f/ege.size
+        - means = enrolled_entrant_applications.map{|k, v| v[:mean]}.compact
+        - mean = means.size == 0 ? '-' : (means.sum.to_f/means.size).round(2)
+        tr
+          td
+            strong= competitive_group.name
+          td= "#{entrant_applications.count}"
+          td= "#{enrolled_entrant_applications.count}"
+          td= "#{exceptioned_entrant_applications.empty? ? '-' : exceptioned_entrant_applications.count}"
+          td= "#{ege_enrolled_entrant_applications.count}"
+          td= "#{exam_enrolled_entrant_applications.count}"
+          td= "#{mean}"
+          td= "#{enrolled_entrant_applications.map{|k, v| v[:full_summa]}.min}"
+          - case competitive_group.education_source_id
+            - when 14 || 15
+              - examless_entrant_applications = entrant_applications.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.olympic_documents.map(&:benefit_type_id).include?(1)}
+              - if examless_entrant_applications.count > 0
+                - enrolled_examless_entrant_applications = examless_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
+                - exceptioned_examless_entrant_applications = entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
+                tr
+                  td
+                    span Без вступительных испытаний
+                  td= "#{examless_entrant_applications.count}"
+                  td= "#{enrolled_examless_entrant_applications.  count}"
+                  td= "#{exceptioned_examless_entrant_applications.empty? ? '-' : exceptioned_examless_entrant_applications.count}"
+                  td
+                  td
+                  td
+                  td
+            - when 16
+              - @target_regions.each do |target_region|
+                - target_entrant_applications = entrant_applications.select{|k, v| k.target_organizations.map{|t| t.region_id}.include?(target_region)}
+                - if target_entrant_applications.count > 0
+                  - enrolled_target_entrant_applications = target_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
+                  - exceptioned_target_entrant_applications = target_entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
+                  - ege_enrolled_target_entrant_applications = enrolled_target_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
+                  - exam_enrolled_target_entrant_applications = enrolled_target_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
+                  - enrolled_target_entrant_applications.each do |k, v|
+                    - ege = []
+                    - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
+                    - ege.size == 0 ? v[:mean] = nil : v[:mean] = ege.sum.to_f/ege.size
+                  - means = enrolled_target_entrant_applications.map{|k, v| v[:mean]}.compact
+                  - mean = means.size == 0 ? '-' : (means.sum.to_f/means.size).round(2)
+                  tr
+                    td
+                      span= target_region
+                    td= "#{target_entrant_applications.count}"
+                    td= "#{enrolled_target_entrant_applications.  count}"
+                    td= "#{exceptioned_target_entrant_applications.empty? ? '-' : exceptioned_target_entrant_applications.count}"
+                    td= "#{ege_enrolled_target_entrant_applications.count}"
+                    td= "#{exam_enrolled_target_entrant_applications.count}"
+                    td= "#{mean}"
+                    td= "#{enrolled_target_entrant_applications.map{|k, v| v[:full_summa]}.min}"
+              - @target_organizations.each do |target_organization|
+                - target_entrant_applications = entrant_applications.select{|k, v| k.target_contracts.map(&:competitive_group_id).include?(competitive_group.id) && k.target_contracts.map(&:target_organization_id).include?(target_organization.id)}
+                - if target_entrant_applications.count > 0
+                  - enrolled_target_entrant_applications = target_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
+                  - exceptioned_target_entrant_applications = target_entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
+                  - ege_enrolled_target_entrant_applications = enrolled_target_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
+                  - exam_enrolled_target_entrant_applications = enrolled_target_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
+                  - enrolled_target_entrant_applications.each do |k, v|
+                    - ege = []
+                    - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
+                    - ege.size == 0 ? v[:mean] = nil : v[:mean] = ege.sum.to_f/ege.size
+                  - means = enrolled_target_entrant_applications.map{|k, v| v[:mean]}.compact
+                  - mean = means.size == 0 ? '-' : (means.sum.to_f/means.size).round(2)
+                  tr
+                    td
+                      span= target_organization.target_organization_name
+                    td= "#{target_entrant_applications.count}"
+                    td= "#{enrolled_target_entrant_applications.  count}"
+                    td= "#{exceptioned_target_entrant_applications.empty? ? '-' : exceptioned_target_entrant_applications.count}"
+                    td= "#{ege_enrolled_target_entrant_applications.count}"
+                    td= "#{exam_enrolled_target_entrant_applications.count}"
+                    td= "#{mean}"
+                    td= "#{enrolled_target_entrant_applications.map{|k, v| v[:full_summa]}.min}"
+            - when 20
+              - disabled_entrant_applications = entrant_applications.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.benefit_documents.map(&:benefit_document_type_id).include?(11)}
+              - if disabled_entrant_applications.count > 0
+                - enrolled_disabled_entrant_applications = disabled_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
+                - exceptioned_disabled_entrant_applications = disabled_entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
+                - ege_enrolled_disabled_entrant_applications = enrolled_disabled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
+                - exam_enrolled_disabled_entrant_applications = enrolled_disabled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
+                - enrolled_disabled_entrant_applications.each do |k, v|
+                  - ege = []
+                  - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
+                  - ege.size == 0 ? v[:mean] = nil : v[:mean] = ege.sum.to_f/ege.size
+                - means = enrolled_disabled_entrant_applications.map{|k, v| v[:mean]}.compact
+                - mean = means.size == 0 ? '-' : (means.sum.to_f/means.size).round(2)
+                tr
+                  td
+                    span Лица с ОВЗ и инвалиды
+                  td= "#{disabled_entrant_applications.count}"
+                  td= "#{enrolled_disabled_entrant_applications.count}"
+                  td= "#{exceptioned_disabled_entrant_applications.empty? ? '-' : exceptioned_disabled_entrant_applications.count}"
+                  td= "#{ege_enrolled_disabled_entrant_applications.count}"
+                  td= "#{exam_enrolled_disabled_entrant_applications.count}"
+                  td= "#{mean}"
+                  td= "#{enrolled_disabled_entrant_applications.map{|k, v| v[:full_summa]}.min}"
+                
+                - orphan_entrant_applications = entrant_applications.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.benefit_documents.map(&:benefit_document_type_id).include?(30)}
+                - if orphan_entrant_applications.count > 0
+                  - enrolled_orphan_entrant_applications = orphan_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
+                  - exceptioned_orphan_entrant_applications = orphan_entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
+                  - ege_enrolled_orphan_entrant_applications = enrolled_orphan_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
+                  - exam_enrolled_orphan_entrant_applications = enrolled_orphan_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
+                  - enrolled_orphan_entrant_applications.each do |k, v|
+                    - ege = []
+                    - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
+                    - ege.size == 0 ? v[:mean] = nil : v[:mean] = ege.sum.to_f/ege.size
+                  - means = enrolled_orphan_entrant_applications.map{|k, v| v[:mean]}.compact
+                  - mean = means.size == 0 ? '-' : (means.sum.to_f/means.size).round(2)
+                  tr
+                    td
+                      span Сироты и лица, оставшиеся без попечения родителей
+                    td= "#{orphan_entrant_applications.count}"
+                    td= "#{enrolled_orphan_entrant_applications.  count}"
+                    td= "#{exceptioned_orphan_entrant_applications.empty? ? '-' : exceptioned_orphan_entrant_applications.count}"
+                    td= "#{ege_enrolled_orphan_entrant_applications.count}"
+                    td= "#{exam_enrolled_orphan_entrant_applications.count}"
+                    td= "#{mean}"
+                    td= "#{enrolled_orphan_entrant_applications.map{|k, v| v[:full_summa]}.min}"
