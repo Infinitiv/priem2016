@@ -28,7 +28,7 @@ p Обращаем Ваше внимание, что возможны измен
       .panel.panel-default
         .panel-heading(role="tab" id="heading#{competitive_group.id}")
           .panel-title
-            = link_to "#{competitive_group.name} (всего мест в конкурсе - #{numbers}, будет зачислено в 1 волну - #{first_stage_numbers})", "#collapse#{competitive_group.id}", data: {toggle: "collapse", parent: "#accordion"}, aria: {expanded: "false", controls: "#collapse#{competitive_group.id}"}
+            = link_to "#{competitive_group.name} (всего мест в конкурсе - #{numbers}, будет зачислено во 2 волну - #{last_numbers})", "#collapse#{competitive_group.id}", data: {toggle: "collapse", parent: "#accordion"}, aria: {expanded: "false", controls: "#collapse#{competitive_group.id}"}
     .panel-collapse.collapse(id="collapse#{competitive_group.id}" role="tabpanel" aria-labelledby="heading#{competitive_group.id}")
       .panel-body
         - unless examless_applications.empty?
@@ -77,7 +77,7 @@ p Обращаем Ваше внимание, что возможны измен
             - applications.each do |application, values|
               - unless application.enrolled == competitive_group.id || application.exeptioned == competitive_group.id
                 - n += 1
-                - label_class = "success" if n <= first_stage_numbers
+                - label_class = "success" if n <= last_numbers
                 - label_class = [label_class, 'tr-hide'].compact.join(' ') unless values[:original_received] && (application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id)
                 tr class=label_class
                   td
