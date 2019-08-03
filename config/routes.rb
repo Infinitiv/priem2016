@@ -15,6 +15,7 @@ Rails.application.routes.draw do
         get 'entrants'
         get 'marks'
         get 'regions'
+        get 'enrolled_regions'
       end
       collection do
         get 'campaigns'

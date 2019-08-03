@@ -1,6 +1,6 @@
 class Api::StatsController < ApplicationController
-  before_filter :set_campaign, only: [:entrants, :marks, :regions]
-  before_filter :set_entrant_applications, only: [:entrants, :regions]
+  before_filter :set_campaign, only: [:entrants, :marks, :regions, :enrolled_regions]
+  before_filter :set_entrant_applications, only: [:entrants, :regions, :enrolled_regions]
   def entrants
     @entrants = @entrant_applications.map(&:registration_date)
   end
@@ -9,6 +9,10 @@ class Api::StatsController < ApplicationController
     @regions = @entrant_applications.map(&:region_id)
   end
   
+  def enrolled_regions
+    @enrolled_regions = @entrant_applications.where.not(enrolled: nil).map(&:region_id)
+  end
+
   def campaigns
     @campaigns = Campaign.where("5 = any(education_levels)").select(:id, :name, :year_start)
   end
