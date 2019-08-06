@@ -39,10 +39,10 @@ class Campaign < ActiveRecord::Base
         admissions[code] = {}
         admissions[code]['direction_id'] = direction_id
         admissions[code]['name'] = name
-        admissions[code]['number_budget_o'] = row["Количество бюджетных мест"] if row["Количество бюджетных мест"].to_i > 0 
-        admissions[code]['number_paid_o'] = row["Количество внебюджетных мест"] if row["Количество внебюджетных мест"].to_i > 0
-        admissions[code]['number_target_o'] = row["Количество целевых мест"] if row["Количество целевых мест"].to_i > 0
-        admissions[code]['number_quota_o'] = row["Количество мест особой квоты"] if row["Количество мест особой квоты"].to_i > 0
+        admissions[code]['number_budget_o'] = row["Количество бюджетных мест"].to_i > 0  ? row["Количество бюджетных мест"] : 0
+        admissions[code]['number_paid_o'] = row["Количество внебюджетных мест"].to_i > 0 ? row["Количество внебюджетных мест"] : 0
+        admissions[code]['number_target_o'] = row["Количество целевых мест"].to_i > 0 ? row["Количество целевых мест"] : 0
+        admissions[code]['number_quota_o'] = row["Количество мест особой квоты"].to_i > 0 ? row["Количество мест особой квоты"] : 0 
       end
     end
 
