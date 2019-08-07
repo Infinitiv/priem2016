@@ -8,7 +8,7 @@ p
   span в академии пакета документов, необходимых для зачисления.
 p Обращаем Ваше внимание, что возможны изменения в списках, связанные с продолжающимся приемом документов на ряд специальностей и сдачей рядом поступающих вступительных испытаний в других вузах.
 
-- applications = @applications_hash.select{|k, v| k.status_id == 4 && v[:mark_values].select{|m| m > 70}.count == @entrance_test_items.size && k.nationality_type_id != 1}
+- applications = @applications_hash.select{|k, v| k.status_id == 4 && v[:mark_values].select{|m| m > 69}.count == @entrance_test_items.size && k.nationality_type_id != 1}
 .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
   .panel.panel-default
     .panel-heading(role="tab" id="headinginter")
@@ -38,13 +38,13 @@ p Обращаем Ваше внимание, что возможны измен
             td.text-center
               - if values[:original_received] || application.paid_agr
                 span.glyphicon.glyphicon-plus(aria-hidden="true")
-            td= values[:full_summa] if values[:mark_values].select{|m| m > 70}.count == 1
+            td= values[:full_summa] if values[:mark_values].select{|m| m > 69}.count == 1
             td= values[:summa]
             td= values[:achievements_sum] if values[:achievements_sum] > 0
 
 - @admission_volume_hash.each do |direction_id, competitive_groups|
   - competitive_groups.sort_by{|competitive_group, numbers| competitive_group.name}.select{|competitive_group, numbers| competitive_group.last_admission_date > Time.now.to_date}.each do |competitive_group, numbers|
-    - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.status_id == 4 && v[:mark_values].select{|m| m > 70}.count == @entrance_test_items.size && k.nationality_type_id == 1}
+    - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.status_id == 4 && v[:mark_values].select{|m| m > 69}.count == @entrance_test_items.size && k.nationality_type_id == 1}
     - if applications.count > 0
       .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
         .panel.panel-default
@@ -77,7 +77,7 @@ p Обращаем Ваше внимание, что возможны измен
                     td.text-center
                       - if values[:original_received] || application.paid_agr == competitive_group.id
                         span.glyphicon.glyphicon-plus(aria-hidden="true")
-                    td= values[:full_summa] if values[:mark_values].select{|m| m > 70}.count == 1
+                    td= values[:full_summa] if values[:mark_values].select{|m| m > 69}.count == 1
                     td= values[:summa]
                     td= values[:achievements_sum] if values[:achievements_sum] > 0
                     td.text-center
