@@ -46,6 +46,7 @@ json.array! @entrants do |entrant|
       when benefits.map(&:benefit_document_type_id).include?(11)
         'Ивалид'
       when benefits.map(&:benefit_document_type_id).include?(30)
+        'Сирота'
       end
     else 
       benefit_type = 'Премущественное право'
