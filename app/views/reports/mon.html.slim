@@ -9,15 +9,17 @@ h1 Мониторинг приемной кампании (#{@campaign.name} #{@
         th Отозваны после зачисления
         th Зачислено по результатам ЕГЭ
         th Зачислено по результатам внутренних испытаний
+        th Зачислено по результатм ЕГЭ и внутренних испытаний
         th Средний балл ЕГЭ
         th Проходной балл
     tbody
       - competitive_groups.each do |competitive_group, numbers|
         - entrant_applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id)}
-        - enrolled_entrant_applications = entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
+        - enrolled_entrant_applications = entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id && k.status_id == 4}
         - exceptioned_entrant_applications = entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
         - ege_enrolled_entrant_applications = enrolled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
-        - exam_enrolled_entrant_applications = enrolled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
+        - exam_enrolled_entrant_applications = enrolled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 0}
+        - exam_ege_enrolled_entrant_applications = enrolled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == (1 || 2)}
         - enrolled_entrant_applications.each do |k, v|
           - ege = []
           - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
@@ -32,10 +34,11 @@ h1 Мониторинг приемной кампании (#{@campaign.name} #{@
           td= "#{exceptioned_entrant_applications.empty? ? '-' : exceptioned_entrant_applications.count}"
           td= "#{ege_enrolled_entrant_applications.count}"
           td= "#{exam_enrolled_entrant_applications.count}"
+          td = "#{exam_ege_enrolled_entrant_applications.count}"
           td= "#{mean}"
           td= "#{enrolled_entrant_applications.map{|k, v| v[:full_summa]}.min}"
           - case competitive_group.education_source_id
-            - when 14 || 15
+            - when (14 || 15)
               - examless_entrant_applications = entrant_applications.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.olympic_documents.map(&:benefit_type_id).include?(1)}
               - if examless_entrant_applications.count > 0
                 - enrolled_examless_entrant_applications = examless_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
@@ -50,14 +53,16 @@ h1 Мониторинг приемной кампании (#{@campaign.name} #{@
                   td
                   td
                   td
+                  td
             - when 16
               - @target_regions.each do |target_region|
                 - target_entrant_applications = entrant_applications.select{|k, v| k.target_organizations.map{|t| t.region_id}.include?(target_region)}
                 - if target_entrant_applications.count > 0
-                  - enrolled_target_entrant_applications = target_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
+                  - enrolled_target_entrant_applications = target_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id && k.status_id == 4}
                   - exceptioned_target_entrant_applications = target_entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
                   - ege_enrolled_target_entrant_applications = enrolled_target_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
                   - exam_enrolled_target_entrant_applications = enrolled_target_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
+                  - exam_ege_enrolled_target_entrant_applications = enrolled_target_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == (1 || 2)}
                   - enrolled_target_entrant_applications.each do |k, v|
                     - ege = []
                     - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
@@ -72,15 +77,17 @@ h1 Мониторинг приемной кампании (#{@campaign.name} #{@
                     td= "#{exceptioned_target_entrant_applications.empty? ? '-' : exceptioned_target_entrant_applications.count}"
                     td= "#{ege_enrolled_target_entrant_applications.count}"
                     td= "#{exam_enrolled_target_entrant_applications.count}"
+                    td= "#{exam_ege_enrolled_target_entrant_applications.count}"
                     td= "#{mean}"
                     td= "#{enrolled_target_entrant_applications.map{|k, v| v[:full_summa]}.min}"
               - @target_organizations.each do |target_organization|
                 - target_entrant_applications = entrant_applications.select{|k, v| k.target_contracts.map(&:competitive_group_id).include?(competitive_group.id) && k.target_contracts.map(&:target_organization_id).include?(target_organization.id)}
                 - if target_entrant_applications.count > 0
-                  - enrolled_target_entrant_applications = target_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
+                  - enrolled_target_entrant_applications = target_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id && k.status_id == 4}
                   - exceptioned_target_entrant_applications = target_entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
                   - ege_enrolled_target_entrant_applications = enrolled_target_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
                   - exam_enrolled_target_entrant_applications = enrolled_target_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
+                  - exam_ege_enrolled_target_entrant_applications = enrolled_target_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == (1 || 2)}
                   - enrolled_target_entrant_applications.each do |k, v|
                     - ege = []
                     - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
@@ -95,15 +102,17 @@ h1 Мониторинг приемной кампании (#{@campaign.name} #{@
                     td= "#{exceptioned_target_entrant_applications.empty? ? '-' : exceptioned_target_entrant_applications.count}"
                     td= "#{ege_enrolled_target_entrant_applications.count}"
                     td= "#{exam_enrolled_target_entrant_applications.count}"
+                    td= "#{exam_ege_enrolled_target_entrant_applications.count}"
                     td= "#{mean}"
                     td= "#{enrolled_target_entrant_applications.map{|k, v| v[:full_summa]}.min}"
             - when 20
               - disabled_entrant_applications = entrant_applications.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.benefit_documents.map(&:benefit_document_type_id).include?(11)}
               - if disabled_entrant_applications.count > 0
-                - enrolled_disabled_entrant_applications = disabled_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
+                - enrolled_disabled_entrant_applications = disabled_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id && k.status_id == 4}
                 - exceptioned_disabled_entrant_applications = disabled_entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
                 - ege_enrolled_disabled_entrant_applications = enrolled_disabled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
                 - exam_enrolled_disabled_entrant_applications = enrolled_disabled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
+                - exam_ege_enrolled_disabled_entrant_applications = enrolled_disabled_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == (1 || 2)}
                 - enrolled_disabled_entrant_applications.each do |k, v|
                   - ege = []
                   - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
@@ -118,15 +127,17 @@ h1 Мониторинг приемной кампании (#{@campaign.name} #{@
                   td= "#{exceptioned_disabled_entrant_applications.empty? ? '-' : exceptioned_disabled_entrant_applications.count}"
                   td= "#{ege_enrolled_disabled_entrant_applications.count}"
                   td= "#{exam_enrolled_disabled_entrant_applications.count}"
+                  td= "#{exam_ege_enrolled_disabled_entrant_applications.count}"
                   td= "#{mean}"
                   td= "#{enrolled_disabled_entrant_applications.map{|k, v| v[:full_summa]}.min}"
                 
                 - orphan_entrant_applications = entrant_applications.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.benefit_documents.map(&:benefit_document_type_id).include?(30)}
                 - if orphan_entrant_applications.count > 0
-                  - enrolled_orphan_entrant_applications = orphan_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id}
+                  - enrolled_orphan_entrant_applications = orphan_entrant_applications.select{|k, v| k.enrolled == competitive_group.id && k.exeptioned != competitive_group.id && k.status_id == 4}
                   - exceptioned_orphan_entrant_applications = orphan_entrant_applications.select{|k, v| k.exeptioned == competitive_group.id}
                   - ege_enrolled_orphan_entrant_applications = enrolled_orphan_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == 3}
                   - exam_enrolled_orphan_entrant_applications = enrolled_orphan_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') != 3}
+                  - exam_ege_enrolled_orphan_entrant_applications = enrolled_orphan_entrant_applications.select{|k, v| v[:mark_forms].count('ЕГЭ') == (1 || 2)}
                   - enrolled_orphan_entrant_applications.each do |k, v|
                     - ege = []
                     - v[:mark_forms].each_with_index{|val, index| ege << v[:mark_values][index] if val == 'ЕГЭ'}
@@ -141,5 +152,6 @@ h1 Мониторинг приемной кампании (#{@campaign.name} #{@
                     td= "#{exceptioned_orphan_entrant_applications.empty? ? '-' : exceptioned_orphan_entrant_applications.count}"
                     td= "#{ege_enrolled_orphan_entrant_applications.count}"
                     td= "#{exam_enrolled_orphan_entrant_applications.count}"
+                    td= "#{exam_ege_enrolled_orphan_entrant_applications.count}"
                     td= "#{mean}"
                     td= "#{enrolled_orphan_entrant_applications.map{|k, v| v[:full_summa]}.min}"

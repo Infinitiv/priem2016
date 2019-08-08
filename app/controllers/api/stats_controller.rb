@@ -1,49 +1,53 @@
 class Api::StatsController < ApplicationController
-  before_filter :set_campaign, only: [:entrants, :marks, :regions, :enrolled_regions, :show]
-  before_filter :set_entrant_applications, only: [:entrants, :regions, :enrolled_regions, :show]
+  before_filter :set_campaign, only: [:entrants, :competitive_groups]
+  before_filter :set_entrant_applications, only: [:entrants]
 
   def show
   end
   def entrants
-    @entrants = @entrant_applications.map(&:registration_date)
-  end
-  
-  def regions
-    @regions = @entrant_applications.map(&:region_id)
-  end
-  
-  def enrolled_regions
-    @enrolled_regions = @entrant_applications.where.not(enrolled: nil).map(&:region_id)
+    @entrants = @entrant_applications.select(
+      :application_number,
+      :gender_id,
+      :birth_date,
+      :region_id,
+      :registration_date,
+      :status_id,
+      :nationality_type_id,
+      :enrolled,
+      :enrolled_date,
+      :exeptioned,
+      :exeptioned_date,
+      :return_documents_date
+    )
+    .includes(
+      :competitive_groups,
+      :marks,
+      :benefit_documents,
+      :achievements,
+      :olympic_documents
+    )
   end
 
   def campaigns
     @campaigns = Campaign.where("5 = any(education_levels)").select(:id, :name, :year_start)
   end
   
-  def marks
-    level = case @campaign.year_start
-            when 2016
-              38
-            when 2017
-              42
-            when 2018
-              42
-            when 2019
-              42
-            end
-    @marks = Mark.select(:id, 
-                         :value, 
-                         :entrant_application_id, 
-                         :form, 
-                         :subject_id)
-    .includes(:subject)
-    .joins(:entrant_application)
-    .where(entrant_applications: {campaign_id: @campaign}, form: 'ЕГЭ')
-    .where("value >= ?", level)
-    .map{|m| [m.subject.subject_name, m.value]}
+  private
+  
+  def competitive_groups
+    @competitive_groups = CompetitiveGroup.select(
+      :id,
+      :campaign_id,
+      :name,
+      :education_source_id,
+      :direction_id,
+      :last_admission_date
+      )
+    .includes(:competitive_group_item)
+    .joins(:campaign)
+    .where(campaigns: {id: @campaign})
   end
   
-  private
   
   def set_campaign
     @campaign = Campaign.where("5 = any(education_levels)").find_by_year_start(params[:id])

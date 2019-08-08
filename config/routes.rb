@@ -13,9 +13,7 @@ Rails.application.routes.draw do
     resources 'stats', only: [:show] do
       member do
         get 'entrants'
-        get 'marks'
-        get 'regions'
-        get 'enrolled_regions'
+        get 'competitive_groups'
       end
       collection do
         get 'campaigns'
