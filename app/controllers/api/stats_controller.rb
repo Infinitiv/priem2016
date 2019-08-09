@@ -24,7 +24,9 @@ class Api::StatsController < ApplicationController
       :marks,
       :benefit_documents,
       :achievements,
-      :olympic_documents
+      :olympic_documents,
+      :target_contracts,
+      :target_organizations
     )
   end
 

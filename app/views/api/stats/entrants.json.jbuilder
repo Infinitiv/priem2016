@@ -46,7 +46,7 @@ json.array! @entrants do |entrant|
       benefit_type = 'Особая квота'
       benefit_document_type = case true
       when benefits.map(&:benefit_document_type_id).include?(11)
-        'Ивалид'
+        'Инвалид'
       when benefits.map(&:benefit_document_type_id).include?(30)
         'Сирота'
       end
@@ -56,4 +56,9 @@ json.array! @entrants do |entrant|
   end
   json.benefit_type benefit_type if benefit_type
   json.benefit_document_type benefit_document_type if benefit_document_type
+  unless entrant.target_contracts.where(competitive_group_id: entrant.enrolled).empty?
+    target_contract = entrant.target_contracts.find_by_competitive_group_id(entrant.enrolled)
+    json.target_region = target_contract.target_organization.region_id
+    json.target_organization_name = target_contract.target_organization.target_organization_name
+  end
 end
