@@ -24,8 +24,10 @@ json.array! @entrants do |entrant|
       marks.where(subject_id: olympic.ege_subject_id).update_all(form: 'Олимпиада')
     end
   end
+  ege_count = marks.map(&:form).count('ЕГЭ')
+  json.ege_count ege_count
   json.sum marks.sum(:value)
-  exam_category = case marks.map(&:form).count('ЕГЭ')
+  exam_category = case ege_count
   when 0
     'ВИ'
   when 3
