@@ -79,7 +79,7 @@ class EntrantApplication < ActiveRecord::Base
             end
           end
         when campaign.education_levels.include?(18)
-          entrant_application.competitive_groups = []
+          entrant_application.competitive_groups = [] unless row.keys.include?('enrolled')
           if row['spec1']
             entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec1']}).where(education_source_id: 14) if row['budg1']
             entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec1']}).where(education_source_id: 15) if row['paid1']

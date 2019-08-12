@@ -6,7 +6,6 @@ p
   span Зеленым цветом выделены абитуриенты гарантированно поступающие на обучение при 
   strong наличии 
   span в академии пакета документов, необходимых для зачисления.
-p Обращаем Ваше внимание, что возможны изменения в списках, связанные с продолжающимся приемом документов на ряд специальностей и сдачей рядом поступающих вступительных испытаний в других вузах.
 
 - applications = @applications_hash.select{|k, v| k.status_id == 4 && v[:mark_values].select{|m| m > 69}.count == @entrance_test_items.size && k.nationality_type_id != 1}
 .panel-group(id="accordion" role="tablist" aria-multiselectable="true")

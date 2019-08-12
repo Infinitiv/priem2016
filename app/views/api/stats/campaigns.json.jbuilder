@@ -1,1 +1,1 @@
-json.campaigns @campaigns
+json.array! @campaigns

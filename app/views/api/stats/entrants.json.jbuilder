@@ -1,23 +1,24 @@
 json.array! @entrants do |entrant|
+  json.year entrant.campaign.year_start
   json.application_number entrant.application_number
   json.gender_id entrant.gender_id
   json.birth_date entrant.birth_date
   json.region_id entrant.region_id
   json.registration_date entrant.registration_date
-  json.status_id entrant.status_id
   json.nationality_type_id entrant.nationality_type_id
-  json.enrolled entrant.enrolled
-  json.enrolled_date entrant.enrolled_date
-  json.exeptioned entrant.exeptioned
-  json.exeptioned_date entrant.exeptioned_date
+  json.status_id entrant.status_id
   json.return_documents_date entrant.return_documents_date
-  json.enrolled_name entrant.competitive_groups.find(entrant.enrolled).name if entrant.enrolled
-  json.exeptioned_name entrant.competitive_groups.find(entrant.exeptioned).name if entrant.exeptioned
+  json.direction_id entrant.enrolled ? entrant.competitive_groups.find(entrant.enrolled).direction_id : nil
+  json.enrolled_name entrant.enrolled ? entrant.competitive_groups.find(entrant.enrolled).name : nil
+  json.education_source_id entrant.enrolled ? entrant.competitive_groups.find(entrant.enrolled).education_source_id : nil
+  json.enrolled_date entrant.enrolled_date
+  json.exeptioned_name entrant.exeptioned ? entrant.competitive_groups.find(entrant.exeptioned).name : nil
+  json.exeptioned_date entrant.exeptioned_date
   olympics = entrant.olympic_documents
   unless olympics.empty?
     olympic_type = olympics.map(&:benefit_type_id).include?(2) ? 'Без ВИ' : 'ЕГЭ 100'
   end
-  json.olympic_type olympic_type if olympic_type
+  json.olympic_type olympic_type ? olympic_type : nil
   marks = entrant.marks
   if olympic_type == 'ЕГЭ 100'
     olympics.each do |olympic|
@@ -36,8 +37,8 @@ json.array! @entrants do |entrant|
     'смешанный'
   end
   json.exam_category exam_category
-  json.mean_ege marks.where(form: 'ЕГЭ').sum(:value).to_f / marks.where(form: 'ЕГЭ').count if marks.where(form: 'ЕГЭ').count > 0
-  json.mean_exam marks.where(form: 'Экзамен').sum(:value).to_f / marks.where(form: 'Экзамен').count if marks.where(form: 'Экзамен').count > 0
+  json.mean_ege marks.where(form: 'ЕГЭ').count > 0 ? marks.where(form: 'ЕГЭ').sum(:value).to_f / marks.where(form: 'ЕГЭ').count : nil
+  json.mean_exam marks.where(form: 'Экзамен').count > 0 ? marks.where(form: 'Экзамен').sum(:value).to_f / marks.where(form: 'Экзамен').count : nil
   achievements = entrant.achievements
   json.achievements achievements.sum(:value) > 10 ? 10.to_f : achievements.sum(:value)
   benefits = entrant.benefit_documents
@@ -54,8 +55,8 @@ json.array! @entrants do |entrant|
       benefit_type = 'Премущественное право'
     end
   end
-  json.benefit_type benefit_type if benefit_type
-  json.benefit_document_type benefit_document_type if benefit_document_type
+  json.benefit_type benefit_type ? benefit_type : nil
+  json.benefit_document_type benefit_document_type ? benefit_document_type : nil
   unless entrant.target_contracts.where(competitive_group_id: entrant.enrolled).empty?
     target_contract = entrant.target_contracts.find_by_competitive_group_id(entrant.enrolled)
     json.target_region = target_contract.target_organization.region_id
