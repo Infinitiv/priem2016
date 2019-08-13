@@ -344,7 +344,7 @@ end
             end
             benefit_competitive_groups = item.competitive_groups.where(education_source_id: 20)
             olympic_documents = item.olympic_documents
-            unless benefit_competitive_groups.empty? && olympic_documents.empty?
+            unless benefit_competitive_groups.empty? #&& olympic_documents.empty?
               a.ApplicationCommonBenefits do |acbs|
                 benefit_competitive_groups.each do |sub_item|
                   acbs.ApplicationCommonBenefit do |acb|
