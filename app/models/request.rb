@@ -716,6 +716,13 @@ end
           unless competitive_group_exeptioned_application.empty?
             competitive_group_exeptioned_application.each do |d, a|
               a.each do |application|
+                postfix = case true
+                          when campaign.education_levels.include?(5)
+                            's'
+                          when campaign.education_levels.include?(18)
+                            'o'
+                          end
+                application_number = [campaign.year_start, "%04d" % application.application_number, postfix].join('-')
                 as.Application do |a|
                   a.ApplicationUID application_number
                   a.OrderUID "oe #{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
