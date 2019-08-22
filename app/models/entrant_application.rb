@@ -217,7 +217,7 @@ class EntrantApplication < ActiveRecord::Base
       end
       entrant_applications_hash[entrant_application][:summa] = entrant_applications_hash[entrant_application][:mark_values].size == entrance_test_items.size ? entrant_applications_hash[entrant_application][:mark_values].sum : 0
       entrant_applications_hash[entrant_application][:achievements] = achievement_values[entrant_application.id]
-      achievements_sum = entrant_applications_hash[entrant_application][:achievements].sum
+      achievements_sum = entrant_applications_hash[entrant_application][:achievements] ? entrant_applications_hash[entrant_application][:achievements].sum : 0
       achievements_limit = 10.to_f if campaign.education_levels.include?(5)
       entrant_applications_hash[entrant_application][:achievements_sum] = achievements_limit ? (achievements_sum > achievements_limit ? achievements_limit : achievements_sum) : achievements_sum
       entrant_applications_hash[entrant_application][:summa] > 0 ? entrant_applications_hash[entrant_application][:full_summa] = [entrant_applications_hash[entrant_application][:summa], entrant_applications_hash[entrant_application][:achievements_sum]].sum : entrant_applications_hash[entrant_application][:full_summa] = 0
@@ -382,7 +382,7 @@ class EntrantApplication < ActiveRecord::Base
 
     CSV.generate(headers: true, col_sep: ';') do |csv|
       csv << headers
-      applications.each do |application, values|
+      applications.select{|application, values| application.nationality_type_id == 1}.each do |application, values|
         application.competitive_groups.each do |competitive_group|
           status = case application.status_id
                     when 6
@@ -391,12 +391,12 @@ class EntrantApplication < ActiveRecord::Base
                       application.enrolled && application.enrolled == competitive_group.id ? 1 : 2
                     end
           order_number = case application.enrolled_date
-                          when Date.new(2018, 8, 13)
-                            '111-ипо'
-                          when Date.new(2018, 8, 15)
-                            '112-ипо'
-                          when Date.new(2018, 8, 17)
-                            '114-ипо'
+                          when Date.new(2019, 8, 12)
+                            '98-ипо'
+                          when Date.new(2019, 8, 14)
+                            '99-ипо'
+                          when Date.new(2019, 8, 16)
+                            '100-ипо'
                           end
           zero_array = ('а'..'г').zip([0, 0, 0, 0]).map{|i| i.join('-')}
           values[:achievements] = values[:achievements].map{|a| a.round()}
@@ -414,7 +414,7 @@ class EntrantApplication < ActiveRecord::Base
           row = [
             application.snils,
             oid,
-            1,
+            2,
             application.birth_date.strftime("%d.%m.%Y"),
             competitive_group.edu_programs.last.code,
             (competitive_group.education_source_id == 15 ? 'договор' : 'бюджет'),
