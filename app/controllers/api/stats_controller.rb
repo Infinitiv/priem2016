@@ -24,6 +24,7 @@ class Api::StatsController < ApplicationController
       :competitive_groups,
       :marks,
       :benefit_documents,
+      :education_document,
       :achievements,
       :olympic_documents,
       :target_contracts,

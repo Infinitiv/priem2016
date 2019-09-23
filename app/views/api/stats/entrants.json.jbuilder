@@ -7,6 +7,8 @@ json.array! @entrants do |entrant|
   json.registration_date entrant.registration_date
   json.nationality_type_id entrant.nationality_type_id
   json.status_id entrant.status_id
+  json.education_document_type entrant.education_document.education_document_type
+  json.education_document_date entrant.education_document.education_document_date
   json.return_documents_date entrant.return_documents_date
   json.direction_id entrant.enrolled ? entrant.competitive_groups.find(entrant.enrolled).direction_id : nil
   json.enrolled_name entrant.enrolled ? entrant.competitive_groups.find(entrant.enrolled).name : nil
