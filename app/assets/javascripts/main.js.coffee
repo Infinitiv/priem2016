@@ -9,7 +9,7 @@ $ ->
     else
       $('.application-number').addClass('hidden')
   $('#applications').change ->
-    if $('#request_query').val() == 'import' & $('#applications:checked').length == 1
+    if $('#request_query').val() == 'import' || $('#request_query').val() == 'validate' & $('#applications:checked').length == 1
       $('.all-applications').removeClass('hidden')
     else
       $('.all-applications').addClass('hidden')
