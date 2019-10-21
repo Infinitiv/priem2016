@@ -194,23 +194,30 @@ end
               cg.IsAdditional true if item.is_additional
               cg.LevelBudget 1
               competitive_group_item = item.competitive_group_item
-              unless item.education_source_id == 16
-                cg.CompetitiveGroupItem do |cgi|
-                  cgi.NumberBudgetO competitive_group_item.number_budget_o if competitive_group_item.number_budget_o > 0
-                  cgi.NumberBudgetOZ competitive_group_item.number_budget_oz if competitive_group_item.number_budget_oz > 0
-                  cgi.NumberBudgetZ competitive_group_item.number_budget_z if competitive_group_item.number_budget_z > 0
-                  cgi.NumberPaidO competitive_group_item.number_paid_o if competitive_group_item.number_paid_o > 0
-                  cgi.NumberPaidOZ competitive_group_item.number_paid_oz if competitive_group_item.number_paid_oz > 0
-                  cgi.NumberPaidZ competitive_group_item.number_paid_z if competitive_group_item.number_paid_z > 0
-                  cgi.NumberTargetO competitive_group_item.number_target_o if competitive_group_item.number_target_o > 0
-                  cgi.NumberTargetOZ competitive_group_item.number_target_oz if competitive_group_item.number_target_oz > 0
-                  cgi.NumberTargetZ competitive_group_item.number_target_z if competitive_group_item.number_target_z > 0
-                  cgi.NumberQuotaO competitive_group_item.number_quota_o if competitive_group_item.number_quota_o > 0
-                  cgi.NumberQuotaOZ competitive_group_item.number_quota_oz if competitive_group_item.number_quota_oz > 0
-                  cgi.NumberQuotaZ competitive_group_item.number_quota_z if competitive_group_item.number_quota_z > 0
-                end
-              end
-              if item.education_source_id == 16
+              case item.education_source_id
+              when 14
+                  cg.CompetitiveGroupItem do |cgi|
+                    case item.education_form_id
+                    when 11
+                      cgi.NumberBudgetO competitive_group_item.number_budget_o || 0
+                    when 12
+                      cgi.NumberBudgetOZ competitive_group_item.number_budget_oz || 0
+                    when 10
+                      cgi.NumberBudgetZ competitive_group_item.number_budget_z || 0
+                    end
+                  end
+              when 15
+                  cg.CompetitiveGroupItem do |cgi|
+                    case item.education_form_id
+                    when 11
+                      cgi.NumberPaidO competitive_group_item.number_paid_o || 0
+                    when 12
+                      cgi.NumberPaidOZ competitive_group_item.number_paid_oz || 0
+                    when 10
+                      cgi.NumBerPaidZ competitive_group_item.number_paid_z || 0
+                    end
+                  end
+              when 16
                 target_numbers = item.target_numbers
                 unless target_numbers.empty?
                   cg.TargetOrganizations do |tos|
@@ -218,14 +225,27 @@ end
                       tos.TargetOrganization do |to|
                         to.UID sub_item.target_organization_id
                         to.CompetitiveGroupTargetItem do |cgti|
-                          cgti.NumberTargetO sub_item.number_target_o if sub_item.number_target_o > 0
-                          cgti.NumberTargetOZ sub_item.number_target_oz if sub_item.number_target_oz > 0
-                          cgti.NumberTargetZ sub_item.number_target_z if sub_item.number_target_z > 0
+                          case item.education_form_id
+                          when 11
+                            cgti.NumberTargetO sub_item.number_target_o || 0
+                          when 12
+                            cgti.NumberTargetOZ sub_item.number_target_oz || 0
+                          when 10
+                            cgti.NumberTargetZ sub_item.number_target_z || 0
+                          end
                         end
                       end
                     end
                   end
                 end
+              when 20
+                cg.CompetitiveGroupItem do |cgi|
+                  cgi.NumberQuotaO competitive_group_item.number_quota_o || 0
+                  cgi.NumberQuotaOZ competitive_group_item.number_quota_oz || 0
+                  cgi.NumberQuotaZ competitive_group_item.number_quota_z || 0
+                end
+              end
+              if item.education_source_id == 16
               end
               entrance_test_items = item.entrance_test_items
               cg.EntranceTestItems do |etis|
