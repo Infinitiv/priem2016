@@ -196,28 +196,38 @@ end
               competitive_group_item = item.competitive_group_item
               case item.education_source_id
               when 14
-                  cg.CompetitiveGroupItem do |cgi|
-                    case item.education_form_id
-                    when 11
-                      cgi.NumberBudgetO competitive_group_item.number_budget_o || 0
-                    when 12
-                      cgi.NumberBudgetOZ competitive_group_item.number_budget_oz || 0
-                    when 10
-                      cgi.NumberBudgetZ competitive_group_item.number_budget_z || 0
-                    end
+                cg.CompetitiveGroupItem do |cgi|
+                  case item.education_form_id
+                  when 11
+                    cgi.NumberBudgetO competitive_group_item.number_budget_o || 0
+                  when 12
+                    cgi.NumberBudgetOZ competitive_group_item.number_budget_oz || 0
+                  when 10
+                    cgi.NumberBudgetZ competitive_group_item.number_budget_z || 0
                   end
+                end
               when 15
-                  cg.CompetitiveGroupItem do |cgi|
-                    case item.education_form_id
-                    when 11
-                      cgi.NumberPaidO competitive_group_item.number_paid_o || 0
-                    when 12
-                      cgi.NumberPaidOZ competitive_group_item.number_paid_oz || 0
-                    when 10
-                      cgi.NumBerPaidZ competitive_group_item.number_paid_z || 0
-                    end
+                cg.CompetitiveGroupItem do |cgi|
+                  case item.education_form_id
+                  when 11
+                    cgi.NumberPaidO competitive_group_item.number_paid_o || 0
+                  when 12
+                    cgi.NumberPaidOZ competitive_group_item.number_paid_oz || 0
+                  when 10
+                    cgi.NumBerPaidZ competitive_group_item.number_paid_z || 0
                   end
+                end
               when 16
+                cg.CompetitiveGroupItem do |cgi|
+                  case item.education_form_id
+                  when 11
+                    cgi.NumberTargetO competitive_group_item.number_target_o || 0
+                  when 12
+                    cgi.NumberTargetOZ competitive_group_item.number_target_oz || 0
+                  when 10
+                    cgi.NumberTargetZ competitive_group_item.number_target_z || 0
+                  end
+                end
                 target_numbers = item.target_numbers
                 unless target_numbers.empty?
                   cg.TargetOrganizations do |tos|
@@ -244,8 +254,6 @@ end
                   cgi.NumberQuotaOZ competitive_group_item.number_quota_oz || 0
                   cgi.NumberQuotaZ competitive_group_item.number_quota_z || 0
                 end
-              end
-              if item.education_source_id == 16
               end
               entrance_test_items = item.entrance_test_items
               cg.EntranceTestItems do |etis|
