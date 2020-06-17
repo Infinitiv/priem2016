@@ -218,17 +218,19 @@ end
                   end
                 end
               when 16
-                cg.CompetitiveGroupItem do |cgi|
-                  case item.education_form_id
-                  when 11
-                    cgi.NumberTargetO competitive_group_item.number_target_o || 0
-                  when 12
-                    cgi.NumberTargetOZ competitive_group_item.number_target_oz || 0
-                  when 10
-                    cgi.NumberTargetZ competitive_group_item.number_target_z || 0
+                target_numbers = item.target_numbers
+                if target_numbers.empty?
+                  cg.CompetitiveGroupItem do |cgi|
+                    case item.education_form_id
+                    when 11
+                      cgi.NumberTargetO competitive_group_item.number_target_o || 0
+                    when 12
+                      cgi.NumberTargetOZ competitive_group_item.number_target_oz || 0
+                    when 10
+                      cgi.NumberTargetZ competitive_group_item.number_target_z || 0
+                    end
                   end
                 end
-                target_numbers = item.target_numbers
                 unless target_numbers.empty?
                   cg.TargetOrganizations do |tos|
                     target_numbers.each do |sub_item|
@@ -250,9 +252,14 @@ end
                 end
               when 20
                 cg.CompetitiveGroupItem do |cgi|
-                  cgi.NumberQuotaO competitive_group_item.number_quota_o || 0
-                  cgi.NumberQuotaOZ competitive_group_item.number_quota_oz || 0
-                  cgi.NumberQuotaZ competitive_group_item.number_quota_z || 0
+                  case item.education_form_id
+                  when 11
+                    cgi.NumberQuotaO competitive_group_item.number_quota_o || 0
+                  when 12
+                    cgi.NumberQuotaOZ competitive_group_item.number_quota_oz || 0
+                  when 10
+                    cgi.NumberQuotaZ competitive_group_item.number_quota_z || 0
+                  end
                 end
               end
               entrance_test_items = item.entrance_test_items
