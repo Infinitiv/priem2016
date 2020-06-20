@@ -217,7 +217,7 @@ class EntrantApplication < ActiveRecord::Base
         entrant_applications_hash[entrant_application][:mark_values] << mark_value
         entrant_applications_hash[entrant_application][:mark_forms] << mark_form
       end
-      entrant_applications_hash[entrant_application][:summa] = entrant_applications_hash[entrant_application][:mark_values].size == entrance_test_items.size ? entrant_applications_hash[entrant_application][:mark_values].sum : 0
+      entrant_applications_hash[entrant_application][:summa] = entrant_applications_hash[entrant_application][:mark_values].size == entrance_test_items.size ? entrant_applications_hash[entrant_application][:mark_values].compact.sum : 0
       entrant_applications_hash[entrant_application][:achievements] = achievement_values[entrant_application.id]
       achievements_sum = entrant_applications_hash[entrant_application][:achievements] ? entrant_applications_hash[entrant_application][:achievements].sum : 0
       achievements_limit = 10.to_f if campaign.education_levels.include?(5)
