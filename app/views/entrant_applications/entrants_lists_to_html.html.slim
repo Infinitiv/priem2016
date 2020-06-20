@@ -44,7 +44,6 @@ p Обращаем Ваше внимание, что до 18 августа во
               th №№
               th № личного дела
               th Ф.И.О.
-              th Наличие оригинала документа об образовании
               th Наличие согласия на зачисление
               th Сумма конкурсных баллов
               - @entrance_test_items.each do |entrance_test_item|
@@ -59,7 +58,6 @@ p Обращаем Ваше внимание, что до 18 августа во
                 td
                 td= "%04d" % application.application_number
                 td= application.fio
-                td.text-center= "+" if values[:original_received]
                 td.text-center= "+" if [application.budget_agr, application.paid_agr].include?(competitive_group.id)
                 td= values[:full_summa] if values[:mark_values].select{|m| m > 41}.count == 3
                 - values[:mark_values].each_with_index do |mark_value, index|
