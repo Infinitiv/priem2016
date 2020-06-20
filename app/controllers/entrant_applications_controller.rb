@@ -1,6 +1,6 @@
 class EntrantApplicationsController < ApplicationController
   load_and_authorize_resource
-  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract]
+  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates]
   before_action :set_competitive_group, only: [:toggle_agreement, :toggle_contract]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
@@ -11,11 +11,17 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def show
-    entrant_applications = @entrant_application.campaign.entrant_applications.select(:id, :application_number)
-    @previous_entrant = entrant_applications.find_by_application_number(@entrant_application.application_number - 1)
-    @next_entrant = entrant_applications.find_by_application_number(@entrant_application.application_number + 1)
+    if @entrant_application.application_number
+      entrant_applications = @entrant_application.campaign.entrant_applications.select(:id, :application_number)
+      @previous_entrant = entrant_applications.find_by_application_number(@entrant_application.application_number - 1) if @entrant_application
+      @next_entrant = entrant_applications.find_by_application_number(@entrant_application.application_number + 1)
+    else
+      entrant_applications = @entrant_application.campaign.entrant_applications.select(:id)
+      @previous_entrant = entrant_applications.find_by_id(@entrant_application.id - 1)
+      @next_entrant = entrant_applications.find_by_id(@entrant_application.id + 1)
+    end
     @marks = @entrant_application.marks.order(:subject_id).includes(:subject)
-    @sum = @marks.pluck(:value).sum
+    @sum = @marks.pluck(:value).any? ? @marks.pluck(:value).sum : 0
     @achievements = @entrant_application.achievements.includes(:institution_achievement)
     @achievements_sum = @achievements.pluck(:value).sum
     achievements_limit = 10 if @entrant_application.campaign.campaign_type_id == 1
@@ -233,6 +239,11 @@ class EntrantApplicationsController < ApplicationController
   def target_report
     @applications_hash = EntrantApplication.entrant_applications_hash(@campaign)
     send_data EntrantApplication.target_report(@applications_hash), filename: "entrant_target_reslut_export-#{Date.today}.xml", type: 'text/xml', disposition: "attachment"
+  end
+  
+  def generate_templates
+    @entrant_application.generate_templates
+    redirect_to @entrant_application
   end
   
   private

@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   
   namespace :api, defaults: {format: 'json'}, path: '/api' do
     resources :entrant_applications, only: [:show, :create, :update, :destroy]
+    resources :attachments, only: [:show, :create, :destroy]
     resources 'stats', only: [:show] do
       member do
         get 'entrants'
@@ -79,6 +80,7 @@ Rails.application.routes.draw do
       get 'touch'
       put 'toggle_original'
       put 'entrant_application_recall'
+      put 'generate_templates'
     end
   end
   

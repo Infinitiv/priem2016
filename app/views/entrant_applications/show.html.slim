@@ -12,12 +12,19 @@
   .pull-left = link_to 'К списку заявлений', entrant_applications_path + "?campaign_id=#{@entrant_application.campaign.id}"
 .row
   h1.pull-left class=label_class
-    = "#{"%04d" % @entrant_application.application_number}"
+    = @entrant_application.application_number ? "#{"%04d" % @entrant_application.application_number}" : "-"
   - if @entrant_application.status_id == 4
     h3.pull-right
       = link_to 'x', entrant_application_recall_entrant_application_url(@entrant_application), method: :put, class: 'label label-warning', title: 'Отозвать документы'
   h1= @entrant_application.fio
   = link_to "Обновлено #{@entrant_application.updated_at.strftime("%Y-%m-%d")}", touch_entrant_application_url(@entrant_application), class: "pull-right label label-default"
+  - host = case Rails.env
+  - when 'development'
+    - 'http://isma.me'
+  - when 'production'
+    - 'https://isma.ivanovo.ru'
+  = link_to 'Личный кабинет абитуриента', "#{[host, 'entrants', @entrant_application.data_hash].join('/')}", target: :blank
+  p= link_to 'Сформировать набор шаблонов', generate_templates_entrant_application_url(@entrant_application), method: :put
   h2 Перечень конкурсов
   table.table
     thead
@@ -61,7 +68,7 @@
     thead
       tr
         - @marks.each do |mark|
-          th = mark.subject.subject_name
+          th = mark.subject.subject_name if mark.subject
         th Сумма
         th С учетом достижений
     tbody

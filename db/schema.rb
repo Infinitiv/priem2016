@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190728113238) do
+ActiveRecord::Schema.define(version: 20200619183008) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,8 +22,11 @@ ActiveRecord::Schema.define(version: 20190728113238) do
     t.float    "value",                      default: 0.0
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
+    t.integer  "attachment_id"
+    t.string   "status"
   end
 
+  add_index "achievements", ["attachment_id"], name: "index_achievements_on_attachment_id", using: :btree
   add_index "achievements", ["entrant_application_id"], name: "index_achievements_on_entrant_application_id", using: :btree
   add_index "achievements", ["institution_achievement_id"], name: "index_achievements_on_institution_achievement_id", using: :btree
 
@@ -49,6 +52,22 @@ ActiveRecord::Schema.define(version: 20190728113238) do
 
   add_index "admission_volumes", ["campaign_id"], name: "index_admission_volumes_on_campaign_id", using: :btree
 
+  create_table "attachments", force: :cascade do |t|
+    t.integer  "entrant_application_id"
+    t.string   "document_type"
+    t.string   "mime_type"
+    t.string   "data_hash"
+    t.string   "status"
+    t.boolean  "merged"
+    t.boolean  "template"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.integer  "document_id"
+    t.string   "filename"
+  end
+
+  add_index "attachments", ["entrant_application_id"], name: "index_attachments_on_entrant_application_id", using: :btree
+
   create_table "benefit_documents", force: :cascade do |t|
     t.integer  "benefit_document_type_id"
     t.string   "benefit_document_series"
@@ -59,8 +78,11 @@ ActiveRecord::Schema.define(version: 20190728113238) do
     t.integer  "entrant_application_id"
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
+    t.integer  "attachment_id"
+    t.string   "status"
   end
 
+  add_index "benefit_documents", ["attachment_id"], name: "index_benefit_documents_on_attachment_id", using: :btree
   add_index "benefit_documents", ["entrant_application_id"], name: "index_benefit_documents_on_entrant_application_id", using: :btree
 
   create_table "campaigns", force: :cascade do |t|
@@ -128,6 +150,19 @@ ActiveRecord::Schema.define(version: 20190728113238) do
     t.integer "competitive_group_id",   null: false
   end
 
+  create_table "contracts", force: :cascade do |t|
+    t.integer  "entrant_application_id"
+    t.integer  "competitive_group_id"
+    t.integer  "attachment_id"
+    t.string   "status"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "contracts", ["attachment_id"], name: "index_contracts_on_attachment_id", using: :btree
+  add_index "contracts", ["competitive_group_id"], name: "index_contracts_on_competitive_group_id", using: :btree
+  add_index "contracts", ["entrant_application_id"], name: "index_contracts_on_entrant_application_id", using: :btree
+
   create_table "dictionaries", force: :cascade do |t|
     t.string   "name"
     t.integer  "code"
@@ -170,8 +205,12 @@ ActiveRecord::Schema.define(version: 20190728113238) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "education_speciality_code", default: ""
+    t.integer  "attachment_id"
+    t.string   "status"
+    t.string   "education_document_issuer"
   end
 
+  add_index "education_documents", ["attachment_id"], name: "index_education_documents_on_attachment_id", using: :btree
   add_index "education_documents", ["entrant_application_id"], name: "index_education_documents_on_entrant_application_id", using: :btree
 
   create_table "entrance_test_items", force: :cascade do |t|
@@ -214,7 +253,16 @@ ActiveRecord::Schema.define(version: 20190728113238) do
     t.integer  "contracts",                             array: true
     t.string   "snils",                 default: ""
     t.date     "return_documents_date"
+    t.text     "comment"
+    t.integer  "attachment_id"
+    t.text     "address"
+    t.string   "zip_code"
+    t.string   "phone"
+    t.text     "special_conditions"
+    t.integer  "locked_by"
   end
+
+  add_index "entrant_applications", ["attachment_id"], name: "index_entrant_applications_on_attachment_id", using: :btree
 
   create_table "entrant_applications_identity_documents", id: false, force: :cascade do |t|
     t.integer "entrant_application_id", null: false
@@ -248,8 +296,12 @@ ActiveRecord::Schema.define(version: 20190728113238) do
     t.string   "alt_entrant_first_name"
     t.string   "alt_entrant_middle_name"
     t.integer  "entrant_application_id"
+    t.integer  "attachment_id"
+    t.string   "status"
+    t.string   "identity_document_issuer"
   end
 
+  add_index "identity_documents", ["attachment_id"], name: "index_identity_documents_on_attachment_id", using: :btree
   add_index "identity_documents", ["entrant_application_id"], name: "index_identity_documents_on_entrant_application_id", using: :btree
   add_index "identity_documents", ["identity_document_type"], name: "index_identity_documents_on_identity_document_type", using: :btree
 
@@ -288,6 +340,7 @@ ActiveRecord::Schema.define(version: 20190728113238) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "organization_uid",       default: ""
+    t.string   "year"
   end
 
   add_index "marks", ["entrant_application_id"], name: "index_marks_on_entrant_application_id", using: :btree
@@ -305,10 +358,14 @@ ActiveRecord::Schema.define(version: 20190728113238) do
     t.date     "olympic_document_date"
     t.integer  "olympic_subject_id"
     t.integer  "ege_subject_id"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "attachment_id"
+    t.string   "status"
+    t.integer  "olympic_document_type_id"
   end
 
+  add_index "olympic_documents", ["attachment_id"], name: "index_olympic_documents_on_attachment_id", using: :btree
   add_index "olympic_documents", ["entrant_application_id"], name: "index_olympic_documents_on_entrant_application_id", using: :btree
 
   create_table "requests", force: :cascade do |t|
@@ -333,8 +390,11 @@ ActiveRecord::Schema.define(version: 20190728113238) do
     t.integer  "target_organization_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.integer  "attachment_id"
+    t.string   "status"
   end
 
+  add_index "target_contracts", ["attachment_id"], name: "index_target_contracts_on_attachment_id", using: :btree
   add_index "target_contracts", ["competitive_group_id"], name: "index_target_contracts_on_competitive_group_id", using: :btree
   add_index "target_contracts", ["entrant_application_id"], name: "index_target_contracts_on_entrant_application_id", using: :btree
   add_index "target_contracts", ["target_organization_id"], name: "index_target_contracts_on_target_organization_id", using: :btree
@@ -368,13 +428,24 @@ ActiveRecord::Schema.define(version: 20190728113238) do
 
   add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
 
+  add_foreign_key "achievements", "attachments"
   add_foreign_key "achievements", "entrant_applications"
   add_foreign_key "achievements", "institution_achievements"
+  add_foreign_key "attachments", "entrant_applications"
+  add_foreign_key "benefit_documents", "attachments"
   add_foreign_key "benefit_documents", "entrant_applications"
+  add_foreign_key "contracts", "attachments"
+  add_foreign_key "contracts", "competitive_groups"
+  add_foreign_key "contracts", "entrant_applications"
+  add_foreign_key "education_documents", "attachments"
+  add_foreign_key "entrant_applications", "attachments"
+  add_foreign_key "identity_documents", "attachments"
   add_foreign_key "identity_documents", "entrant_applications"
   add_foreign_key "journals", "entrant_applications"
   add_foreign_key "journals", "users"
+  add_foreign_key "olympic_documents", "attachments"
   add_foreign_key "olympic_documents", "entrant_applications"
+  add_foreign_key "target_contracts", "attachments"
   add_foreign_key "target_contracts", "competitive_groups"
   add_foreign_key "target_contracts", "entrant_applications"
   add_foreign_key "target_contracts", "target_organizations"

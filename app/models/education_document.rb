@@ -11,6 +11,14 @@ class EducationDocument < ActiveRecord::Base
   end
 
   def education_document_data
-    "Номер #{education_document_number}, выдан #{education_document_date}"
+    education_document_name = case education_document_type
+                              when 'HighEduDiplomaDocument'
+                                'Диплом о высшем профессиональном образовании'
+                              when 'MiddleEduDiplomaDocument'
+                                'Диплом о среднем специальном образовании'
+                              when 'SchoolCertificateDocument'
+                                'Аттестат о среднем общем образовании'
+                              end
+    "#{education_document_name}: Номер #{education_document_number}, выдан #{education_document_date.strftime("%d.%m.%Y")}  #{education_document_issuer}"
   end
 end

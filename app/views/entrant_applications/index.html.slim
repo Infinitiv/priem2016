@@ -20,7 +20,10 @@ table.table.datatable
         - else
           - label_class = "label label-default"
       tr
-        td= link_to "%04d" % entrant_application.application_number, entrant_application, class: label_class
+        - if entrant_application.application_number
+          td= link_to "%04d" % entrant_application.application_number, entrant_application, class: label_class
+        - else
+          td= link_to '-', entrant_application, class: label_class
         td= entrant_application.fio
         - case @campaign.campaign_type_id
           - when 1

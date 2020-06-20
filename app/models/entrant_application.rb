@@ -9,10 +9,12 @@ class EntrantApplication < ActiveRecord::Base
   has_and_belongs_to_many :institution_achievements
   has_many :benefit_documents, dependent: :destroy
   has_and_belongs_to_many :competitive_groups
-  has_many :target_contracts
+  has_many :target_contracts, dependent: :destroy
+  has_many :contracts, dependent: :destroy
   has_many :target_organizations, through: :target_contracts
   has_many :achievements, dependent: :destroy
   has_many :olympic_documents, dependent: :destroy
+  has_many :attachments, dependent: :destroy
   
 #   validates :application_number, :campaign_id, :entrant_last_name, :entrant_first_name, :gender_id, :birth_date, :registration_date, :status_id, :data_hash, presence: true
   
@@ -746,4 +748,165 @@ class EntrantApplication < ActiveRecord::Base
     end
   end
   
+  def generate_templates
+    countries = Dictionary.find_by_name('Страна').items
+    identity_documents_list = Dictionary.find_by_name('Тип документа, удостоверяющего личность').items
+    benefit_types = Dictionary.find_by_name('Вид льготы').items
+    document_types = Dictionary.find_by_name('Тип документа').items
+    title = "Заявление о приеме в ИвГМА № #{application_number}"
+    tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
+    pdf = Prawn::Document.new(page_size: "A4", :info => {
+      :Title => title,
+      :Author => "Vladimir Markovnin",
+      :Subject => "Прием ИвГМА",
+      :Creator => "ИвГМА",
+      :Producer => "Prawn",
+      :CreationDate => Time.now }
+      )
+    pdf.font_families.update("Ubuntu" => {
+      :normal => "vendor/fonts/Ubuntu-R.ttf",
+      :italic => "vendor/fonts/Ubuntu-RI.ttf",
+      :bold => "vendor/fonts/Ubuntu-B.ttf"
+      })
+    pdf.font "Ubuntu"
+    pdf.text title, style: :bold, :size => 12, align: :center
+    pdf.move_down 4
+    pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", size: 8, align: :right
+    pdf.move_down 4
+    pdf.text "д.м.н., проф. Е. В. Борзову", size: 8, align: :right
+    pdf.move_down 4
+    pdf.move_down 4
+    pdf.text "Я, #{fio}, прошу допустить меня к участию в конкурсе в ФГБОУ ВО ИвГМА Минздрава России на программы специалитета", size: 8
+    pdf.move_down 4
+    pdf.move_down 4
+    pdf.text "Персональные данные", size: 10
+    pdf.move_down 4
+    pdf.text "Дата рождения: #{birth_date.strftime("%d.%m.%Y")}", size: 8
+    pdf.move_down 4
+    pdf.text "Гражданство: #{countries.select{|item| item['id'] == nationality_type_id}[0]['name']}", size: 8
+    pdf.move_down 4
+    if address
+      pdf.text "Адрес проживания: #{address}", size: 8
+      pdf.move_down 4
+    end
+    pdf.move_down 4
+    pdf.text "Документ удостоверяющий личность", size: 10
+    pdf.move_down 4
+    identity_document = identity_documents.order(identity_document_date: :asc).last
+    pdf.text "#{identity_documents_list.select{|item| item['id'] == identity_document.identity_document_type}[0]['name']}: #{identity_document.identity_document_data}", size: 8
+    pdf.move_down 4
+    pdf.move_down 4
+    pdf.text "Документ об образовании", size: 10
+    pdf.move_down 4
+    pdf.text "#{education_document.education_document_data}", size: 8
+    pdf.move_down 4
+    pdf.move_down 4
+    pdf.text "Прошу рассмотреть мои документы для участия в следующих конкурсах:", size: 10
+    pdf.move_down 4
+    competitive_groups.each do |competitive_group|
+      pdf.text "- #{competitive_group.name}", size: 8
+      pdf.move_down 4
+      pdf.move_down 4
+    end
+    if olympionic || benefit
+      pdf.text "Имею особые права:", size: 10
+      pdf.move_down 4
+      olympic_documents.each do |olympic_document|
+        pdf.text "Имею право на #{benefit_types.select{|item| item['id'] == olympic_document.benefit_type_id}[0]['name']}", size: 8
+        pdf.move_down 4
+        pdf.text "Реквизиты документа, дающего особое право: #{document_types.select{|item| item['id'] == benefit_document.olympic_document_type_id}[0]['name']} #{olympic_document.olympic_document_data}", size: 8
+        pdf.move_down 4
+      end
+      benefit_documents.each do |benefit_document|
+        pdf.text "Имею право на #{'прием' if benefit_document.benefit_type_id == 4} #{benefit_types.select{|item| item['id'] == benefit_document.benefit_type_id}[0]['name']}", size: 8
+        pdf.move_down 4
+        pdf.text "Реквизиты документа, дающего особое право: #{document_types.select{|item| item['id'] == benefit_document.benefit_document_type_id}[0]['name']} #{benefit_document.benefit_document_data}", size: 8
+        pdf.move_down 4
+      end
+    end
+    pdf.text "Для участия в конкурсе выбираю следующие формы вступительных испытаний:", size: 10
+    pdf.move_down 4
+    marks.each do |mark|
+      pdf.text "#{mark.subject.subject_name} - #{mark.form}", size: 8
+      pdf.move_down 4
+    end
+    if special_entrant
+      pdf.text "Нуждаюсь в необходимости создания особых условиях при проведении вступительных испытаний в связи с ограниченными возможностями здоровья, а именно:", size: 8
+      pdf.move_down 4
+      pdf.text "#{special_conditions}", size: 8
+      pdf.move_down 4
+      pdf.move_down 4
+    end
+    unless achievements.empty?
+      pdf.text "Имею следующие индивидуальные достижения", size: 10
+      pdf.move_down 4
+      achievements.each do |achievement|
+        pdf.text "- #{achievement.institution_achievement.name}", size: 8
+        pdf.move_down 4
+        pdf.move_down 4
+      end
+    end
+    if need_hostel
+      pdf.text "Нуждаюсь в предоставлении места в общежитии на период обучения", size: 8
+      pdf.move_down 4
+    end
+    pdf.move_down 4
+    pdf.text "Подтверждаю, что я ознакомлен с  с копией лицензии на осуществление образовательной деятельности (с приложением); с копией свидетельства о государственной аккредитации (с приложением) или с информацией об отсутствии указанного свидетельства; с информацией о предоставляемых поступающим особых правах и преимуществах; с датами завершения приема заявлений о согласии на зачисление; с правилами приема, в том числе с правилами подачи апелляции по результатам вступительных испытаний, проводимых Академией самостоятельно", size: 8
+    pdf.move_down 4
+    pdf.text "Подпись ___________________", size: 8, align: :right
+    pdf.move_down 4
+    pdf.text "Согласен на обработку персональных данных", size: 8
+    pdf.move_down 4
+    pdf.text "Подпись ___________________", size: 8, align: :right
+    pdf.move_down 4
+    pdf.text "Ознакомлен с информацией о необходимости указания в заявлении о приеме достоверных сведений и представления подлинных документов", size: 8
+    pdf.move_down 4
+    pdf.text "Подпись ___________________", size: 8, align: :right
+    pdf.move_down 4
+    unless (competitive_groups.map(&:education_source_id) - [20]).empty?
+      pdf.text "Потверждаю отсутствие у меня диплома бакалавра, диплома специалиста, диплома магистра", size: 8
+      pdf.move_down 4
+      pdf.text "Подпись ___________________", size: 8, align: :right
+      pdf.move_down 4
+    end
+    pdf.text "Подтверждаю, что одновременно подаю заявления о приеме не более чем в 5 организаций высшего образования, включая ИвГМА", size: 8
+    pdf.move_down 4
+    pdf.text "Подпись ___________________", size: 8, align: :right
+    pdf.move_down 4
+    if olympic_documents.map(&:benefit_type_id).include?(1)
+      pdf.text "Подтверждаю, что подаю заявления о приеме на основании соответствующего особого права только в ИвГМА и только на одну образовательную программу", size: 8
+      pdf.move_down 4
+      pdf.text "Подпись ___________________", size: 8, align: :right
+      pdf.move_down 4
+    end
+    pdf.text "", size: 8
+    pdf.move_down 4
+    pdf.text "", size: 8
+    pdf.move_down 4
+    pdf.text "", size: 8
+    pdf.move_down 4
+    pdf.text "", size: 8
+    pdf.move_down 4
+    string = "Страница <page> из <total>"
+    options = {:at => [pdf.bounds.right - 100, 0], :width => 150, :align => :center, :start_count_at => 1, size: 8}
+    pdf.number_pages string, options
+    pdf.render_file tempfile
+    
+    attachment = Attachment.new
+    attachment.entrant_application_id = id
+    attachment.document_type = 'entrant_application'
+    attachment.document_id = id
+    attachment.filename = "#{title}.pdf"
+    attachment.mime_type = 'application/pdf'
+    attachment.merged = false
+    attachment.template = true
+    md5 = ::Digest::MD5.file(tempfile).hexdigest
+    attachment.data_hash = md5
+    path = attachment.data_hash[0..2].split('').join('/')
+    if attachment.save
+      %x(mkdir -p #{Rails.root.join('storage', path)})
+      file_path = Rails.root.join('storage', path, attachment.data_hash)
+      %x(mv "#{tempfile}" "#{file_path}")
+    end
+  end
 end
