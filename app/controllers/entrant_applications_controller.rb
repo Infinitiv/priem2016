@@ -188,7 +188,6 @@ class EntrantApplicationsController < ApplicationController
     html = render_to_string layout: 'entrants_lists_to_html'
     filename = "#{@campaign.id}-#{Time.now.to_datetime.strftime("%F %T")}.html".gsub(' ', '-')
     File.open(Rails.root.join('public', 'entrants', filename), 'w').write(html)
-    FileUtils.cp(Rails.root.join('public', 'competitions', 'current_competitions_spec.html'), Rails.root.join('public', 'competitions', 'current_competitions_spec.html.bak'))
     FileUtils.mv(Rails.root.join('public', 'entrants', filename), Rails.root.join('public', 'entrants', 'current_entrants_spec.html'))
     redirect_to :root
   end
