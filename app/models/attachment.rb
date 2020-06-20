@@ -18,7 +18,7 @@ class Attachment < ActiveRecord::Base
       img = Magick::Image.read(file_path).first
       img.format = 'JPEG'
       img.scale!(img.columns > img.rows ? 1024 / img.columns.to_f : 1024 / img.rows.to_f) if img.rows > 1024 || img.columns > 1024
-      img.write(file_path){ self.quality = 10 }
+      img.write(file_path){ self.quality = 90 }
       %x(jpegoptim -s #{file_path})
     end
   end
