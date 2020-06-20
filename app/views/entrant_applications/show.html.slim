@@ -24,7 +24,10 @@
   - when 'production'
     - 'https://isma.ivanovo.ru'
   = link_to 'Личный кабинет абитуриента', "#{[host, 'entrants', @entrant_application.data_hash].join('/')}", target: :blank
-  p= link_to 'Сформировать набор шаблонов', generate_templates_entrant_application_url(@entrant_application), method: :put
+  - if @entrant_application.application_number
+    p= link_to 'Сформировать набор шаблонов', generate_templates_entrant_application_url(@entrant_application), method: :put
+  - else
+    p= link_to 'Одобрить и присвоить номер личного дела', approve_entrant_application_url(@entrant_application), method: :put
   h2 Перечень конкурсов
   table.table
     thead
@@ -89,13 +92,19 @@
   h2 Персональные данные
   dl
     dt Пол
-    dh= @entrant_application.gender_id == 1 ? "Мужской" : "Женский"
+    dd= @entrant_application.gender_id == 1 ? "Мужской" : "Женский"
     dt Дата рождения
-    dh= @entrant_application.birth_date
+    dd= @entrant_application.birth_date
     dt Страна
-    dh= @citizenship
+    dd= @citizenship
     dt Регион
-    dh= @entrant_application.region_id
+    dd= @entrant_application.region_id
+    dt Почтовый адрес
+    dd= @entrant_application.address
+    dt Адрес электронной почты
+    dd= mail_to @entrant_application.email, @entrant_application.email
+    dt Телефон
+    dd= @entrant_application.phone
   h2 Документы
   dl
     dt

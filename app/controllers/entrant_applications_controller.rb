@@ -1,6 +1,6 @@
 class EntrantApplicationsController < ApplicationController
   load_and_authorize_resource
-  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates]
+  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates, :approve]
   before_action :set_competitive_group, only: [:toggle_agreement, :toggle_contract]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
@@ -244,6 +244,14 @@ class EntrantApplicationsController < ApplicationController
   def generate_templates
     @entrant_application.generate_templates
     redirect_to @entrant_application
+  end
+  
+  def approve
+    last_application_number = @entrant_application.campaign.entrant_applications.select(:id, :application_number).map(&:application_number).compact.max
+    @entrant_application.application_number = last_application_number ?  last_application_number + 1 : 1
+    @entrant_application.status_id = 4
+    @entrant_application.save
+    redirect_to :back
   end
   
   private

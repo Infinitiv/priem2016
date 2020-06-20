@@ -10,6 +10,7 @@ table.table.datatable
     th Номер заявления
     th Ф.И.О.
     th Форма вступительного испытания
+    th Удалить заявление
   tbody
     - @entrant_applications.each do |entrant_application|
       - case
@@ -30,4 +31,3 @@ table.table.datatable
             td= entrant_application.marks.map(&:form).include?('Экзамен') ? 'Экзамен' : 'ЕГЭ'
           - when 4
             td= entrant_application.marks.map(&:form).include?('тест') ? 'Экзамен' : 'Аккредитация'
-            

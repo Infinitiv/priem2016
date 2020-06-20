@@ -81,6 +81,7 @@ Rails.application.routes.draw do
       put 'toggle_original'
       put 'entrant_application_recall'
       put 'generate_templates'
+      put 'approve'
     end
   end
   
