@@ -4,7 +4,7 @@ json.campaigns @campaigns do |campaign|
   json.campaign_type_id campaign.campaign_type_id
   json.year_start campaign.year_start
   json.admission_volumes campaign.admission_volumes, :id, :direction_id
-  json.competitive_groups campaign.competitive_groups do |competitive_group|
+  json.competitive_groups campaign.competitive_groups.order(name: :asc) do |competitive_group|
     json.id competitive_group.id
     json.name competitive_group.name
     json.direction_id competitive_group.direction_id
