@@ -6,8 +6,8 @@
   - else
     - label_class = "label label-default"
 .row
-  .pull-left = link_to 'Предыдущий', entrant_application_url(@previous_entrant) if @previous_entrant
-  .pull-right = link_to 'Следующий', entrant_application_url(@next_entrant) if @next_entrant
+  .pull-left = link_to 'Предыдущий', entrant_application_path(@previous_entrant) if @previous_entrant
+  .pull-right = link_to 'Следующий', entrant_application_path(@next_entrant) if @next_entrant
 .row
   .pull-left = link_to 'К списку заявлений', entrant_applications_path + "?campaign_id=#{@entrant_application.campaign.id}"
 .row
@@ -15,19 +15,19 @@
     = @entrant_application.application_number ? "#{"%04d" % @entrant_application.application_number}" : "-"
   - if @entrant_application.status_id == 4
     h3.pull-right
-      = link_to 'x', entrant_application_recall_entrant_application_url(@entrant_application), method: :put, class: 'label label-warning', title: 'Отозвать документы'
+      = link_to 'x', entrant_application_recall_entrant_application_path(@entrant_application), method: :put, class: 'label label-warning', title: 'Отозвать документы'
   h1= @entrant_application.fio
-  = link_to "Обновлено #{@entrant_application.updated_at.strftime("%Y-%m-%d")}", touch_entrant_application_url(@entrant_application), class: "pull-right label label-default"
-  - host = case Rails.env
+  = link_to "Обновлено #{@entrant_application.updated_at.strftime("%Y-%m-%d")}", touch_entrant_application_path(@entrant_application), class: "pull-right label label-default"
+  - host_name = case Rails.env
   - when 'development'
     - 'http://isma.me'
   - when 'production'
     - 'https://isma.ivanovo.ru'
-  = link_to 'Личный кабинет абитуриента', "#{[host, 'entrants', @entrant_application.data_hash].join('/')}", target: :blank
+  = link_to 'Личный кабинет абитуриента', "#{[host_name, 'entrants', @entrant_application.data_hash].join('/')}", target: :blank
   - if @entrant_application.application_number
-    p= link_to 'Сформировать набор шаблонов', generate_templates_entrant_application_url(@entrant_application), method: :put
+    p= link_to 'Сформировать набор шаблонов', generate_templates_entrant_application_path(@entrant_application), method: :put
   - else
-    p= link_to 'Одобрить и присвоить номер личного дела', approve_entrant_application_url(@entrant_application), method: :put
+    p= link_to 'Одобрить и присвоить номер личного дела', approve_entrant_application_path(@entrant_application), method: :put
   h2 Перечень конкурсов
   table.table
     thead
@@ -114,7 +114,7 @@
           = i.identity_document_data
           - if can? :manage, IdentityDocument
             span &nbsp;
-            strong= link_to 'x', identity_document_url(i), class: 'label label-warning', method: :delete
+            strong= link_to 'x', identity_document_path(i), class: 'label label-warning', method: :delete
     dt
       h3 Документ об образовании
       - if @entrant_application.education_document.original_received_date
@@ -136,7 +136,7 @@
       = @entrant_application.education_document.education_document_data
       span &nbsp;
       span.label.label-success= @entrant_application.education_document.original_received_date if @entrant_application.education_document.original_received_date
-      strong= link_to orininal_sign, toggle_original_entrant_application_url(@entrant_application), method: :put, class: original_class, title: 'Изменить оригинал'
+      strong= link_to orininal_sign, toggle_original_entrant_application_path(@entrant_application), method: :put, class: original_class, title: 'Изменить оригинал'
       p= @entrant_application.education_document.education_speciality_code
     - unless @target_contracts.empty?
       dt
@@ -193,4 +193,4 @@
             span= " заключение договора на #{@entrant_application.competitive_groups.find(journal_entry.new_value).name}" if journal_entry.new_value
           - if can? :destroy, Journal
             span &nbsp;
-            strong= link_to 'x', journal_url(journal_entry), class: 'label label-warning', method: :delete
+            strong= link_to 'x', journal_path(journal_entry), class: 'label label-warning', method: :delete
