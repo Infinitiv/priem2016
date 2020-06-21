@@ -65,6 +65,7 @@ class Api::EntrantApplicationsController < ApplicationController
         end
       end
     end
+    Events.welcome_mail(@entrant_application).deliver_later
     send_data({status: 'success', hash: @entrant_application.data_hash}.to_json)
   end
   

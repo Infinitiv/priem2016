@@ -8,10 +8,7 @@ class Api::AttachmentsController < ApplicationController
   end
   
   def create
-    message = ''
-    if attachment_params[:entrant_application_id].blank? || attachment_params[:files].empty?
-      message = {status: 'error'}
-    else
+    unless attachment_params[:entrant_application_id].blank? || attachment_params[:files].nil?
       attachment_params[:files].each do |file|
         @attachment = Attachment.new
         @attachment.entrant_application_id = attachment_params[:entrant_application_id]
@@ -20,10 +17,10 @@ class Api::AttachmentsController < ApplicationController
         @attachment.merged = false
         @attachment.template = false
         @attachment.uploaded_file(file)
-        message = {status: 'success'} if @attachment.save
+        @attachment.save
       end
     end
-    send_data(message.to_json)
+    render text: 'ok'
   end
   
   private

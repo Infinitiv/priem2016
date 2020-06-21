@@ -242,13 +242,13 @@ class EntrantApplicationsController < ApplicationController
   
   def generate_templates
     @entrant_application.generate_templates
+    Events.generate_templates(@entrant_application).deliver_later
     redirect_to @entrant_application
   end
   
   def approve
     last_application_number = @entrant_application.campaign.entrant_applications.select(:id, :application_number).map(&:application_number).compact.max
     @entrant_application.application_number = last_application_number ?  last_application_number + 1 : 1
-    @entrant_application.status_id = 4
     @entrant_application.save
     redirect_to :back
   end
