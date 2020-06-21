@@ -1,5 +1,5 @@
 h1 Организации целевого приема
-= link_to 'Добавить', new_target_organization_url, class: 'btn btn-primary'
+= link_to 'Добавить', new_target_organization_path, class: 'btn btn-primary'
 table.table
   thead
     tr
@@ -13,4 +13,4 @@ table.table
         td
           span= target_organization.target_organization_name
           span= " (#{@regions.select{|i| i.value?(target_organization.region_id)}.first['name']})" if target_organization.region_id
-        td= link_to 'Редактировать', edit_target_organization_url(target_organization)
+        td= link_to 'Редактировать', edit_target_organization_path(target_organization)

@@ -1,7 +1,7 @@
 h1= @competitive_group.name
 - unless @competitive_group.competitive_group_item
   span.pull-right &nbsp;|&nbsp;
-  = link_to 'Добавить места', "#{new_competitive_group_item_url}?competitive_group_id=#{@competitive_group.id}"
+  = link_to 'Добавить места', "#{new_competitive_group_item_path}?competitive_group_id=#{@competitive_group.id}"
 dl
   dt Приемная кампания
   dd= "#{@competitive_group.campaign.name} #{@competitive_group.campaign.year_start}"

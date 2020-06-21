@@ -29,7 +29,7 @@ table.table
     tr 
       td= "#{journal.created_at.strftime("%d.%m.%Y %H:%M")} "
       td= "#{journal.user.login} "
-      td= link_to "#{"%04d" % entrant_application.application_number} #{entrant_application.entrant_last_name} ", entrant_application_url(entrant_application)
+      td= link_to "#{"%04d" % entrant_application.application_number} #{entrant_application.entrant_last_name} ", entrant_application_path(entrant_application)
       td
         = "#{method_name}"
         - case journal.method
@@ -40,6 +40,6 @@ table.table
           span= " расторжение договора на #{entrant_application.competitive_groups.find(journal.old_value).name}" if journal.old_value
           span= " заключение договора на #{entrant_application.competitive_groups.find(journal.new_value).name}" if journal.new_value
       td
-        span= link_to 'Выполнено', done_journal_url(journal), method: :put
+        span= link_to 'Выполнено', done_journal_path(journal), method: :put
         span &nbsp;|&nbsp;
-        span= link_to 'Удалить', journal_url(journal), method: :delete
+        span= link_to 'Удалить', journal_path(journal), method: :delete

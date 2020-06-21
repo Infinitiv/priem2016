@@ -39,9 +39,9 @@ body
               - if can? :read, DistributedAdmissionVolume
                 li= link_to 'Распределенный объем приема', distributed_admission_volumes_path
               - if can? :read, CompetitiveGroup
-                li= link_to 'Конкурсы', competitive_groups_url
+                li= link_to 'Конкурсы', competitive_groups_path
               - if can? :read, EntranceTestItem
-                li= link_to 'Испытания', entrance_test_items_url
+                li= link_to 'Испытания', entrance_test_items_path
         - if can?(:read, EduProgram) || can?(:read, TargetOrganization) || can?(:read, Subject) || can?(:read, InstitutionAchievement)
           li.dropdown
             = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
@@ -51,11 +51,11 @@ body
               - if can? :read, EduProgram
                 li= link_to 'Образовательные программы', edu_programs_path
               - if can? :read, TargetOrganization
-                li= link_to 'Организации целевого приема', target_organizations_url
+                li= link_to 'Организации целевого приема', target_organizations_path
               - if can? :read, Subject
-                li= link_to 'Предметы', subjects_url
+                li= link_to 'Предметы', subjects_path
               - if can? :read, InstitutionAchievement
-                li= link_to 'Индивидуальные достижения', institution_achievements_url
+                li= link_to 'Индивидуальные достижения', institution_achievements_path
         - if can?(:ege_to_txt, EntrantApplication) || can?(:errors, EntrantApplication) || can?(:competition_lists, EntrantApplication) || can?(:ord_export, EntrantApplication) || can?(:ord_return_export, EntrantApplication) || can?(:ord_result_export, EntrantApplication) || can?(:target_report, EntrantApplication) || can?(:ord_marks_request, EntrantApplication) || can?(:entrants_lists_to_html, EntrantApplication) || can?(:entrants_lists_ord_to_html, EntrantApplication) || can?(:competition_lists_to_html, EntrantApplication) || can?(:competition_lists_ord_to_html, EntrantApplication)
           li.dropdown
             = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
@@ -63,18 +63,18 @@ body
               span.caret
             ul.dropdown-menu
               - @campaigns.where(year_start: Time.now.year).each do |campaign|
-                li= link_to "Выгрузить ЕГЭ #{campaign.name} #{campaign.year_start}", ege_to_txt_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
-                li= link_to "Ошибки #{campaign.name} #{campaign.year_start}", errors_entrant_applications_url + "?campaign_id=#{campaign.id}"
-                li= link_to "Конкурс #{campaign.name} #{campaign.year_start}", competition_lists_entrant_applications_url + "?campaign_id=#{campaign.id}"
-                li= link_to "Выгрузка в ИАС #{campaign.name} #{campaign.year_start}", ord_export_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
-                li= link_to "Выгрузка в ИАС (отзыв заявлений) #{campaign.name} #{campaign.year_start}", ord_return_export_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
-                li= link_to "Отчет в ИАС #{campaign.name} #{campaign.year_start}", ord_result_export_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
-                li= link_to "Отчет по целевикам #{campaign.name} #{campaign.year_start}", target_report_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
-                li= link_to "Запрос оценок из ИАС #{campaign.name} #{campaign.year_start}", ord_marks_request_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
-                li= link_to "Cписки подавших документы в html #{campaign.name} #{campaign.year_start}", entrants_lists_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
-                li= link_to "Списки подавших документы в html #{campaign.name} #{campaign.year_start}", entrants_lists_ord_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
-                li= link_to "Конкурсные списки в html #{campaign.name} #{campaign.year_start}", competition_lists_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
-                li= link_to "Конкурсные списки в html #{campaign.name} #{campaign.year_start}", competition_lists_ord_to_html_entrant_applications_url + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+                li= link_to "Выгрузить ЕГЭ #{campaign.name} #{campaign.year_start}", ege_to_txt_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
+                li= link_to "Ошибки #{campaign.name} #{campaign.year_start}", errors_entrant_applications_path + "?campaign_id=#{campaign.id}"
+                li= link_to "Конкурс #{campaign.name} #{campaign.year_start}", competition_lists_entrant_applications_path + "?campaign_id=#{campaign.id}"
+                li= link_to "Выгрузка в ИАС #{campaign.name} #{campaign.year_start}", ord_export_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+                li= link_to "Выгрузка в ИАС (отзыв заявлений) #{campaign.name} #{campaign.year_start}", ord_return_export_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+                li= link_to "Отчет в ИАС #{campaign.name} #{campaign.year_start}", ord_result_export_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+                li= link_to "Отчет по целевикам #{campaign.name} #{campaign.year_start}", target_report_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
+                li= link_to "Запрос оценок из ИАС #{campaign.name} #{campaign.year_start}", ord_marks_request_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+                li= link_to "Cписки подавших документы в html #{campaign.name} #{campaign.year_start}", entrants_lists_to_html_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
+                li= link_to "Списки подавших документы в html #{campaign.name} #{campaign.year_start}", entrants_lists_ord_to_html_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+                li= link_to "Конкурсные списки в html #{campaign.name} #{campaign.year_start}", competition_lists_to_html_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
+                li= link_to "Конкурсные списки в html #{campaign.name} #{campaign.year_start}", competition_lists_ord_to_html_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
         - if can? :mon, Report
           li.dropdown
             = link_to '#', class: 'dropdown-toggle', data: {toggle: 'dropdown'}, role: 'button', aria: {haspopup: true, expanded: false} do
@@ -82,11 +82,11 @@ body
               span.caret
             ul.dropdown-menu
               - @campaigns.each do |campaign|
-                li= link_to "Мониторинг приемной кампании #{campaign.name} #{campaign.year_start}", reports_mon_url + "?campaign_id=#{campaign.id}"
+                li= link_to "Мониторинг приемной кампании #{campaign.name} #{campaign.year_start}", reports_mon_path + "?campaign_id=#{campaign.id}"
         - if can? :manage, Journal
-          li= link_to 'Журнал изменений', journals_url
+          li= link_to 'Журнал изменений', journals_path
       ul.nav.navbar-nav.pull-right
-        li= user_signed_in? ? (link_to 'Выйти', destroy_user_session_url, method: 'delete') : (link_to 'Войти', new_user_session_url)
+        li= user_signed_in? ? (link_to 'Выйти', destroy_user_session_path, method: 'delete') : (link_to 'Войти', new_user_session_path)
     - if notice || alert
       .row
         .notice= notice

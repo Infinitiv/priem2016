@@ -18,21 +18,21 @@ h1 Конкурсы
           td= 'да' if competitive_group.is_for_krym
           - cgi = competitive_group.competitive_group_item
           - cgi_sum = [cgi.number_budget_o, cgi.number_budget_oz, cgi.number_budget_z].sum
-          td= link_to cgi_sum, edit_competitive_group_item_url(cgi) if cgi_sum > 0
+          td= link_to cgi_sum, edit_competitive_group_item_path(cgi) if cgi_sum > 0
           - cgi_sum = [cgi.number_paid_o, cgi.number_paid_oz, cgi.number_paid_z].sum
-          td= link_to cgi_sum, edit_competitive_group_item_url(cgi) if cgi_sum > 0
+          td= link_to cgi_sum, edit_competitive_group_item_path(cgi) if cgi_sum > 0
           - cgi_sum = [cgi.number_quota_o, cgi.number_quota_oz, cgi.number_quota_z].sum
-          td= link_to cgi_sum, edit_competitive_group_item_url(cgi) if cgi_sum > 0
+          td= link_to cgi_sum, edit_competitive_group_item_path(cgi) if cgi_sum > 0
           - cgi_sum = [cgi.number_target_o, cgi.number_target_oz, cgi.number_target_z].sum
-          td= link_to cgi_sum, edit_competitive_group_item_url(cgi) if cgi_sum > 0
+          td= link_to cgi_sum, edit_competitive_group_item_path(cgi) if cgi_sum > 0
           td
             = link_to 'Удалить', competitive_group, method: 'delete', class: 'pull-right'
             span.pull-right &nbsp;|&nbsp;
             = link_to 'Редактировать', edit_competitive_group_path(competitive_group), class: 'pull-right'
             - unless competitive_group.competitive_group_item
               span.pull-right &nbsp;|&nbsp;
-              = link_to 'Добавить места', "#{new_competitive_group_item_url}?competitive_group_id=#{competitive_group.id}", class: 'pull-right' 
+              = link_to 'Добавить места', "#{new_competitive_group_item_path}?competitive_group_id=#{competitive_group.id}", class: 'pull-right' 
             - if competitive_group.education_source_id == 16
               span.pull-right &nbsp;|&nbsp;
-              = link_to 'Добавить целевые места', "#{new_target_number_url}?competitive_group_id=#{competitive_group.id}", class: 'pull-right' if competitive_group.education_source_id == 16
+              = link_to 'Добавить целевые места', "#{new_target_number_path}?competitive_group_id=#{competitive_group.id}", class: 'pull-right' if competitive_group.education_source_id == 16
       
