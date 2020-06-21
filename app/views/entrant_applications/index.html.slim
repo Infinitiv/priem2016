@@ -10,7 +10,8 @@ table.table.datatable
     th Номер заявления
     th Ф.И.О.
     th Форма вступительного испытания
-    th Удалить заявление
+    - if can? :destroy, @entrant_application
+      th Удалить заявление
   tbody
     - @entrant_applications.each do |entrant_application|
       - case
@@ -31,3 +32,5 @@ table.table.datatable
             td= entrant_application.marks.map(&:form).include?('Экзамен') ? 'Экзамен' : 'ЕГЭ'
           - when 4
             td= entrant_application.marks.map(&:form).include?('тест') ? 'Экзамен' : 'Аккредитация'
+        - if can? :destroy, @entrant_application
+          td= link_to 'Удалить', entrant_application, method: :delete, data: {confirm: 'Вот тот механизм, который так ждали. Применить?'}

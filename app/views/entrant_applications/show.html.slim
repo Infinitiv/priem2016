@@ -12,22 +12,28 @@
   .pull-left = link_to 'К списку заявлений', entrant_applications_path + "?campaign_id=#{@entrant_application.campaign.id}"
 .row
   h1.pull-left class=label_class
-    = @entrant_application.application_number ? "#{"%04d" % @entrant_application.application_number}" : "-"
+    = @entrant_application.application_number ? "#{"%04d" % @entrant_application.application_number}" : "на рассмотрении"
   - if @entrant_application.status_id == 4
     h3.pull-right
       = link_to 'x', entrant_application_recall_entrant_application_path(@entrant_application), method: :put, class: 'label label-warning', title: 'Отозвать документы'
+  - else
+    h3.pull-right
+      = link_to 'x', @entrant_application, method: :delete, class: 'label label-danger', title: 'Удалить заявление', data: { confirm: 'Вот тот механизм, который так ждали. Применить?'}
+.row    
   h1= @entrant_application.fio
   = link_to "Обновлено #{@entrant_application.updated_at.strftime("%Y-%m-%d")}", touch_entrant_application_path(@entrant_application), class: "pull-right label label-default"
+.row
   - host_name = case Rails.env
   - when 'development'
     - 'http://isma.me'
   - when 'production'
     - 'https://isma.ivanovo.ru'
-  = link_to 'Личный кабинет абитуриента', "#{[host_name, 'entrants', @entrant_application.data_hash].join('/')}", target: :blank
-  - if @entrant_application.application_number
-    p= link_to 'Сформировать набор шаблонов', generate_templates_entrant_application_path(@entrant_application), method: :put
-  - else
-    p= link_to 'Одобрить и присвоить номер личного дела', approve_entrant_application_path(@entrant_application), method: :put
+  = link_to 'Личный кабинет абитуриента', "#{[host_name, 'entrants', @entrant_application.data_hash].join('/')}", target: :blank, class: 'pull-right'
+  - if @entrant_application.attachments.where(document_type: 'entrant_application', template: false).count > 0
+    = link_to 'Допустить к участию в конкурсе', approve_entrant_application_path(@entrant_application), method: :put, class: 'pull-left'
+  - unless @entrant_application.application_number
+    = link_to 'Присвоить номер личного дела и сформировать набор шаблонов', generate_templates_entrant_application_path(@entrant_application), method: :put, class: 'pull-left'
+.row
   h2 Перечень конкурсов
   table.table
     thead
@@ -85,7 +91,7 @@
     ul
       - @achievements.each do |achievement|
         - if achievement.value > 0
-          li= achievement.institution_achievement.name 
+          li= achievement.institution_achievement.name
   h2= "Льготы" if @entrant_application.olympionic || @entrant_application.benefit
   p= "Олимпиада" if @entrant_application.olympionic
   p= "Особое право поступления" if @entrant_application.benefit

@@ -62,7 +62,7 @@ class EntrantApplicationsController < ApplicationController
   
   def destroy
     @entrant_application.destroy
-    redirect_to entrant_applications_path
+    redirect_to :back
   end
   
   def touch
@@ -241,15 +241,16 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def generate_templates
-    @entrant_application.generate_templates
+    last_application_number = @entrant_application.campaign.entrant_applications.select(:id, :application_number).map(&:application_number).compact.max
+    @entrant_application.application_number = last_application_number ?  last_application_number + 1 : 1
+    @entrant_application.save
+    @entrant_application.generate_templates if @entrant_application.save
     Events.generate_templates(@entrant_application).deliver_later
     redirect_to @entrant_application
   end
   
   def approve
-    last_application_number = @entrant_application.campaign.entrant_applications.select(:id, :application_number).map(&:application_number).compact.max
-    @entrant_application.application_number = last_application_number ?  last_application_number + 1 : 1
-    @entrant_application.save
+    @entrant_application.update_attributes(status_id: 4)
     redirect_to :back
   end
   
