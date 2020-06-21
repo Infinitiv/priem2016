@@ -9,6 +9,6 @@ class BenefitDocument < ActiveRecord::Base
   end
   
   def benefit_document_data
-    "Серия #{benefit_document_series} номер #{benefit_document_number}, выдан #{benefit_document_date.strftime("%d.%m.%Y")} #{benefit_document_organization}"
+    "Серия #{benefit_document_series} номер #{benefit_document_number}, выдан #{benefit_document_date.strftime("%d.%m.%Y") if benefit_document_date} #{benefit_document_organization}"
   end
 end

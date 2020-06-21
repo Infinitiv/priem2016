@@ -19,6 +19,6 @@ class EducationDocument < ActiveRecord::Base
                               when 'SchoolCertificateDocument'
                                 'Аттестат о среднем общем образовании'
                               end
-    "#{education_document_name}: Номер #{education_document_number}, выдан #{education_document_date.strftime("%d.%m.%Y")}  #{education_document_issuer}"
+    "#{education_document_name}: Номер #{education_document_number}, выдан #{education_document_date.strftime("%d.%m.%Y") if education_document_date}  #{education_document_issuer}"
   end
 end
