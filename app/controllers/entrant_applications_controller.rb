@@ -1,6 +1,6 @@
 class EntrantApplicationsController < ApplicationController
   load_and_authorize_resource
-  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates, :approve]
+  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates, :approve, :add_comment, :delete_comment]
   before_action :set_competitive_group, only: [:toggle_agreement, :toggle_contract]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
@@ -250,8 +250,21 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def approve
-    @entrant_application.update_attributes(status_id: 4)
+    @entrant_application.update_attributes(status_id: 4, comment: nil)
     redirect_to :back
+  end
+  
+  def add_comment
+    @entrant_application.comment = params[:comment]
+    @entrant_application.save
+    Events.add_comment(@entrant_application).deliver_later if Rails.env == 'production'
+    redirect_to @entrant_application
+  end
+  
+  def delete_comment
+    @entrant_application.comment = nil
+    @entrant_application.save
+    redirect_to @entrant_application
   end
   
   private

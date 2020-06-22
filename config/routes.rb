@@ -82,6 +82,8 @@ Rails.application.routes.draw do
       put 'entrant_application_recall'
       put 'generate_templates'
       put 'approve'
+      put 'add_comment'
+      delete 'delete_comment'
     end
   end
   

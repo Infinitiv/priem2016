@@ -11,4 +11,9 @@ class Events < ActionMailer::Base
     @entrant_application = entrant_application
     mail(to: @entrant_application.email, subject: 'Приемная комиссия ИвГМА сообщает')
   end
+  
+  def add_comment(entrant_application)
+    @entrant_application = entrant_application
+    mail(to: @entrant_application.email, subject: 'Приемная комиссия ИвГМА сообщает')
+  end
 end

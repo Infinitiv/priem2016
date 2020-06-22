@@ -180,6 +180,18 @@
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'olympic_document' && attachment.document_id == olympic_document.id
               dd= link_to attachment.filename, "#{api_attachment_path(attachment.data_hash)}?filename=#{attachment.filename}"
+- if @entrant_application.comment
+  .row
+    p= @entrant_application.comment
+    = link_to 'Удалить', delete_comment_entrant_application_path(@entrant_application), method: :delete, data: { confirm: 'Точно все хорошо теперь?' }, class: 'btn btn-primary'
+- else
+  .row
+    = form_tag(add_comment_entrant_application_path(@entrant_application), method: :put) 
+    do
+      .form_group
+        = label_tag 'Замечания'
+        = text_area_tag :comment, nil, class: 'form-control', size: '20x5'
+      = submit_tag 'Добавить', class: 'btn btn-primary'
 - unless @journal_entries.empty?
   .row
     h2 Лист изменений
