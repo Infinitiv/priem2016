@@ -43,6 +43,7 @@ class Api::EntrantApplicationsController < ApplicationController
         @entrant_application.identity_documents.create(identity_document)
       end
       entrant_application_params[:marks].each do |mark|
+        mark[:value] = 0
         @entrant_application.marks.create(mark)
       end
       entrant_application_params[:competitive_groups].each do |competitive_group|
