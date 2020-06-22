@@ -13,8 +13,9 @@ table.table.datatable
   thead
     th Номер заявления
     th Ф.И.О.
+    th Дата заполнения анкеты
     th Форма вступительного испытания
-    - if can? :destroy, @entrant_application
+    - if can? :destroy, EntrantApplication
       th Удалить заявление
   tbody
     - @entrant_applications.each do |entrant_application|
@@ -31,6 +32,7 @@ table.table.datatable
         - else
           td= link_to '-', entrant_application, class: label_class
         td= link_to entrant_application.fio, "#{[host_name, 'entrants', entrant_application.data_hash].join('/')}", target: :blank
+        td= entrant_application.registration_date
         - case @campaign.campaign_type_id
           - when 1
             td= entrant_application.marks.map(&:form).include?('Экзамен') ? 'Экзамен' : 'ЕГЭ'
