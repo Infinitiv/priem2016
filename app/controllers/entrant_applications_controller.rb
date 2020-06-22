@@ -62,7 +62,7 @@ class EntrantApplicationsController < ApplicationController
   
   def destroy
     @entrant_application.destroy
-    redirect_to :back
+    redirect_to "#{entrant_applications_path}?campaign_id=#{@entrant_application.campaign.id}"
   end
   
   def touch
@@ -184,7 +184,7 @@ class EntrantApplicationsController < ApplicationController
   def entrants_lists_to_html
     @entrance_test_items = @campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     @admission_volume_hash = EntrantApplication.admission_volume_hash(@campaign)
-    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign).sort_by{|k, v| k.application_number}
+    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign).select{|k, v| k.application_number}.sort_by{|k, v| k.application_number}
     html = render_to_string layout: 'entrants_lists_to_html'
     filename = "#{@campaign.id}-#{Time.now.to_datetime.strftime("%F %T")}.html".gsub(' ', '-')
     File.open(Rails.root.join('public', 'entrants', filename), 'w').write(html)
