@@ -115,12 +115,15 @@
   dl
     dt
       h3 Документ, удостоверяющий личность
-      - @entrant_application.identity_documents.order(:identity_document_date).each do |i|
+      - @entrant_application.identity_documents.order(:identity_document_date).each do |identity_document|
         dd 
-          = i.identity_document_data
+          = identity_document.identity_document_data
           - if can? :manage, IdentityDocument
             span &nbsp;
-            strong= link_to 'x', identity_document_path(i), class: 'label label-warning', method: :delete
+            strong= link_to 'x', identity_document_path(identity_document), class: 'label label-warning', method: :delete
+        - @entrant_application.attachments.each do |attachment|
+          - if attachment.document_type == 'identity_document' && attachment.document_id == identity_document.id
+            dd= link_to attachment.filename, "#{api_attachment_path(attachment.data_hash)}?filename=#{attachment.filename}"
     dt
       h3 Документ об образовании
       - if @entrant_application.education_document.original_received_date
@@ -144,11 +147,17 @@
       span.label.label-success= @entrant_application.education_document.original_received_date if @entrant_application.education_document.original_received_date
       strong= link_to orininal_sign, toggle_original_entrant_application_path(@entrant_application), method: :put, class: original_class, title: 'Изменить оригинал'
       p= @entrant_application.education_document.education_speciality_code
+      - @entrant_application.attachments.each do |attachment|
+        - if attachment.document_type == 'education_document' && attachment.document_id == @entrant_application.education_document.id
+          dd= link_to attachment.filename, "#{api_attachment_path(attachment.data_hash)}?filename=#{attachment.filename}"
     - unless @target_contracts.empty?
       dt
         h3 Целевые договоры
         - @target_contracts.each do |target_contract|
           dd= "#{target_contract.competitive_group.name} - #{target_contract.target_organization.target_organization_name}"
+          - @entrant_application.attachments.each do |attachment|
+            - if attachment.document_type == 'target_contract' && attachment.document_id == target_contract.id
+              dd= link_to attachment.filename, "#{api_attachment_path(attachment.data_hash)}?filename=#{attachment.filename}"
     - unless @entrant_application.contracts.empty?
       dt
         h3 Договоры
@@ -158,13 +167,19 @@
     - if  @entrant_application.benefit
       dt
         h3 Документы на льготу
-        - @entrant_application.benefit_documents.each do |b|
-          dd= b.benefit_document_data
+        - @entrant_application.benefit_documents.each do |benefit_document|
+          dd= benefit_document.benefit_document_data
+          - @entrant_application.attachments.each do |attachment|
+            - if attachment.document_type == 'benefit_document' && attachment.document_id == benefit_document.id
+              dd= link_to attachment.filename, "#{api_attachment_path(attachment.data_hash)}?filename=#{attachment.filename}"
     - if @entrant_application.olympionic
       dt
         h3 Диплом победителя/призера олимпиады
-        - @entrant_application.olympic_documents.each do |o|
-          dd= o.olympic_document_data
+        - @entrant_application.olympic_documents.each do |olympic_document|
+          dd= olympic_document.olympic_document_data
+          - @entrant_application.attachments.each do |attachment|
+            - if attachment.document_type == 'olympic_document' && attachment.document_id == olympic_document.id
+              dd= link_to attachment.filename, "#{api_attachment_path(attachment.data_hash)}?filename=#{attachment.filename}"
 - unless @journal_entries.empty?
   .row
     h2 Лист изменений

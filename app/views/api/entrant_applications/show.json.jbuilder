@@ -22,7 +22,7 @@ json.full_sum @full_sum
 
 json.identity_documents @entrant_application.identity_documents.order(:identity_document_date) do |identity_document|
   json.id identity_document.id
-  json.identity_document_type
+  json.identity_document_type identity_document.identity_document_type
   json.identity_document_data identity_document.identity_document_data
   json.status identity_document.status
 end
