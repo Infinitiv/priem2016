@@ -245,7 +245,7 @@ class EntrantApplicationsController < ApplicationController
     @entrant_application.application_number = last_application_number ?  last_application_number + 1 : 1
     @entrant_application.save
     @entrant_application.generate_templates if @entrant_application.save
-    Events.generate_templates(@entrant_application).deliver_later
+    Events.generate_templates(@entrant_application).deliver_later if Rails.env == 'production'
     redirect_to @entrant_application
   end
   
