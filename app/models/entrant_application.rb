@@ -907,6 +907,7 @@ class EntrantApplication < ActiveRecord::Base
       %x(mkdir -p #{Rails.root.join('storage', path)})
       file_path = Rails.root.join('storage', path, attachment.data_hash)
       %x(mv "#{tempfile}" "#{file_path}")
+      %x(touch "#{file_path}")
     end
   end
 end
