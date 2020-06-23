@@ -24,7 +24,8 @@ Rails.application.routes.draw do
     resources :campaigns, only: [:index, :show]
   end
   
-  resources :identity_documents, only: [:destroy]
+  resources :identity_documents, only: [:update, :destroy]
+  resources :education_documents, only: [:update, :destroy]
   resources :journals, only: [:index, :destroy] do
     member do
       put 'done'
