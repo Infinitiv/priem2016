@@ -32,7 +32,7 @@
   - when 'production'
     - 'https://isma.ivanovo.ru'
   = link_to 'Личный кабинет абитуриента', "#{[host_name, 'entrants', @entrant_application.data_hash].join('/')}", target: :blank, class: 'pull-right'
-  - if @entrant_application.attachments.where(document_type: 'entrant_application', template: false).count > 0
+  - if @entrant_application.attachments.where(document_type: 'entrant_application', template: false).count > 0 && @entrant_application.status_id != 4
     = link_to 'Допустить к участию в конкурсе', approve_entrant_application_path(@entrant_application), method: :put, class: 'pull-left'
   - unless @entrant_application.application_number
     = link_to 'Присвоить номер личного дела и сформировать набор шаблонов', generate_templates_entrant_application_path(@entrant_application), method: :put, class: 'pull-left'
