@@ -123,7 +123,7 @@
             strong= link_to 'x', identity_document_path(identity_document), class: 'label label-warning', method: :delete
         - @entrant_application.attachments.each do |attachment|
           - if attachment.document_type == 'identity_document' && attachment.document_id == identity_document.id
-            dd= link_to attachment.filename, "#{api_attachment_path(attachment.data_hash)}?filename=#{attachment.filename}"
+            dd= link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
     dt
       h3 Документ об образовании
       - if @entrant_application.education_document.original_received_date
@@ -149,7 +149,7 @@
       p= @entrant_application.education_document.education_speciality_code
       - @entrant_application.attachments.each do |attachment|
         - if attachment.document_type == 'education_document' && attachment.document_id == @entrant_application.education_document.id
-          dd= link_to attachment.filename, "#{api_attachment_path(attachment.data_hash)}?filename=#{attachment.filename}"
+          dd= link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
     - unless @target_contracts.empty?
       dt
         h3 Целевые договоры
@@ -157,7 +157,7 @@
           dd= "#{target_contract.competitive_group.name} - #{target_contract.target_organization.target_organization_name}"
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'target_contract' && attachment.document_id == target_contract.id
-              dd= link_to attachment.filename, "#{api_attachment_path(attachment.data_hash)}?filename=#{attachment.filename}"
+              dd= link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
     - unless @entrant_application.contracts.empty?
       dt
         h3 Договоры
@@ -171,7 +171,7 @@
           dd= benefit_document.benefit_document_data
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'benefit_document' && attachment.document_id == benefit_document.id
-              dd= link_to attachment.filename, "#{api_attachment_path(attachment.data_hash)}?filename=#{attachment.filename}"
+              dd= link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
     - if @entrant_application.olympionic
       dt
         h3 Диплом победителя/призера олимпиады
@@ -179,7 +179,7 @@
           dd= olympic_document.olympic_document_data
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'olympic_document' && attachment.document_id == olympic_document.id
-              dd= link_to attachment.filename, "#{api_attachment_path(attachment.data_hash)}?filename=#{attachment.filename}"
+              dd= link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
 - if @entrant_application.comment
   .row
     p= @entrant_application.comment
