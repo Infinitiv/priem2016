@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200624073731) do
+ActiveRecord::Schema.define(version: 20200625072413) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -369,6 +369,20 @@ ActiveRecord::Schema.define(version: 20200624073731) do
   add_index "olympic_documents", ["attachment_id"], name: "index_olympic_documents_on_attachment_id", using: :btree
   add_index "olympic_documents", ["entrant_application_id"], name: "index_olympic_documents_on_entrant_application_id", using: :btree
 
+  create_table "other_documents", force: :cascade do |t|
+    t.integer  "entrant_application_id"
+    t.string   "other_document_series"
+    t.string   "other_document_number"
+    t.date     "other_document_date"
+    t.string   "other_document_issuer"
+    t.integer  "attachment_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "other_documents", ["attachment_id"], name: "index_other_documents_on_attachment_id", using: :btree
+  add_index "other_documents", ["entrant_application_id"], name: "index_other_documents_on_entrant_application_id", using: :btree
+
   create_table "requests", force: :cascade do |t|
     t.string   "query"
     t.text     "input"
@@ -446,6 +460,8 @@ ActiveRecord::Schema.define(version: 20200624073731) do
   add_foreign_key "journals", "users"
   add_foreign_key "olympic_documents", "attachments"
   add_foreign_key "olympic_documents", "entrant_applications"
+  add_foreign_key "other_documents", "attachments"
+  add_foreign_key "other_documents", "entrant_applications"
   add_foreign_key "target_contracts", "attachments"
   add_foreign_key "target_contracts", "competitive_groups"
   add_foreign_key "target_contracts", "entrant_applications"

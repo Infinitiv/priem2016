@@ -14,6 +14,7 @@ class EntrantApplication < ActiveRecord::Base
   has_many :target_organizations, through: :target_contracts
   has_many :achievements, dependent: :destroy
   has_many :olympic_documents, dependent: :destroy
+  has_many :other_documents, dependent: :destroy
   has_many :attachments, dependent: :destroy
   
 #   validates :application_number, :campaign_id, :entrant_last_name, :entrant_first_name, :gender_id, :birth_date, :registration_date, :status_id, :data_hash, presence: true

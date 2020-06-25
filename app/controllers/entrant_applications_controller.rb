@@ -33,6 +33,44 @@ class EntrantApplicationsController < ApplicationController
     @citizenship = Dictionary.find_by_code(21).items.select{|country| country.key(@entrant_application.nationality_type_id)}.first['name']
     @target_contracts = @entrant_application.target_contracts
     @journal_entries = Journal.includes(:user).where(entrant_application_id: @entrant_application.id)
+    @benefit_document_types = [
+        {
+          id: 11,
+          name: "Справка об установлении инвалидности"
+        },
+        {
+          id: 30,
+          name: "Документ, подтверждающий принадлежность к детям-сиротам и детям, оставшимся без попечения родителей"
+        },
+        {
+          id: 31,
+          name: "Документ, подтверждающий принадлежность к ветеранам боевых действий"
+        },
+        {
+          id: 32,
+          name: "Документ, подтверждающий наличие только одного родителя - инвалида I группы и принадлежность к числу малоимущих семей"
+        },
+        {
+          id: 33,
+          name: "Документ, подтверждающий принадлежность родителей и опекунов к погибшим в связи с исполнением служебных обязанностей"
+        },
+        {
+          id: 34,
+          name: "Документ, подтверждающий принадлежность к сотрудникам государственных органов Российской Федерации"
+        },
+        {
+          id: 35,
+          name: "Документ, подтверждающий участие в работах на радиационных объектах или воздействие радиации"
+        }
+        ]
+        @benefit_types = [{
+                           id: 4,
+                           name: "По квоте приёма лиц, имеющих особое право"
+                           },
+                          {
+                           id: 5,
+                           name: "Преимущественное право на поступление"
+                           }]
   end
   
   def new
@@ -272,7 +310,7 @@ class EntrantApplicationsController < ApplicationController
   private
   
   def set_entrant_application
-    @entrant_application = EntrantApplication.includes(:campaign, :competitive_groups, :marks, :achievements, :identity_documents, :education_document, :target_contracts, :target_organizations).find(params[:id])
+    @entrant_application = EntrantApplication.includes(:campaign, :competitive_groups, :marks, :achievements, :identity_documents, :education_document, :target_contracts, :target_organizations, :olympic_documents, :benefit_documents, :other_documents).find(params[:id])
   end
   
   def entrant_application_params
