@@ -161,7 +161,15 @@
       dt
         h3 Целевые договоры
         - @target_contracts.each do |target_contract|
-          dd= "#{target_contract.competitive_group.name} - #{target_contract.target_organization.target_organization_name}"
+          dd
+            = "#{target_contract.competitive_group.name}"
+            - if target_contract.target_organization
+              span= " - #{target_contract.target_organization.target_organization_name}"
+            - else
+              = form_for target_contract, method: :put, html: {class: 'form-inline'} do |f|
+                .form-group.mb-2
+                  = f.select :target_organization_id, target_contract.competitive_group.target_organizations.collect{|p| [p.target_organization_name, p.id]}, {include_blank: true}, {class: 'form-control'}
+                = f.submit 'Сохранить', class: 'btn btn-primary mb-2'
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'target_contract' && attachment.document_id == target_contract.id
               dd= link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank

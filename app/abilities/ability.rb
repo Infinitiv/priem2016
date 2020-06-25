@@ -8,6 +8,7 @@ class Ability
     can [:read, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :destroy, :approve, :generate_templates, :add_comment, :delete_comment, :update], EntrantApplication
     can [:update], IdentityDocument
     can [:update], EducationDocument
+    can [:update], TargetContract
     can [:update, :convert_to_other_document], OlympicDocument
     can [:update, :convert_to_other_document], BenefitDocument
     return unless user.super?

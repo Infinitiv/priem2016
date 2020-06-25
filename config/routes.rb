@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   
   resources :identity_documents, only: [:update, :destroy]
   resources :education_documents, only: [:update, :destroy]
+  resources :target_contracts, only: [:update, :destroy]
   resources :olympic_documents, only: [:update, :destroy] do
     member do
       put 'convert_to_other_document'
