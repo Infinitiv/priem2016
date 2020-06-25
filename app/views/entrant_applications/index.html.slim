@@ -9,6 +9,7 @@ h1 = "Список заявлений #{@campaign.name} #{@campaign.year_start}"
   - 'http://isma.me'
 - when 'production'
   - 'https://isma.ivanovo.ru'
+h5= @entrant_applications.map(&:status).uniq.map{|status| "#{status} - (#{@entrant_applications.where(status: status).length})"}.join('; ')
 table.table.datatable
   thead
     th Номер заявления
