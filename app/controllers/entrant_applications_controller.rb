@@ -7,7 +7,7 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export, :target_report, :entrants_lists_to_html, :entrants_lists_ord_to_html]
   
   def index
-    @entrant_applications = EntrantApplication.includes(:education_document, :marks).select(:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :status_id, :campaign_id, :data_hash, :registration_date).where(campaign_id: @campaign)
+    @entrant_applications = EntrantApplication.includes(:education_document, :marks).select(:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :status_id, :campaign_id, :data_hash, :registration_date, :status, :comment).where(campaign_id: @campaign)
   end
   
   def show
@@ -247,18 +247,18 @@ class EntrantApplicationsController < ApplicationController
       @entrant_application.save
     end
     @entrant_application.generate_templates
+    @entrant_application.update_attributes(status: 'проверено, замечаний нет')
     Events.generate_templates(@entrant_application).deliver_later if Rails.env == 'production'
     redirect_to @entrant_application
   end
   
   def approve
-    @entrant_application.update_attributes(status_id: 4, comment: nil)
+    @entrant_application.update_attributes(status_id: 4, comment: nil, status: 'принято')
     redirect_to :back
   end
   
   def add_comment
-    @entrant_application.comment = params[:comment]
-    @entrant_application.save
+    @entrant_application.update_attributes(comment: params[:comment], status: 'проверено, есть замечания')
     Events.add_comment(@entrant_application).deliver_later if Rails.env == 'production'
     redirect_to @entrant_application
   end

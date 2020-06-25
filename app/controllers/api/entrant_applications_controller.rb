@@ -35,6 +35,7 @@ class Api::EntrantApplicationsController < ApplicationController
     @entrant_application.phone = entrant_application_params[:phone]
     @entrant_application.email = entrant_application_params[:email]
     @entrant_application.special_conditions = entrant_application_params[:special_conditions]
+    @entrant_application.status = 'новое'
     if @entrant_application.save
       education_document = EducationDocument.new(entrant_application_params[:education_document])
       education_document.entrant_application_id = @entrant_application.id

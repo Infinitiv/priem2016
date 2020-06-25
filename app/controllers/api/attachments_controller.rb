@@ -20,6 +20,9 @@ class Api::AttachmentsController < ApplicationController
         @attachment.save
       end
     end
+    if @attachment.document_type == 'entrant_application' && @attachment.template == false
+      @attachment.entrant_application.update_attributes(status: 'заявление загружено')
+    end
     render text: 'ok'
   end
   

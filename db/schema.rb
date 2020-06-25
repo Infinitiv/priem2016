@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200619183008) do
+ActiveRecord::Schema.define(version: 20200624073731) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -260,6 +260,7 @@ ActiveRecord::Schema.define(version: 20200619183008) do
     t.string   "phone"
     t.text     "special_conditions"
     t.integer  "locked_by"
+    t.string   "status"
   end
 
   add_index "entrant_applications", ["attachment_id"], name: "index_entrant_applications_on_attachment_id", using: :btree

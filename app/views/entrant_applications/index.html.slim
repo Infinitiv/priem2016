@@ -13,6 +13,7 @@ table.table.datatable
   thead
     th Номер заявления
     th Ф.И.О.
+    th Статус заявления
     th Дата заполнения анкеты
     th Форма вступительного испытания
     - if can? :destroy, EntrantApplication
@@ -31,7 +32,9 @@ table.table.datatable
           td= link_to "%04d" % entrant_application.application_number, entrant_application, class: label_class
         - else
           td= link_to '-', entrant_application, class: label_class
-        td= link_to entrant_application.fio, "#{[host_name, 'entrants', entrant_application.data_hash].join('/')}", target: :blank
+        td= link_to entrant_application.fio, "#{[host_name, 'entrants', entrant_application.data_hash].join('/')}", target: :blank, title: entrant_application.comment
+        td
+          .label.label-info= entrant_application.status
         td= entrant_application.registration_date
         - case @campaign.campaign_type_id
           - when 1
