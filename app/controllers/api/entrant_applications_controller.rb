@@ -57,7 +57,7 @@ class Api::EntrantApplicationsController < ApplicationController
         end
       end
       entrant_application_params[:olympic_documents].each do |olympic_document|
-        if olympic_document[:olympic_document_type_id]
+        unless olympic_document[:olympic_document_type_id] == ''
           @entrant_application.olympic_documents.create(olympic_document)
         end
       end
