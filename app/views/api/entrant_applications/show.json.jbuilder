@@ -50,6 +50,7 @@ end
 json.competitive_groups @entrant_application.competitive_groups.order(:name), :id, :name, :education_level_id, :education_source_id, :education_form_id, :direction_id
 
 json.target_contracts @entrant_application.target_contracts do |target_contract|
+  json.id target_contract.id
   json.competitive_group_name target_contract.competitive_group.name
   json.target_organization_name target_contract.target_organization.target_organization_name
   json.status target_contract.status

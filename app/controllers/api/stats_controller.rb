@@ -58,6 +58,6 @@ class Api::StatsController < ApplicationController
   end
   
   def set_entrant_applications
-    @entrant_applications = @campaign.entrant_applications.includes(:marks, :target_contracts, :education_document).select(:id, :registration_date, :region_id, :enrolled)
+    @entrant_applications = @campaign.entrant_applications.includes(:marks, :target_contracts, :education_document).select(:id, :registration_date, :region_id, :enrolled).where(status_id: [4, 6])
   end
 end
