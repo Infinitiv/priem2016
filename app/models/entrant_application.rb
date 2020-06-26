@@ -893,7 +893,7 @@ class EntrantApplication < ActiveRecord::Base
     pdf.number_pages string, options
     pdf.render_file tempfile
     
-    attachment = Attachment.new
+    attachment = attachments.where(document_type: 'entrant_application', document_id: id, template: true).first || Attachment.new
     attachment.entrant_application_id = id
     attachment.document_type = 'entrant_application'
     attachment.document_id = id
@@ -910,5 +910,179 @@ class EntrantApplication < ActiveRecord::Base
       %x(mv "#{tempfile}" "#{file_path}")
       %x(touch "#{file_path}")
     end
+    
+    competitive_groups.each do |competitive_group|
+      title = "Заявление о согласии на зачисление в ИвГМА"
+      tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
+      pdf = Prawn::Document.new(page_size: "A5", page_layout: :landscape, :info => {
+        :Title => title,
+        :Author => "Vladimir Markovnin",
+        :Subject => "Прием ИвГМА",
+        :Creator => "ИвГМА",
+        :Producer => "Prawn",
+        :CreationDate => Time.now }
+        )
+      pdf.font_families.update("Ubuntu" => {
+        :normal => "vendor/fonts/Ubuntu-R.ttf",
+        :italic => "vendor/fonts/Ubuntu-RI.ttf",
+        :bold => "vendor/fonts/Ubuntu-B.ttf"
+        })
+      pdf.font "Ubuntu"
+      pdf.text title, style: :bold, :size => 14, align: :center
+      pdf.move_down 6
+      pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", align: :right
+      pdf.move_down 6
+      pdf.text "д.м.н., проф. Е. В. Борзову", align: :right
+      pdf.move_down 6
+      pdf.move_down 6
+      pdf.text "Я, #{fio} (№ личного дела #{application_number}), прошу зачислить меня на обучение по образовательной программе специалитета в рамках конкурса #{competitive_group.name}"
+      pdf.move_down 6
+      pdf.text "Обязуюсь:"
+      pdf.move_down 6
+      pdf.move_down 6
+      unless competitive_group.education_source_id == 15
+        pdf.text "в течение первого года обучения представить в ФГБОУ ВО ИвГМА Минздрава России оригинал документа, удостоверяющего образование соответствующего уровня, необходимого для зачисления"
+      else
+        pdf.text "в течение первого года обучения представить в ФГБОУ ВО ИвГМА Минздрава России оригинал документа (или заверенную копию), удостоверяющего образование соответствующего уровня, необходимого для зачисления"
+      end
+        pdf.move_down 6
+        pdf.text "Подпись ___________________"
+        pdf.move_down 6
+        pdf.text "пройти обязательные предварительные медицинские осмотры (обследования) в порядке, установленном при заключении трудового договора или служебного контракта по соответствующей должности или специальности, утвержденном постановлением Правительства Российской Федерации от 14 августа 2013 г. No 697"
+        pdf.move_down 6
+        pdf.text "Подпись ___________________"
+        pdf.move_down 6
+        pdf.text "Подтверждаю, что у меня отсутствуют действительные (не отозванные) заявления о согласии на зачисление на обучение по программам высшего образования данного уровня на места в рамках контрольных цифр, в том числе поданные в другие организации"
+        pdf.move_down 6
+        pdf.text "Подпись ___________________"
+        pdf.move_down 6
+      pdf.move_down 6
+      pdf.text "Дата ___________________ 2020 года"
+      pdf.move_up 12
+      pdf.text "Подпись ___________________", align: :right
+      
+      pdf.render_file tempfile
+    
+      attachment = attachments.where(document_type: 'consent_application', document_id: competitive_group.id, template: true).first || Attachment.new
+      attachment.entrant_application_id = id
+      attachment.document_type = 'consent_application'
+      attachment.document_id = competitive_group.id
+      attachment.filename = "#{title}.pdf"
+      attachment.mime_type = 'application/pdf'
+      attachment.merged = false
+      attachment.template = true
+      md5 = ::Digest::MD5.file(tempfile).hexdigest
+      attachment.data_hash = md5
+      path = attachment.data_hash[0..2].split('').join('/')
+      if attachment.save
+        %x(mkdir -p #{Rails.root.join('storage', path)})
+        file_path = Rails.root.join('storage', path, attachment.data_hash)
+        %x(mv "#{tempfile}" "#{file_path}")
+        %x(touch "#{file_path}")
+      end
+      
+      title = "Заявление об отказе от зачисления в ИвГМА"
+      tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
+      pdf = Prawn::Document.new(page_size: "A5", page_layout: :landscape, :info => {
+        :Title => title,
+        :Author => "Vladimir Markovnin",
+        :Subject => "Прием ИвГМА",
+        :Creator => "ИвГМА",
+        :Producer => "Prawn",
+        :CreationDate => Time.now }
+        )
+      pdf.font_families.update("Ubuntu" => {
+        :normal => "vendor/fonts/Ubuntu-R.ttf",
+        :italic => "vendor/fonts/Ubuntu-RI.ttf",
+        :bold => "vendor/fonts/Ubuntu-B.ttf"
+        })
+      pdf.font "Ubuntu"
+      pdf.text title, style: :bold, :size => 14, align: :center
+      pdf.move_down 6
+      pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", align: :right
+      pdf.move_down 6
+      pdf.text "д.м.н., проф. Е. В. Борзову", align: :right
+      pdf.move_down 6
+      pdf.move_down 6
+      pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от зачисления по образовательной программе специалитета в рамках конкурса #{competitive_group.name}"
+      pdf.move_down 6
+      pdf.text "Обязуюсь:"
+      pdf.move_down 6
+      pdf.move_down 6
+      pdf.text "в соответствии с поданным «____»________ 2020 г. заявлением о согласии на зачислении."
+      pdf.move_down 6
+      pdf.text "Дата ___________________ 2020 года"
+      pdf.move_up 12
+      pdf.text "Подпись ___________________", align: :right
+      
+      pdf.render_file tempfile
+    
+      attachment = attachments.where(document_type: 'withdraw_application', document_id: competitive_group.id, template: true).first || Attachment.new
+      attachment.entrant_application_id = id
+      attachment.document_type = 'withdraw_application'
+      attachment.document_id = competitive_group.id
+      attachment.filename = "#{title}.pdf"
+      attachment.mime_type = 'application/pdf'
+      attachment.merged = false
+      attachment.template = true
+      md5 = ::Digest::MD5.file(tempfile).hexdigest
+      attachment.data_hash = md5
+      path = attachment.data_hash[0..2].split('').join('/')
+      if attachment.save
+        %x(mkdir -p #{Rails.root.join('storage', path)})
+        file_path = Rails.root.join('storage', path, attachment.data_hash)
+        %x(mv "#{tempfile}" "#{file_path}")
+        %x(touch "#{file_path}")
+      end
+    end
+    
+    title = "Заявление об отзыве поданных в ИвГМА документов"
+      tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
+      pdf = Prawn::Document.new(page_size: "A5", page_layout: :landscape, :info => {
+        :Title => title,
+        :Author => "Vladimir Markovnin",
+        :Subject => "Прием ИвГМА",
+        :Creator => "ИвГМА",
+        :Producer => "Prawn",
+        :CreationDate => Time.now }
+        )
+      pdf.font_families.update("Ubuntu" => {
+        :normal => "vendor/fonts/Ubuntu-R.ttf",
+        :italic => "vendor/fonts/Ubuntu-RI.ttf",
+        :bold => "vendor/fonts/Ubuntu-B.ttf"
+        })
+      pdf.font "Ubuntu"
+      pdf.text title, style: :bold, :size => 14, align: :center
+      pdf.move_down 6
+      pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", align: :right
+      pdf.move_down 6
+      pdf.text "д.м.н., проф. Е. В. Борзову", align: :right
+      pdf.move_down 6
+      pdf.move_down 6
+      pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от участия в конкурсе / от зачисления на обучение по образовательным программам специалитета в ФГБОУ ВО ИвГМА Минздрава России и отзываю поданные документы. Прошу исключить меня из списков поступающих / зачисленных в  ФГБОУ ВО ИвГМА Минздрава России."
+      pdf.move_down 6
+      pdf.text "Дата ___________________ 2020 года"
+      pdf.move_up 12
+      pdf.text "Подпись ___________________", align: :right
+      
+      pdf.render_file tempfile
+    
+      attachment = attachments.where(document_type: 'recall_application', document_id: id, template: true).first || Attachment.new
+      attachment.entrant_application_id = id
+      attachment.document_type = 'recall_application'
+      attachment.document_id = id
+      attachment.filename = "#{title}.pdf"
+      attachment.mime_type = 'application/pdf'
+      attachment.merged = false
+      attachment.template = true
+      md5 = ::Digest::MD5.file(tempfile).hexdigest
+      attachment.data_hash = md5
+      path = attachment.data_hash[0..2].split('').join('/')
+      if attachment.save
+        %x(mkdir -p #{Rails.root.join('storage', path)})
+        file_path = Rails.root.join('storage', path, attachment.data_hash)
+        %x(mv "#{tempfile}" "#{file_path}")
+        %x(touch "#{file_path}")
+      end
   end
 end
