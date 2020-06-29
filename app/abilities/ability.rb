@@ -12,6 +12,7 @@ class Ability
     can [:update, :convert_to_other_document], OlympicDocument
     can [:update, :convert_to_other_document], BenefitDocument
     return unless user.super?
+    can [:toggle_competitive_group], EntrantApplication
     can [:mon], Report
     can [:competition_lists, :competition_lists_to_html], EntrantApplication
     return unless user.admin?

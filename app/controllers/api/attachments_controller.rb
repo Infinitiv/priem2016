@@ -23,6 +23,12 @@ class Api::AttachmentsController < ApplicationController
     if @attachment.document_type == 'entrant_application' && @attachment.template == false
       @attachment.entrant_application.update_attributes(status: 'заявление загружено')
     end
+    if @attachment.document_type == 'consent_application' && @attachment.template == false
+      @attachment.entrant_application.update_attributes(status: 'подано согласие на зачисление')
+    end
+    if @attachment.document_type == 'withdraw_application' && @attachment.template == false
+      @attachment.entrant_application.update_attributes(status: 'подан отказ от зачисления')
+    end
     render text: 'ok'
   end
   

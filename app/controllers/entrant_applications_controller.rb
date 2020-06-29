@@ -1,7 +1,7 @@
 class EntrantApplicationsController < ApplicationController
   load_and_authorize_resource
-  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates, :approve, :add_comment, :delete_comment]
-  before_action :set_competitive_group, only: [:toggle_agreement, :toggle_contract]
+  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates, :approve, :add_comment, :delete_comment, :toggle_competitive_group]
+  before_action :set_competitive_group, only: [:toggle_agreement, :toggle_contract, :toggle_competitive_group]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update]
   before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export, :target_report, :entrants_lists_to_html, :entrants_lists_ord_to_html]
@@ -92,6 +92,7 @@ class EntrantApplicationsController < ApplicationController
   
   def update
     if @entrant_application.update(entrant_application_params)
+      @entrant_application.update_attributes(status_id: 2)
       redirect_to @entrant_application
     else
       render action: 'edit'
@@ -133,6 +134,7 @@ class EntrantApplicationsController < ApplicationController
       Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
     end
     if @entrant_application.save!
+      @entrant_application.update_attributes(status: 'принято')
       redirect_to @entrant_application
     end
   end
@@ -154,6 +156,16 @@ class EntrantApplicationsController < ApplicationController
     if @entrant_application.save!
       redirect_to @entrant_application
     end
+  end
+  
+  def toggle_competitive_group
+    if @entrant_application.competitive_groups.include? @competitive_group
+      @entrant_application.competitive_groups.delete(@competitive_group)
+    else
+      @entrant_application.competitive_groups << @competitive_group
+    end
+    @entrant_application.update_attributes(status_id: 2, status: 'внесены изменения')
+    redirect_to @entrant_application
   end
   
   def entrant_application_recall
@@ -284,8 +296,9 @@ class EntrantApplicationsController < ApplicationController
       @entrant_application.application_number = last_application_number ?  last_application_number + 1 : 1
       @entrant_application.save
     end
+    @entrant_application.attachments.where(document_type: 'entrant_application', template: false).destroy_all
     @entrant_application.generate_templates
-    @entrant_application.update_attributes(status: 'проверено, замечаний нет')
+    @entrant_application.update_attributes(request: nil, comment: nil, status: 'проверено, замечаний нет')
     Events.generate_templates(@entrant_application).deliver_later if Rails.env == 'production'
     redirect_to @entrant_application
   end

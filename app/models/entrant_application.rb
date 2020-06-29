@@ -957,8 +957,6 @@ class EntrantApplication < ActiveRecord::Base
         pdf.text "Подпись ___________________"
         pdf.move_down 6
       pdf.move_down 6
-      pdf.text "Дата ___________________ 2020 года"
-      pdf.move_up 12
       pdf.text "Подпись ___________________", align: :right
       
       pdf.render_file tempfile
@@ -1009,10 +1007,8 @@ class EntrantApplication < ActiveRecord::Base
       pdf.text "Обязуюсь:"
       pdf.move_down 6
       pdf.move_down 6
-      pdf.text "в соответствии с поданным «____»________ 2020 г. заявлением о согласии на зачислении."
+      pdf.text "в соответствии с поданным заявлением о согласии на зачислении."
       pdf.move_down 6
-      pdf.text "Дата ___________________ 2020 года"
-      pdf.move_up 12
       pdf.text "Подпись ___________________", align: :right
       
       pdf.render_file tempfile
@@ -1061,8 +1057,6 @@ class EntrantApplication < ActiveRecord::Base
       pdf.move_down 6
       pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от участия в конкурсе / от зачисления на обучение по образовательным программам специалитета в ФГБОУ ВО ИвГМА Минздрава России и отзываю поданные документы. Прошу исключить меня из списков поступающих / зачисленных в  ФГБОУ ВО ИвГМА Минздрава России."
       pdf.move_down 6
-      pdf.text "Дата ___________________ 2020 года"
-      pdf.move_up 12
       pdf.text "Подпись ___________________", align: :right
       
       pdf.render_file tempfile

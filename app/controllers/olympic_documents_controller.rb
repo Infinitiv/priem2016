@@ -17,6 +17,7 @@ class OlympicDocumentsController < ApplicationController
   
   def update
     @olympic_document.update(olympic_document_params)
+    @olympic_document.entrant_application.update_attributes(status_id: 2)
     redirect_to :back
   end
   

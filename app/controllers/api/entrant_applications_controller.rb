@@ -1,8 +1,8 @@
 class Api::EntrantApplicationsController < ApplicationController
   skip_before_action :verify_authenticity_token
+  before_filter :set_entrant_application, only: [:show, :update]
   
   def show
-    @entrant_application = EntrantApplication.includes(:identity_documents, :education_document, :marks, :achievements, :olympic_documents, :benefit_documents, :competitive_groups, :target_contracts, :contracts, :attachments).find_by_data_hash(params[:id])
     @marks = @entrant_application.marks.order(:subject_id).includes(:subject)
     @sum = @marks.pluck(:value).any? ? @marks.pluck(:value).sum : 0
     @achievements = @entrant_application.achievements.includes(:institution_achievement)
@@ -71,7 +71,20 @@ class Api::EntrantApplicationsController < ApplicationController
     send_data({status: 'success', hash: @entrant_application.data_hash}.to_json)
   end
   
+  def update
+    if params[:request]
+      @entrant_application.update_attributes(request: params[:request], status: 'запрошены изменения') unless params[:request].empty?
+    else
+      @entrant_application.update_attributes(status: 'прошу проверить')
+    end
+    send_data({status: 'success', hash: @entrant_application.data_hash}.to_json)
+  end
+  
   private
+  
+  def set_entrant_application
+    @entrant_application = EntrantApplication.includes(:identity_documents, :education_document, :marks, :achievements, :olympic_documents, :benefit_documents, :competitive_groups, :target_contracts, :contracts, :attachments).find_by_data_hash(params[:id])
+  end
   
   def entrant_application_params
     params.permit(:citizenship, 

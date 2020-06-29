@@ -21,6 +21,9 @@
       = link_to 'x', @entrant_application, method: :delete, class: 'label label-danger', title: 'Удалить заявление', data: { confirm: 'Вот тот механизм, который так ждали. Применить?'}
 .row
   .label.label-info= @entrant_application.status
+- if @entrant_application.request
+  .row
+    .label.label-warning= @entrant_application.request
 .row
   h1
     = @entrant_application.fio
@@ -34,10 +37,14 @@
   - when 'production'
     - 'https://isma.ivanovo.ru'
   = link_to 'Личный кабинет абитуриента', "#{[host_name, 'entrants', @entrant_application.data_hash].join('/')}", target: :blank, class: 'pull-right'
-  - if @entrant_application.attachments.where(document_type: 'entrant_application', template: false).count > 0 && @entrant_application.status_id != 4
+  - if @entrant_application.status == 'заявление загружено'
     = link_to 'Допустить к участию в конкурсе', approve_entrant_application_path(@entrant_application), method: :put, class: 'pull-left'
-  - unless @entrant_application.application_number
+  - case true
+  - when @entrant_application.application_number.nil?
     = link_to 'Присвоить номер личного дела и сформировать набор шаблонов', generate_templates_entrant_application_path(@entrant_application), method: :put, class: 'pull-left'
+  - when @entrant_application.status == 'внесены изменения' || @entrant_application.status == 'прошу проверить'
+    = link_to 'Cформировать набор шаблонов', generate_templates_entrant_application_path(@entrant_application), method: :put, class: 'pull-left'
+    
 .row
   h2 Перечень конкурсов
   table.table
@@ -68,6 +75,10 @@
         tr
           td
             = competitive_group.name
+            - if can? :toggle_competitive_group, @entrant_application
+              span &nbsp;
+              span= link_to 'x', [@entrant_application.id, 'competitive_groups', competitive_group.id, 'toggle_competitive_group'].join('/'), method: :put, class: 'label label-warning', title: 'Удалить конкурс'
+            
           td.text-center
             span.label.label-success= "согласие" if agreement_exists
             stron= link_to agreement_sign, [@entrant_application.id, 'competitive_groups', competitive_group.id, 'toggle_agreement'].join('/'), method: 'put', class: agreement_class, title: 'Изменить согласие на зачисление'
@@ -77,6 +88,14 @@
           td
               span.label.label-success= "зачислен #{@entrant_application.enrolled_date}" if @entrant_application.enrolled == competitive_group.id
               span.label.label-warning= "отказ #{@entrant_application.exeptioned_date}" if @entrant_application.exeptioned == competitive_group.id
+  - if can? :toggle_competitive_group, @entrant_application
+    h3 Добавить конкурс
+    - competitive_groups = @entrant_application.campaign.competitive_groups - @entrant_application.competitive_groups
+    - competitive_groups.each do |competitive_group|
+      p
+        = competitive_group.name
+        span &nbsp;
+        span= link_to '+', [@entrant_application.id, 'competitive_groups', competitive_group.id, 'toggle_competitive_group'].join('/'), method: :put, class: 'label label-success', title: 'Добавить конкурс'
   h2 Конкурсные баллы
   table.table
     thead
@@ -213,8 +232,7 @@
     = link_to 'Удалить', delete_comment_entrant_application_path(@entrant_application), method: :delete, data: { confirm: 'Точно все хорошо теперь?' }, class: 'btn btn-primary'
 - else
   .row
-    = form_tag(add_comment_entrant_application_path(@entrant_application), method: :put) 
-    do
+    = form_tag(add_comment_entrant_application_path(@entrant_application), method: :put)
       .form_group
         = label_tag 'Замечания'
         = text_area_tag :comment, nil, class: 'form-control', size: '20x5'
@@ -293,6 +311,10 @@
               = f.label :region_id, 'Код региона', class: 'label-control col-sm-4'
               .col-sm-4
                 = f.number_field :region_id, in: 1..200, class: 'form-control', placeholder: 'код региона'
+            .form-group.row
+              = f.label :email, 'Адрес электронной почты', class: 'label-control col-sm-4'
+              .col-sm-4
+                = f.email_field :email, in: 1..200, class: 'form-control', placeholder: 'user@email.com'
             .form-group.row
               .col-sm-12
                 = f.label :need_hostel, '', class: 'checkbox-inline'

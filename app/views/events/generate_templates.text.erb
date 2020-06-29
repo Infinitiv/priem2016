@@ -4,8 +4,8 @@
   <%- when 'production' %>
     <%- 'https://isma.ivanovo.ru' %>
 <%- end %>
-<%= [@entrant_application.entrant_first_name, @entrant_application.entrant_middle_name].compact.join(' ') %>, Ваши документы рассмотрены и одобрены, вам присвоен номер личного дела абитуриента <%= @entrant_application.application_number %>
-Для Вас сформирован набор бланков заявлений, доступных теперь в личном кабинете <%= "#{[host_name, 'entrants', @entrant_application.data_hash].join('/')}" %>
+<%= [@entrant_application.entrant_first_name, @entrant_application.entrant_middle_name].compact.join(' ') %>, Ваши документы рассмотрены и одобрены.
+Для Вас сформирован набор бланков заявлений, доступных в личном кабинете <%= "#{[host_name, 'entrants', @entrant_application.data_hash].join('/')}" %>
 Вам необходимо распечатать бланк заявления о приеме, подписать его, отсканировать и прикрепить в личном кабинете. После этого Вы будете допущены к конкурсу и увидите себя в списке лиц, подавших заявление.
 
 С уважением, приемная комиссия ИвГМА

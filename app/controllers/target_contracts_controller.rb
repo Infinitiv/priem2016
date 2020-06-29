@@ -4,6 +4,7 @@ class TargetContractsController < ApplicationController
   
   def update
     @target_contract.update(target_contract_params)
+    @target_contract.entrant_application.update_attributes(status_id: 2)
     redirect_to :back
   end
   
