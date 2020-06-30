@@ -202,8 +202,9 @@
       dt
         h3 Документы на льготу
         - @entrant_application.benefit_documents.each do |benefit_document|
-          dd= benefit_document.benefit_document_data
-          sup= link_to'Редактировать', '#', data: {toggle: 'modal', target: "#benefitDocument#{benefit_document.id}"}
+          dd
+            = benefit_document.benefit_document_data
+            sup= link_to'Редактировать', '#', data: {toggle: 'modal', target: "#benefitDocument#{benefit_document.id}"}
           span &nbsp;
           dd= link_to 'Переместить в прочие документы', convert_to_other_document_benefit_document_path(benefit_document), method: :put
           - @entrant_application.attachments.each do |attachment|
@@ -213,7 +214,10 @@
       dt
         h3 Диплом победителя/призера олимпиады
         - @entrant_application.olympic_documents.each do |olympic_document|
-          dd= olympic_document.olympic_document_data
+          dd
+            = olympic_document.olympic_document_data
+            sup= link_to'Редактировать', '#', data: {toggle: 'modal', target: "#olympicDocument#{olympic_document.id}"}
+          span &nbsp;
           dd= link_to 'Переместить в прочие документы', convert_to_other_document_olympic_document_path(olympic_document), method: :put
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'olympic_document' && attachment.document_id == olympic_document.id
@@ -393,7 +397,7 @@
             = f.submit 'Сохранить', class: 'btn btn-primary'
 / Диплом победителя/призера олимпиады
 - @entrant_application.olympic_documents.each do |olympic_document|
-  .modal.fade(id="olympic_document_#{olympic_document.id}" tabindex="-1" role="dialog" aria-labelledby="olympic_document_#{olympic_document.id}Label" aria-hidden="true")
+  .modal.fade(id="olympicDocument#{olympic_document.id}" tabindex="-1" role="dialog" aria-labelledby="olympic_document_#{olympic_document.id}Label" aria-hidden="true")
     .modal-dialog(role="document")
       .modal-content
         .modal-header
@@ -411,7 +415,15 @@
               .form-group.row
                 = f.label :olympic_profile_id, 'Профиль олимпиады', class: 'label-control col-sm-4'
                 .col-sm-4
-                  = f.text_field :olympic_profile_id, class: 'form-control'
+                  = f.number_field :olympic_profile_id, class: 'form-control'
+              .form-group.row
+                = f.label :olympic_subject_id, 'Предмет олимпиады', class: 'label-control col-sm-4'
+                .col-sm-4
+                  = f.number_field :olympic_subject_id, class: 'form-control'
+              .form-group.row
+                = f.label :ege_subject_id, 'Предмет ЕГЭ', class: 'label-control col-sm-4'
+                .col-sm-4
+                  = f.number_field :ege_subject_id, class: 'form-control'
               .form-group.row
                 = f.label :olympic_document_date, 'Дата выдачи', class: 'label-control col-sm-4'
                 .col-sm-4
@@ -419,15 +431,15 @@
               .form-group.row
                 = f.label :diploma_type_id, 'Тип диплома', class: 'label-control col-sm-4'
                 .col-sm-4
-                  = f.text_field :diploma_type_id, class: 'form-control', placeholder: 'Тип диплома'
+                  = f.number_field :diploma_type_id, class: 'form-control', placeholder: 'Тип диплома'
               .form-group.row
                 = f.label :olympic_id, 'Номер олимпиады', class: 'label-control col-sm-4'
                 .col-sm-4
-                  = f.text_field :olympic_id, class: 'form-control', placeholder: 'Номер олимпиады'
+                  = f.number_field :olympic_id, class: 'form-control', placeholder: 'Номер олимпиады'
               .form-group.row
-                = f.label :olympic_profile_id, 'Профиль олимпиады', class: 'label-control col-sm-4'
-                .col-sm-4
-                  = f.text_field :olympic_profile_id, class: 'form-control', placeholder: 'Профиль олимпиады'
+                = f.label :benefit_type_id, 'Тип льготы', class: 'label-control col-sm-4'
+                .col-sm-8
+                  = f.select :benefit_type_id, @olympic_benefit_types.collect{|p| [p[:name], p[:id]]}, {include_blank: true}, {class: 'form-control'}
             .modal-footer
               button.btn.btn-secondary(type="button" data-dismiss="modal") Закрыть
               = f.submit 'Сохранить', class: 'btn btn-primary'

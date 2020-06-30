@@ -71,6 +71,14 @@ class EntrantApplicationsController < ApplicationController
                            id: 5,
                            name: "Преимущественное право на поступление"
                            }]
+        @olympic_benefit_types = [{
+                           id: 1,
+                           name: "Зачисление без вступительных испытаний"
+                           },
+                          {
+                           id: 3,
+                           name: "Приравнивание к лицам, набравшим максимальное количество баллов по ЕГЭ"
+                           }]
   end
   
   def new
