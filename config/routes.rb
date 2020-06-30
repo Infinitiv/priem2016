@@ -38,6 +38,7 @@ Rails.application.routes.draw do
     end
   end
   resources :achievements, only: [:create, :update, :destroy]
+  resources :marks, only: [:create, :update, :destroy]
   resources :journals, only: [:index, :destroy] do
     member do
       put 'done'

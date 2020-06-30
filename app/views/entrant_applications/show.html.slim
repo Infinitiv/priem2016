@@ -106,7 +106,14 @@
     tbody
       tr
         - @marks.each do |mark|
-          td= "#{mark.value} (#{mark.form})"
+          td
+            = form_for mark, method: :put do |f|
+              .form-group.row
+                = f.label mark.value, class: 'col-sm-1 col-form-label'
+                .col-sm-6
+                  = f.select :form, options_for_select(["ЕГЭ", "Экзамен"], selected: mark.form), {}, {class: 'form-control'}
+                .col-sm-2
+                  = f.submit 'Сохранить', class: 'btn btn-primary'
         td= @sum
         td= @full_sum
   dl
