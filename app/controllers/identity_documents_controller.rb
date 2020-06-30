@@ -4,7 +4,7 @@ class IdentityDocumentsController < ApplicationController
   
   def update
     @identity_document.update(identity_document_params)
-    @identity_document.entrant_application.update_attributes(status_id: 2)
+    @identity_document.entrant_application.update_attributes(status_id: 2, status: 'внесены изменения')
     redirect_to :back
   end
   

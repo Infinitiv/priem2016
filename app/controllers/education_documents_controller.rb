@@ -4,7 +4,7 @@ class EducationDocumentsController < ApplicationController
   
   def update
     @education_document.update(education_document_params)
-    @education_document.entrant_application.update_attributes(status_id: 2)
+    @education_document.entrant_application.update_attributes(status_id: 2, status: 'внесены изменения')
     redirect_to :back
   end
   

@@ -18,7 +18,7 @@ class BenefitDocumentsController < ApplicationController
   
   def update
     @benefit_document.update(benefit_document_params)
-    @benefit_document.entrant_application.update_attributes(status_id: 2)
+    @benefit_document.entrant_application.update_attributes(status_id: 2, status: 'внесены изменения')
     redirect_to :back
   end
   
