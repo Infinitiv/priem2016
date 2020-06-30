@@ -37,6 +37,7 @@ Rails.application.routes.draw do
       put 'convert_to_other_document'
     end
   end
+  resources :achievements, only: [:create, :update, :destroy]
   resources :journals, only: [:index, :destroy] do
     member do
       put 'done'

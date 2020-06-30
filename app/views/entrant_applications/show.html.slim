@@ -109,12 +109,30 @@
           td= "#{mark.value} (#{mark.form})"
         td= @sum
         td= @full_sum
-  - if @achievements_sum > 0
-    h2 Индивидуальные достижения
-    ul
+  dl
+    dt
+      h2 Индивидуальные достижения
       - @achievements.each do |achievement|
-        - if achievement.value > 0
-          li= achievement.institution_achievement.name
+        dd
+          = form_for achievement, method: :put do |f|
+            .form-group.row
+              = f.label achievement.institution_achievement.name, class: 'col-sm-6 col-form-label'
+              .col-sm-2
+                = f.number_field :value, value: achievement.value.to_f, min: 0, max: achievement.institution_achievement.max_value, class: 'form-control'
+              .col-sm-2
+                = f.submit 'Сохранить', class: 'btn btn-primary'
+              .col-sm-1
+                - if can? :delete, achievement
+                  span &nbsp;
+                  span= link_to 'x', achievement, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление достижения необратимо. Все равно удалить?'}
+  - if can? :create, Achievement
+    = form_for @achievement do |f|
+      = f.number_field :entrant_application_id, value: @entrant_application.id, class: 'hide'
+      .form-group.row
+        .col-sm-2
+          = f.select :institution_achievement_id, @institution_achievements.collect{|p| [p.name, p.id]}, {include_blank: true}, {class: 'form-control'}
+        .col-sm-2
+          = f.submit 'Добавить достижение', class: 'btn btn-primary'
   h2= "Льготы" if @entrant_application.olympionic || @entrant_application.benefit
   p= "Олимпиада" if @entrant_application.olympionic
   p= "Особое право поступления" if @entrant_application.benefit

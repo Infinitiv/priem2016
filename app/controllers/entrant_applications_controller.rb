@@ -79,6 +79,8 @@ class EntrantApplicationsController < ApplicationController
                            id: 3,
                            name: "Приравнивание к лицам, набравшим максимальное количество баллов по ЕГЭ"
                            }]
+        @institution_achievements = @entrant_application.campaign.institution_achievements
+        @achievement = @entrant_application.achievements.new
   end
   
   def new
