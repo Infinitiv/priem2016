@@ -125,7 +125,7 @@
                 - if can? :delete, achievement
                   span &nbsp;
                   span= link_to 'x', achievement, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление достижения необратимо. Все равно удалить?'}
-  - if can? :create, Achievement
+  - if can? :create, @achievement
     = form_for @achievement do |f|
       = f.number_field :entrant_application_id, value: @entrant_application.id, class: 'hide'
       .form-group.row
