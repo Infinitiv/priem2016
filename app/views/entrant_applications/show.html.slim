@@ -44,7 +44,6 @@
     = link_to 'Присвоить номер личного дела и сформировать набор шаблонов', generate_templates_entrant_application_path(@entrant_application), method: :put, class: 'pull-left'
   - when @entrant_application.status == 'внесены изменения' || @entrant_application.status == 'прошу проверить'
     = link_to 'Cформировать набор шаблонов', generate_templates_entrant_application_path(@entrant_application), method: :put, class: 'pull-left'
-    
 .row
   h2 Перечень конкурсов
   table.table
@@ -136,6 +135,16 @@
     dt Телефон
     dd= @entrant_application.phone
   h2 Документы
+  - if @entrant_application.attachments.select{|attachment| attachment.document_type =~ /_application/ && !attachment.template}.length > 0
+    dl
+      dt
+        h3 Заявления
+        - @entrant_application.attachments.select{|attachment| attachment.document_type =~ /_application/ && !attachment.template}.each do |attachment|
+          dd
+            = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+            - if can? :delete, attachment
+              span &nbsp;
+              span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
   dl
     dt
       h3 Документ, удостоверяющий личность
@@ -150,8 +159,9 @@
           - if attachment.document_type == 'identity_document' && attachment.document_id == identity_document.id
             dd
               = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-              span &nbsp;
-              span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
+              - if can? :delete, attachment
+                span &nbsp;
+                span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     dt
       h3 Документ об образовании
       - if @entrant_application.education_document.original_received_date
@@ -180,8 +190,9 @@
         - if attachment.document_type == 'education_document' && attachment.document_id == @entrant_application.education_document.id
           dd
             = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-            span &nbsp;
-            span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
+            - if can? :delete, attachment
+              span &nbsp;
+              span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - unless @target_contracts.empty?
       dt
         h3 Целевые договоры
@@ -201,8 +212,9 @@
             - if attachment.document_type == 'target_contract' && attachment.document_id == target_contract.id
               dd
                 = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-                span &nbsp;
-                span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
+                - if can? :delete, attachment
+                  span &nbsp;
+                  span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - unless @entrant_application.contracts.empty?
       dt
         h3 Договоры
@@ -222,8 +234,9 @@
             - if attachment.document_type == 'benefit_document' && attachment.document_id == benefit_document.id
               dd
                 = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-                span &nbsp;
-                span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
+                - if can? :delete, attachment
+                  span &nbsp;
+                  span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - if @entrant_application.olympionic
       dt
         h3 Диплом победителя/призера олимпиады
@@ -237,8 +250,9 @@
             - if attachment.document_type == 'olympic_document' && attachment.document_id == olympic_document.id
               dd
                 = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-                span &nbsp;
-                span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
+                - if can? :delete, attachment
+                  span &nbsp;
+                  span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - unless @entrant_application.other_documents.empty?
       dt
         h3 Прочие документы
@@ -248,8 +262,9 @@
             - if attachment.document_type == 'other_document' && attachment.document_id == other_document.id
               dd
                 = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-                span &nbsp;
-                span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
+                - if can? :delete, attachment
+                  span &nbsp;
+                  span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
 - if @entrant_application.comment
   .row
     p= @entrant_application.comment
