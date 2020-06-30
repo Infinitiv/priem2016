@@ -864,7 +864,7 @@ class EntrantApplication < ActiveRecord::Base
     pdf.move_down 4
     pdf.text "Подпись ___________________", size: 8, align: :right
     pdf.move_down 4
-    unless (competitive_groups.map(&:education_source_id) - [20]).empty?
+    unless (competitive_groups.map(&:education_source_id) - [15]).empty? && education_document.education_document_type != 'HighEduDiplomaDocument'
       pdf.text "Потверждаю отсутствие у меня диплома бакалавра, диплома специалиста, диплома магистра", size: 8
       pdf.move_down 4
       pdf.text "Подпись ___________________", size: 8, align: :right

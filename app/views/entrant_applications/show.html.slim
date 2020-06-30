@@ -148,7 +148,10 @@
             strong= link_to 'x', identity_document_path(identity_document), class: 'label label-warning', method: :delete
         - @entrant_application.attachments.each do |attachment|
           - if attachment.document_type == 'identity_document' && attachment.document_id == identity_document.id
-            dd= link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+            dd
+              = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+              span &nbsp;
+              span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     dt
       h3 Документ об образовании
       - if @entrant_application.education_document.original_received_date
@@ -175,13 +178,18 @@
       p= @entrant_application.education_document.education_speciality_code
       - @entrant_application.attachments.each do |attachment|
         - if attachment.document_type == 'education_document' && attachment.document_id == @entrant_application.education_document.id
-          dd= link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+          dd
+            = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+            span &nbsp;
+            span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - unless @target_contracts.empty?
       dt
         h3 Целевые договоры
         - @target_contracts.each do |target_contract|
           dd
             = "#{target_contract.competitive_group.name}"
+            span &nbsp;
+            span= link_to 'x', target_contract, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление целевого договора необратимо. Все равно удалить?'}
             - if target_contract.target_organization
               span= " - #{target_contract.target_organization.target_organization_name}"
             - else
@@ -191,7 +199,10 @@
                 = f.submit 'Сохранить', class: 'btn btn-primary mb-2'
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'target_contract' && attachment.document_id == target_contract.id
-              dd= link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+              dd
+                = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+                span &nbsp;
+                span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - unless @entrant_application.contracts.empty?
       dt
         h3 Договоры
@@ -209,7 +220,10 @@
           dd= link_to 'Переместить в прочие документы', convert_to_other_document_benefit_document_path(benefit_document), method: :put
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'benefit_document' && attachment.document_id == benefit_document.id
-              dd= link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+              dd
+                = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+                span &nbsp;
+                span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - if @entrant_application.olympionic
       dt
         h3 Диплом победителя/призера олимпиады
@@ -221,7 +235,10 @@
           dd= link_to 'Переместить в прочие документы', convert_to_other_document_olympic_document_path(olympic_document), method: :put
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'olympic_document' && attachment.document_id == olympic_document.id
-              dd= link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+              dd
+                = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+                span &nbsp;
+                span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - unless @entrant_application.other_documents.empty?
       dt
         h3 Прочие документы
@@ -229,7 +246,10 @@
           dd= other_document.other_document_data
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'other_document' && attachment.document_id == other_document.id
-              dd= link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+              dd
+                = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+                span &nbsp;
+                span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
 - if @entrant_application.comment
   .row
     p= @entrant_application.comment
