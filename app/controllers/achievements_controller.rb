@@ -10,11 +10,11 @@ class AchievementsController < ApplicationController
   
   def update
     @achievement.update(achievement_params)
-    @achievement.entrant_application.update_attributes(status_id: 2, status: 'внесены изменения')
     redirect_to :back
   end
   
   def destroy
+    @achievement.entrant_application.update_attributes(status_id: 2, status: 'внесены изменения')
     @achievement.destroy
     redirect_to :back
   end
