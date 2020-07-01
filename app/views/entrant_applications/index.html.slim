@@ -33,7 +33,14 @@ table.table.datatable
           td= link_to "%04d" % entrant_application.application_number, entrant_application, class: label_class
         - else
           td= link_to '-', entrant_application, class: label_class
-        td= link_to entrant_application.fio, "#{[host_name, 'entrants', entrant_application.data_hash].join('/')}", target: :blank, title: entrant_application.comment
+        - title = case entrant_application.status
+        - when 'проверено, есть замечания'
+          - entrant_application.comment
+        - when 'запрошены изменения'
+          - entrant_application.request
+        - else
+          - title = ''
+        td= link_to entrant_application.fio, "#{[host_name, 'entrants', entrant_application.data_hash].join('/')}", target: :blank, title: title
         td
           .label.label-info= entrant_application.status
         td= entrant_application.registration_date
