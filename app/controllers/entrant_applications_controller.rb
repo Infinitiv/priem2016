@@ -3,7 +3,7 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates, :approve, :add_comment, :delete_comment, :toggle_competitive_group]
   before_action :set_competitive_group, only: [:toggle_agreement, :toggle_contract, :toggle_competitive_group]
   before_action :entrant_application_params, only: [:create, :update]
-  before_action :set_selects, only: [:new, :edit, :create, :update]
+  before_action :set_selects, only: [:new, :edit, :create, :update, :show]
   before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export, :target_report, :entrants_lists_to_html, :entrants_lists_ord_to_html]
   
   def index
@@ -33,54 +33,7 @@ class EntrantApplicationsController < ApplicationController
     @citizenship = Dictionary.find_by_code(21).items.select{|country| country.key(@entrant_application.nationality_type_id)}.first['name']
     @target_contracts = @entrant_application.target_contracts
     @journal_entries = Journal.includes(:user).where(entrant_application_id: @entrant_application.id)
-    @benefit_document_types = [
-        {
-          id: 11,
-          name: "Справка об установлении инвалидности"
-        },
-        {
-          id: 30,
-          name: "Документ, подтверждающий принадлежность к детям-сиротам и детям, оставшимся без попечения родителей"
-        },
-        {
-          id: 31,
-          name: "Документ, подтверждающий принадлежность к ветеранам боевых действий"
-        },
-        {
-          id: 32,
-          name: "Документ, подтверждающий наличие только одного родителя - инвалида I группы и принадлежность к числу малоимущих семей"
-        },
-        {
-          id: 33,
-          name: "Документ, подтверждающий принадлежность родителей и опекунов к погибшим в связи с исполнением служебных обязанностей"
-        },
-        {
-          id: 34,
-          name: "Документ, подтверждающий принадлежность к сотрудникам государственных органов Российской Федерации"
-        },
-        {
-          id: 35,
-          name: "Документ, подтверждающий участие в работах на радиационных объектах или воздействие радиации"
-        }
-        ]
-        @benefit_types = [{
-                           id: 4,
-                           name: "По квоте приёма лиц, имеющих особое право"
-                           },
-                          {
-                           id: 5,
-                           name: "Преимущественное право на поступление"
-                           }]
-        @olympic_benefit_types = [{
-                           id: 1,
-                           name: "Зачисление без вступительных испытаний"
-                           },
-                          {
-                           id: 3,
-                           name: "Приравнивание к лицам, набравшим максимальное количество баллов по ЕГЭ"
-                           }]
-        @institution_achievements = @entrant_application.campaign.institution_achievements
-        @achievement = @entrant_application.achievements.new
+    @achievement = @entrant_application.achievements.new
   end
   
   def new
@@ -347,7 +300,54 @@ class EntrantApplicationsController < ApplicationController
   def set_selects
     @target_organizations = TargetOrganization.order(:target_organization_name)
     @application_statuses = Dictionary.find_by_code(4).items
-    @countries = Dictionary.find_by_code(7).items
+    @countries = Dictionary.find_by_code(21).items
+    @benefit_document_types = [
+        {
+          id: 11,
+          name: "Справка об установлении инвалидности"
+        },
+        {
+          id: 30,
+          name: "Документ, подтверждающий принадлежность к детям-сиротам и детям, оставшимся без попечения родителей"
+        },
+        {
+          id: 31,
+          name: "Документ, подтверждающий принадлежность к ветеранам боевых действий"
+        },
+        {
+          id: 32,
+          name: "Документ, подтверждающий наличие только одного родителя - инвалида I группы и принадлежность к числу малоимущих семей"
+        },
+        {
+          id: 33,
+          name: "Документ, подтверждающий принадлежность родителей и опекунов к погибшим в связи с исполнением служебных обязанностей"
+        },
+        {
+          id: 34,
+          name: "Документ, подтверждающий принадлежность к сотрудникам государственных органов Российской Федерации"
+        },
+        {
+          id: 35,
+          name: "Документ, подтверждающий участие в работах на радиационных объектах или воздействие радиации"
+        }
+        ]
+    @benefit_types = [{
+                        id: 4,
+                        name: "По квоте приёма лиц, имеющих особое право"
+                        },
+                      {
+                        id: 5,
+                        name: "Преимущественное право на поступление"
+                        }]
+    @olympic_benefit_types = [{
+                        id: 1,
+                        name: "Зачисление без вступительных испытаний"
+                        },
+                      {
+                        id: 3,
+                        name: "Приравнивание к лицам, набравшим максимальное количество баллов по ЕГЭ"
+                        }]
+    @institution_achievements = @entrant_application.campaign.institution_achievements
   end
   
   def set_competitive_group

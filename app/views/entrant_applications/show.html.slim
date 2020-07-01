@@ -359,6 +359,10 @@
               .col-sm-4
                 = f.text_field :entrant_middle_name, class: 'form-control', placeholder: 'Отчество'
             .form-group.row
+              = f.label :nationality_type_id, 'Гражданство', class: 'label-control col-sm-4'
+              .col-sm-4
+                = f.select :nationality_type_id, @countries.collect{|p| [p['name'], p['id']]}, {include_blank: true}, {class: 'form-control'}
+            .form-group.row
               = f.label :gender_id, 'Пол', class: 'label-control col-sm-4'
               .col-sm-8
                 = f.label '', class: 'radio-inline'
