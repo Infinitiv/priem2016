@@ -167,7 +167,7 @@
         - @entrant_application.attachments.select{|attachment| attachment.document_type =~ /_application/ && !attachment.template}.each do |attachment|
           dd
             = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-            - if can? :delete, attachment
+            - if can? :destroy, attachment
               span &nbsp;
               span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
   dl
@@ -184,7 +184,7 @@
           - if attachment.document_type == 'identity_document' && attachment.document_id == identity_document.id
             dd
               = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-              - if can? :delete, attachment
+              - if can? :destroy, attachment
                 span &nbsp;
                 span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     dt
@@ -215,7 +215,7 @@
         - if attachment.document_type == 'education_document' && attachment.document_id == @entrant_application.education_document.id
           dd
             = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-            - if can? :delete, attachment
+            - if can? :destroy, attachment
               span &nbsp;
               span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - unless @target_contracts.empty?
@@ -237,7 +237,7 @@
             - if attachment.document_type == 'target_contract' && attachment.document_id == target_contract.id
               dd
                 = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-                - if can? :delete, attachment
+                - if can? :destroy, attachment
                   span &nbsp;
                   span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - unless @entrant_application.contracts.empty?
@@ -259,7 +259,7 @@
             - if attachment.document_type == 'benefit_document' && attachment.document_id == benefit_document.id
               dd
                 = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-                - if can? :delete, attachment
+                - if can? :destroy, attachment
                   span &nbsp;
                   span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - if @entrant_application.olympionic
@@ -275,7 +275,7 @@
             - if attachment.document_type == 'olympic_document' && attachment.document_id == olympic_document.id
               dd
                 = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-                - if can? :delete, attachment
+                - if can? :destroy, attachment
                   span &nbsp;
                   span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - unless @entrant_application.other_documents.empty?
@@ -287,7 +287,7 @@
             - if attachment.document_type == 'other_document' && attachment.document_id == other_document.id
               dd
                 = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
-                - if can? :delete, attachment
+                - if can? :destroy, attachment
                   span &nbsp;
                   span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
 - if @entrant_application.comment

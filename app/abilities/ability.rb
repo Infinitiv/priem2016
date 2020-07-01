@@ -17,6 +17,7 @@ class Ability
     can [:toggle_competitive_group], EntrantApplication
     can [:mon], Report
     can [:competition_lists, :competition_lists_to_html], EntrantApplication
+    can [:destroy], Attachment
     return unless user.admin?
     can :manage, :all
   end
