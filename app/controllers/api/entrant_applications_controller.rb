@@ -27,8 +27,12 @@ class Api::EntrantApplicationsController < ApplicationController
     @entrant_application.special_entrant = entrant_application_params[:special_entrant]
     @entrant_application.registration_date = Time.now.to_date
     @entrant_application.nationality_type_id = 1 if entrant_application_params[:citizenship]
-    @entrant_application.olympionic = true unless entrant_application_params[:olympic_documents].map{|item| item.values.join()}.join() == ''
-    @entrant_application.benefit = true unless entrant_application_params[:benefit_documents].map{|item| item.values.join()}.join() == ''
+    if entrant_application_params[:olympic_documents]
+      @entrant_application.olympionic = true unless entrant_application_params[:olympic_documents].map{|item| item.values.join()}.join() == ''
+    end
+    if entrant_application_params[:benefit_documents]
+      @entrant_application.benefit = true unless entrant_application_params[:benefit_documents].map{|item| item.values.join()}.join() == ''
+    end
     @entrant_application.data_hash = Digest::MD5.hexdigest entrant_application_params.values.join()
     @entrant_application.address = entrant_application_params[:address]
     @entrant_application.zip_code = entrant_application_params[:zip_code]
@@ -56,14 +60,18 @@ class Api::EntrantApplicationsController < ApplicationController
           @entrant_application.achievements.create(institution_achievement_id: institution_achievement_id)
         end
       end
-      entrant_application_params[:olympic_documents].each do |olympic_document|
-        unless olympic_document[:olympic_document_type_id] == ''
-          @entrant_application.olympic_documents.create(olympic_document)
+      if entrant_application_params[:olympic_documents]
+        entrant_application_params[:olympic_documents].each do |olympic_document|
+          unless olympic_document[:olympic_document_type_id] == ''
+            @entrant_application.olympic_documents.create(olympic_document)
+          end
         end
       end
-      entrant_application_params[:benefit_documents].each do |benefit_document|
-        if benefit_document[:benefit_document_type_id]
-          @entrant_application.benefit_documents.create(benefit_document)
+      if entrant_application_params[:benefit_documents]
+        entrant_application_params[:benefit_documents].each do |benefit_document|
+          if benefit_document[:benefit_document_type_id]
+            @entrant_application.benefit_documents.create(benefit_document)
+          end
         end
       end
     end
@@ -101,6 +109,7 @@ class Api::EntrantApplicationsController < ApplicationController
                   :need_hostel, 
                   :special_entrant, 
                   :special_conditions,
+                  :snils,
                   identity_documents: [
                                        :identity_document_type,
                                        :identity_document_series,
@@ -122,7 +131,8 @@ class Api::EntrantApplicationsController < ApplicationController
                           :subject_id,
                           :form,
                           :year,
-                          :value
+                          :value,
+                          :organization_uid
                           ],
                   competitive_groups: [
                                        :id,

@@ -11,6 +11,7 @@ class Ability
     can [:update], TargetContract
     can [:update, :convert_to_other_document], OlympicDocument
     can [:update, :convert_to_other_document], BenefitDocument
+    can [:show], Attachment
     return unless user.super?
     can [:manage], Achievement
     can [:manage], TargetContract

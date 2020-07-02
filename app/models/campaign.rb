@@ -70,27 +70,29 @@ class Campaign < ActiveRecord::Base
         numbers.each do |name, number|
           case name
           when 'number_budget_o'
-            competitive_group_name = "#{values['name']}. Бюджет."
+            competitive_group_name = "#{values['name']}. Бюджет." if number.to_i > 0
             education_source_id = 14
           when 'number_paid_o'
-            competitive_group_name = "#{values['name']}. Внебюджет."
+            competitive_group_name = "#{values['name']}. Внебюджет." if number.to_i > 0
             education_source_id = 15
           when 'number_target_o'
-            competitive_group_name = "#{values['name']}. Целевые места."
+            competitive_group_name = "#{values['name']}. Целевые места." if number.to_i > 0
             education_source_id = 16
           when 'number_quota_o'
-            competitive_group_name = "#{values['name']}. Квота особого права."
+            competitive_group_name = "#{values['name']}. Квота особого права." if number.to_i > 0
             education_source_id = 20
           end
-          # добавляем конкурсные группы
-          competitive_group = campaign.competitive_groups.find_by_name(competitive_group_name) || campaign.competitive_groups.create(name: competitive_group_name, education_level_id: campaign.education_levels.first, education_source_id: education_source_id, education_form_id: campaign.education_forms.first, direction_id: values['direction_id'])
-          # добавляем элементы конкурсных групп
-          competitive_group_item = competitive_group.competitive_group_item || CompetitiveGroupItem.new
-          competitive_group_item.attributes = {name => number, competitive_group_id: competitive_group.id}
-          competitive_group_item.save!
-          # прикрепляем образовательные программы
-          competitive_group.edu_programs = []
-          competitive_group.edu_programs << EduProgram.find_by_code(code)
+          if competitive_group_name
+            # добавляем конкурсные группы
+            competitive_group = campaign.competitive_groups.find_by_name(competitive_group_name) || campaign.competitive_groups.create(name: competitive_group_name, education_level_id: campaign.education_levels.first, education_source_id: education_source_id, education_form_id: campaign.education_forms.first, direction_id: values['direction_id'])
+            # добавляем элементы конкурсных групп
+            competitive_group_item = competitive_group.competitive_group_item || CompetitiveGroupItem.new
+            competitive_group_item.attributes = {name => number, competitive_group_id: competitive_group.id}
+            competitive_group_item.save!
+            # прикрепляем образовательные программы
+            competitive_group.edu_programs = []
+            competitive_group.edu_programs << EduProgram.find_by_code(code)
+          end
         end
       end
     end
