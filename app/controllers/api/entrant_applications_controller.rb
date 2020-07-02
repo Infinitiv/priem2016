@@ -82,7 +82,7 @@ class Api::EntrantApplicationsController < ApplicationController
   
   def update
     if params[:request]
-      @entrant_application.update_attributes(request: params[:request], status: 'запрошены изменения') unless params[:request].empty?
+      @entrant_application.update_attributes(request: params[:request]) unless params[:request].empty?
     else
       @entrant_application.update_attributes(status: 'прошу проверить')
     end

@@ -98,6 +98,7 @@ Rails.application.routes.draw do
       put 'approve'
       put 'add_comment'
       delete 'delete_comment'
+      delete 'delete_request'
     end
   end
   

@@ -15,6 +15,7 @@ table.table.datatable
     th Номер заявления
     th Ф.И.О.
     th Статус заявления
+    th Запрошены изменения
     th Дата заполнения анкеты
     th Форма вступительного испытания
     - if can? :destroy, EntrantApplication
@@ -43,6 +44,9 @@ table.table.datatable
         td= link_to entrant_application.fio, "#{[host_name, 'entrants', entrant_application.data_hash].join('/')}", target: :blank, title: title
         td
           .label.label-info= entrant_application.status
+        td
+          - if entrant_application.request
+            .label.label-success зеленая точка
         td= entrant_application.registration_date
         - case @campaign.campaign_type_id
           - when 1

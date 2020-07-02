@@ -5,7 +5,7 @@ class Ability
     return unless user.present?
     can :read, Campaign
     return unless user.clerk?
-    can [:read, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :destroy, :approve, :generate_templates, :add_comment, :delete_comment, :update], EntrantApplication
+    can [:read, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :destroy, :approve, :generate_templates, :add_comment, :delete_comment, :update, :delete_request], EntrantApplication
     can [:update], IdentityDocument
     can [:update], EducationDocument
     can [:update], TargetContract

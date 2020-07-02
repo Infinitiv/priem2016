@@ -23,7 +23,11 @@
   .label.label-info= @entrant_application.status
 - if @entrant_application.request
   .row
-    .label.label-warning= @entrant_application.request
+    h3 Запрошены изменения
+    p
+      strong= @entrant_application.request
+      span &nbsp;
+      span= link_to 'x', delete_request_entrant_application_path(@entrant_application), method: :delete, class: 'label label-warning', title: 'Удалить замечание', confirm: 'Точно?'
 .row
   h1
     = @entrant_application.fio

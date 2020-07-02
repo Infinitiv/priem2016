@@ -1,6 +1,6 @@
 class EntrantApplicationsController < ApplicationController
   load_and_authorize_resource
-  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates, :approve, :add_comment, :delete_comment, :toggle_competitive_group]
+  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates, :approve, :add_comment, :delete_comment, :toggle_competitive_group, :delete_request]
   before_action :set_competitive_group, only: [:toggle_agreement, :toggle_contract, :toggle_competitive_group]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update, :show]
@@ -280,6 +280,11 @@ class EntrantApplicationsController < ApplicationController
   def delete_comment
     @entrant_application.comment = nil
     @entrant_application.save
+    redirect_to @entrant_application
+  end
+  
+  def delete_request
+    @entrant_application.update_attributes(request: nil)
     redirect_to @entrant_application
   end
   
