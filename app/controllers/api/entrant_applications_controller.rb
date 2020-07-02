@@ -38,6 +38,7 @@ class Api::EntrantApplicationsController < ApplicationController
     @entrant_application.zip_code = entrant_application_params[:zip_code]
     @entrant_application.phone = entrant_application_params[:phone]
     @entrant_application.email = entrant_application_params[:email]
+    @entrant_application.snils = entrant_application_params[:snils]
     @entrant_application.special_conditions = entrant_application_params[:special_conditions]
     @entrant_application.status = 'новое'
     if @entrant_application.save
