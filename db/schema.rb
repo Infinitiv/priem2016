@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200629094218) do
+ActiveRecord::Schema.define(version: 20200703061512) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -379,6 +379,7 @@ ActiveRecord::Schema.define(version: 20200629094218) do
     t.integer  "attachment_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.string   "name"
   end
 
   add_index "other_documents", ["attachment_id"], name: "index_other_documents_on_attachment_id", using: :btree

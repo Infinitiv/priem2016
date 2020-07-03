@@ -47,6 +47,11 @@ json.benefit_documents @entrant_application.benefit_documents do |benefit_docume
   json.status benefit_document.status
 end
 
+json.other_documents @entrant_application.other_documents do |other_document|
+  json.id other_document.id
+  json.other_document_data other_document.other_document_data
+end
+
 json.competitive_groups @entrant_application.competitive_groups.order(:name), :id, :name, :education_level_id, :education_source_id, :education_form_id, :direction_id
 
 json.target_contracts @entrant_application.target_contracts do |target_contract|

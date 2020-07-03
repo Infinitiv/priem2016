@@ -75,6 +75,13 @@ class Api::EntrantApplicationsController < ApplicationController
           end
         end
       end
+      if entrant_application_params[:other_documents]
+        entrant_application_params[:other_documents].each do |other_document|
+          unless other_document[:other_document_number] == ''
+            @entrant_application.other_documents.create(other_document)
+          end
+        end
+      end
     end
     Events.welcome_mail(@entrant_application).deliver_later if Rails.env == 'production'
     send_data({status: 'success', hash: @entrant_application.data_hash}.to_json)
@@ -92,7 +99,7 @@ class Api::EntrantApplicationsController < ApplicationController
   private
   
   def set_entrant_application
-    @entrant_application = EntrantApplication.includes(:identity_documents, :education_document, :marks, :achievements, :olympic_documents, :benefit_documents, :competitive_groups, :target_contracts, :contracts, :attachments).find_by_data_hash(params[:id])
+    @entrant_application = EntrantApplication.includes(:identity_documents, :education_document, :marks, :achievements, :olympic_documents, :benefit_documents, :other_documents, :competitive_groups, :target_contracts, :contracts, :attachments).find_by_data_hash(params[:id])
   end
   
   def entrant_application_params
@@ -125,7 +132,8 @@ class Api::EntrantApplicationsController < ApplicationController
                                        :education_document_type,
                                        :education_document_number,
                                        :education_document_issuer,
-                                       :education_document_date
+                                       :education_document_date,
+                                       :education_speciality_code
                                        ],
                   institution_achievement_ids: [],
                   marks: [
@@ -153,6 +161,13 @@ class Api::EntrantApplicationsController < ApplicationController
                                          :olympic_document_number,
                                          :olympic_document_date,
                                          :class_number
-                                         ])
+                                         ],
+                  other_documents: [
+                                    :name,
+                                    :other_document_number,
+                                    :other_document_series,
+                                    :other_document_date,
+                                    :other_document_issuer
+                                    ])
   end
 end
