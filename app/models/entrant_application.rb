@@ -770,126 +770,165 @@ class EntrantApplication < ActiveRecord::Base
       :bold => "vendor/fonts/Ubuntu-B.ttf"
       })
     pdf.font "Ubuntu"
-    pdf.text title, style: :bold, :size => 12, align: :center
+    pdf.text title, style: :bold, :size => 14, align: :center
     pdf.move_down 4
-    pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", size: 8, align: :right
+    pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", size: 10, align: :right
     pdf.move_down 4
-    pdf.text "д.м.н., проф. Е. В. Борзову", size: 8, align: :right
-    pdf.move_down 4
-    pdf.move_down 4
-    pdf.text "Я, #{fio}, прошу допустить меня к участию в конкурсе в ФГБОУ ВО ИвГМА Минздрава России на программы специалитета", size: 8
+    pdf.text "д.м.н., проф. Е. В. Борзову", size: 10, align: :right
     pdf.move_down 4
     pdf.move_down 4
-    pdf.text "Персональные данные", size: 10
+    case campaign.campaign_type_id
+    when 1
+      pdf.text "Я, #{fio}, прошу допустить меня к участию в конкурсе в ФГБОУ ВО ИвГМА Минздрава России на программы специалитета", size: 10
+    when 4
+      pdf.text "Я, #{fio}, прошу допустить меня к участию в конкурсе в ФГБОУ ВО ИвГМА Минздрава России на программы ординатуры", size: 10
+    end
     pdf.move_down 4
-    pdf.text "Дата рождения: #{birth_date.strftime("%d.%m.%Y")}", size: 8
     pdf.move_down 4
-    pdf.text "Гражданство: #{countries.select{|item| item['id'] == nationality_type_id}[0]['name']}", size: 8
+    pdf.text "Персональные данные", size: 12
+    pdf.move_down 4
+    pdf.text "Дата рождения: #{birth_date.strftime("%d.%m.%Y")}", size: 10
+    pdf.move_down 4
+    pdf.text "Гражданство: #{countries.select{|item| item['id'] == nationality_type_id}[0]['name']}", size: 10
     pdf.move_down 4
     if address
-      pdf.text "Адрес проживания: #{address}", size: 8
+      pdf.text "Адрес проживания: #{address}", size: 10
+      pdf.move_down 4
+    end
+    if email && campaign.campaign_type_id == 4
+      pdf.text "Адрес электронной почты: #{email}", size: 10
       pdf.move_down 4
     end
     pdf.move_down 4
-    pdf.text "Документ удостоверяющий личность", size: 10
+    pdf.text "Документ удостоверяющий личность", size: 12
     pdf.move_down 4
     identity_document = identity_documents.order(identity_document_date: :asc).last
-    pdf.text "#{identity_documents_list.select{|item| item['id'] == identity_document.identity_document_type}[0]['name']}: #{identity_document.identity_document_data}", size: 8
+    pdf.text "#{identity_documents_list.select{|item| item['id'] == identity_document.identity_document_type}[0]['name']}: #{identity_document.identity_document_data}", size: 10
     pdf.move_down 4
     pdf.move_down 4
-    pdf.text "Документ об образовании", size: 10
+    pdf.text "Документ об образовании", size: 12
     pdf.move_down 4
-    pdf.text "#{education_document.education_document_data}", size: 8
+    pdf.text "#{education_document.education_document_data}", size: 10
     pdf.move_down 4
     pdf.move_down 4
-    pdf.text "Прошу рассмотреть мои документы для участия в следующих конкурсах:", size: 10
+    if campaign.campaign_type_id == 4
+      other_documents.where(name: 'Свидетельство об аккредитации специалиста').each do |other_document|
+        pdf.text "#{other_document.other_document_data}", size: 12
+        pdf.move_down 4
+        pdf.move_down 4
+      end
+      other_documents.where(name: 'Выписка из итогового протокола заседания аккредитационной комиссии').each do |other_document|
+        pdf.text "#{other_document.other_document_data}", size: 12
+        pdf.move_down 4
+        pdf.move_down 4
+      end
+      pdf.text "Номер СНИЛС #{snils}", size: 12
+      pdf.move_down 4
+      pdf.move_down 4
+    end
+    pdf.text "Прошу рассмотреть мои документы для участия в следующих конкурсах:", size: 12
     pdf.move_down 4
     competitive_groups.each do |competitive_group|
-      pdf.text "- #{competitive_group.name}", size: 8
+      pdf.text "- #{competitive_group.name}", size: 10
       pdf.move_down 4
       pdf.move_down 4
     end
     if olympionic || benefit
-      pdf.text "Имею особые права:", size: 10
+      pdf.text "Имею особые права:", size: 12
       pdf.move_down 4
       olympic_documents.each do |olympic_document|
-        pdf.text "Имею право на #{benefit_types.select{|item| item['id'] == olympic_document.benefit_type_id}[0]['name']}", size: 8
+        pdf.text "Имею право на #{benefit_types.select{|item| item['id'] == olympic_document.benefit_type_id}[0]['name']}", size: 10
         pdf.move_down 4
-        pdf.text "Реквизиты документа, дающего особое право: #{document_types.select{|item| item['id'] == benefit_document.olympic_document_type_id}[0]['name']} #{olympic_document.olympic_document_data}", size: 8
+        pdf.text "Реквизиты документа, дающего особое право: #{document_types.select{|item| item['id'] == benefit_document.olympic_document_type_id}[0]['name']} #{olympic_document.olympic_document_data}", size: 10
         pdf.move_down 4
       end
       benefit_documents.each do |benefit_document|
-        pdf.text "Имею право на #{'прием' if benefit_document.benefit_type_id == 4} #{benefit_types.select{|item| item['id'] == benefit_document.benefit_type_id}[0]['name']}", size: 8
+        pdf.text "Имею право на #{'прием' if benefit_document.benefit_type_id == 4} #{benefit_types.select{|item| item['id'] == benefit_document.benefit_type_id}[0]['name']}", size: 10
         pdf.move_down 4
-        pdf.text "Реквизиты документа, дающего особое право: #{document_types.select{|item| item['id'] == benefit_document.benefit_document_type_id}[0]['name']} #{benefit_document.benefit_document_data}", size: 8
+        pdf.text "Реквизиты документа, дающего особое право: #{document_types.select{|item| item['id'] == benefit_document.benefit_document_type_id}[0]['name']} #{benefit_document.benefit_document_data}", size: 10
         pdf.move_down 4
       end
     end
-    pdf.text "Для участия в конкурсе выбираю следующие формы вступительных испытаний:", size: 10
+    pdf.text "Для участия в конкурсе выбираю следующие формы вступительных испытаний:", size: 12
     pdf.move_down 4
     marks.each do |mark|
-      pdf.text "#{mark.subject.subject_name} - #{mark.form}", size: 8
+      pdf.text "#{mark.subject.subject_name} - #{mark.form}", size: 10
       pdf.move_down 4
     end
     if special_entrant
-      pdf.text "Нуждаюсь в необходимости создания особых условиях при проведении вступительных испытаний в связи с ограниченными возможностями здоровья, а именно:", size: 8
+      pdf.text "Нуждаюсь в необходимости создания особых условиях при проведении вступительных испытаний в связи с ограниченными возможностями здоровья, а именно:", size: 10
       pdf.move_down 4
-      pdf.text "#{special_conditions}", size: 8
+      pdf.text "#{special_conditions}", size: 10
       pdf.move_down 4
       pdf.move_down 4
     end
     unless achievements.empty?
-      pdf.text "Имею следующие индивидуальные достижения", size: 10
+      pdf.text "Имею следующие индивидуальные достижения", size: 12
       pdf.move_down 4
       achievements.each do |achievement|
-        pdf.text "- #{achievement.institution_achievement.name}", size: 8
+        pdf.text "- #{achievement.institution_achievement.name}", size: 10
         pdf.move_down 4
         pdf.move_down 4
       end
     end
     if need_hostel
-      pdf.text "Нуждаюсь в предоставлении места в общежитии на период обучения", size: 8
+      pdf.text "Нуждаюсь в предоставлении места в общежитии на период обучения", size: 10
       pdf.move_down 4
     end
     pdf.move_down 4
-    pdf.text "Подтверждаю, что я ознакомлен с  с копией лицензии на осуществление образовательной деятельности (с приложением); с копией свидетельства о государственной аккредитации (с приложением) или с информацией об отсутствии указанного свидетельства; с информацией о предоставляемых поступающим особых правах и преимуществах; с датами завершения приема заявлений о согласии на зачисление; с правилами приема, в том числе с правилами подачи апелляции по результатам вступительных испытаний, проводимых Академией самостоятельно", size: 8
+    case campaign.campaign_type_id
+    when 1
+      pdf.text "Подтверждаю, что я ознакомлен с  с копией лицензии на осуществление образовательной деятельности (с приложением); с копией свидетельства о государственной аккредитации (с приложением) или с информацией об отсутствии указанного свидетельства; с информацией о предоставляемых поступающим особых правах и преимуществах; с датами завершения приема заявлений о согласии на зачисление; с правилами приема, в том числе с правилами подачи апелляции по результатам вступительных испытаний, проводимых Академией самостоятельно", size: 10
+    when 4
+      pdf.text "Подтверждаю, что я ознакомлен с  с копией лицензии на осуществление образовательной деятельности (с приложением); с копией свидетельства о государственной аккредитации (с приложением) или с информацией об отсутствии указанного свидетельства; с датами завершения приема заявлений о согласии на зачисление; с правилами приема, в том числе с правилами подачи апелляции по результатам вступительного испытания", size: 10
+    end
     pdf.move_down 4
-    pdf.text "Подпись ___________________", size: 8, align: :right
+    pdf.text "Подпись ___________________", size: 10, align: :right
     pdf.move_down 4
-    pdf.text "Согласен на обработку персональных данных", size: 8
+    pdf.text "Согласен на обработку персональных данных", size: 10
     pdf.move_down 4
-    pdf.text "Подпись ___________________", size: 8, align: :right
+    pdf.text "Подпись ___________________", size: 10, align: :right
     pdf.move_down 4
-    pdf.text "Ознакомлен с информацией о необходимости указания в заявлении о приеме достоверных сведений и представления подлинных документов", size: 8
+    pdf.text "Ознакомлен с информацией о необходимости указания в заявлении о приеме достоверных сведений и представления подлинных документов", size: 10
     pdf.move_down 4
-    pdf.text "Подпись ___________________", size: 8, align: :right
+    pdf.text "Подпись ___________________", size: 10, align: :right
     pdf.move_down 4
-    unless (competitive_groups.map(&:education_source_id) - [15]).empty? && education_document.education_document_type != 'HighEduDiplomaDocument'
-      pdf.text "Потверждаю отсутствие у меня диплома бакалавра, диплома специалиста, диплома магистра", size: 8
+    case campaign.campaign_type_id
+    when 1
+      unless (competitive_groups.map(&:education_source_id) - [15]).empty? && education_document.education_document_type != 'HighEduDiplomaDocument'
+        pdf.text "Потверждаю отсутствие у меня диплома бакалавра, диплома специалиста, диплома магистра", size: 10
+        pdf.move_down 4
+        pdf.text "Подпись ___________________", size: 10, align: :right
+        pdf.move_down 4
+      end
+    when 4
+      unless (competitive_groups.map(&:education_source_id) - [15]).empty?
+        pdf.text "Потверждаю отсутствие у меня диплома об окончании ординатруры или диплома об окончании интернатуры", size: 10
+        pdf.move_down 4
+        pdf.text "Подпись ___________________", size: 10, align: :right
+        pdf.move_down 4
+      end
+    end
+    case campaign.campaign_type_id
+    when 1
+      pdf.text "Подтверждаю, что одновременно подаю заявления о приеме не более чем в 5 организаций высшего образования, включая ИвГМА", size: 10
       pdf.move_down 4
-      pdf.text "Подпись ___________________", size: 8, align: :right
+      pdf.text "Подпись ___________________", size: 10, align: :right
+      pdf.move_down 4
+      if olympic_documents.map(&:benefit_type_id).include?(1)
+        pdf.text "Подтверждаю, что подаю заявления о приеме на основании соответствующего особого права только в ИвГМА и только на одну образовательную программу", size: 10
+        pdf.move_down 4
+        pdf.text "Подпись ___________________", size: 10, align: :right
+        pdf.move_down 4
+      end
+    when 4
+      pdf.text "Обязуюсь представить заявление о согласии на зачисление не позднее дня завершения приема заявлений о согласии на зачисление", size: 10
+      pdf.move_down 4
+      pdf.text "Подпись ___________________", size: 10, align: :right
       pdf.move_down 4
     end
-    pdf.text "Подтверждаю, что одновременно подаю заявления о приеме не более чем в 5 организаций высшего образования, включая ИвГМА", size: 8
-    pdf.move_down 4
-    pdf.text "Подпись ___________________", size: 8, align: :right
-    pdf.move_down 4
-    if olympic_documents.map(&:benefit_type_id).include?(1)
-      pdf.text "Подтверждаю, что подаю заявления о приеме на основании соответствующего особого права только в ИвГМА и только на одну образовательную программу", size: 8
-      pdf.move_down 4
-      pdf.text "Подпись ___________________", size: 8, align: :right
-      pdf.move_down 4
-    end
-    pdf.text "", size: 8
-    pdf.move_down 4
-    pdf.text "", size: 8
-    pdf.move_down 4
-    pdf.text "", size: 8
-    pdf.move_down 4
-    pdf.text "", size: 8
-    pdf.move_down 4
     string = "Страница <page> из <total>"
-    options = {:at => [pdf.bounds.right - 100, 0], :width => 150, :align => :center, :start_count_at => 1, size: 8}
+    options = {:at => [pdf.bounds.right - 100, 0], :width => 150, :align => :center, :start_count_at => 1, size: 10}
     pdf.number_pages string, options
     pdf.render_file tempfile
     
@@ -935,7 +974,12 @@ class EntrantApplication < ActiveRecord::Base
       pdf.text "д.м.н., проф. Е. В. Борзову", align: :right
       pdf.move_down 6
       pdf.move_down 6
-      pdf.text "Я, #{fio} (№ личного дела #{application_number}), прошу зачислить меня на обучение по образовательной программе специалитета в рамках конкурса #{competitive_group.name}"
+      case campaign.campaign_type_id
+      when 1
+        pdf.text "Я, #{fio} (№ личного дела #{application_number}), прошу зачислить меня на обучение по образовательной программе специалитета в рамках конкурса #{competitive_group.name}"
+      when 4
+        pdf.text "Я, #{fio} (№ личного дела #{application_number}), прошу зачислить меня на обучение по образовательной программе ординатуры в рамках конкурса #{competitive_group.name}"
+      end
       pdf.move_down 6
       pdf.text "Обязуюсь:"
       pdf.move_down 6
@@ -1002,12 +1046,12 @@ class EntrantApplication < ActiveRecord::Base
       pdf.text "д.м.н., проф. Е. В. Борзову", align: :right
       pdf.move_down 6
       pdf.move_down 6
-      pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от зачисления по образовательной программе специалитета в рамках конкурса #{competitive_group.name}"
-      pdf.move_down 6
-      pdf.text "Обязуюсь:"
-      pdf.move_down 6
-      pdf.move_down 6
-      pdf.text "в соответствии с поданным заявлением о согласии на зачислении."
+      case campaign.campaign_type_id
+      when 1
+        pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от зачисления по образовательной программе специалитета в рамках конкурса #{competitive_group.name}"
+      when 4
+        pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от зачисления по образовательной программе ординатуры в рамках конкурса #{competitive_group.name} в соответствии с ранее поданным заявлением о согласии на зачислении."
+      end
       pdf.move_down 6
       pdf.text "Подпись ___________________", align: :right
       
@@ -1055,7 +1099,12 @@ class EntrantApplication < ActiveRecord::Base
       pdf.text "д.м.н., проф. Е. В. Борзову", align: :right
       pdf.move_down 6
       pdf.move_down 6
-      pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от участия в конкурсе / от зачисления на обучение по образовательным программам специалитета в ФГБОУ ВО ИвГМА Минздрава России и отзываю поданные документы. Прошу исключить меня из списков поступающих / зачисленных в  ФГБОУ ВО ИвГМА Минздрава России."
+      case campaign.campaign_type_id
+      when 1
+        pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от участия в конкурсе / от зачисления на обучение по образовательным программам специалитета в ФГБОУ ВО ИвГМА Минздрава России и отзываю поданные документы. Прошу исключить меня из списков поступающих / зачисленных в  ФГБОУ ВО ИвГМА Минздрава России."
+      when 4
+        pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от участия в конкурсе / от зачисления на обучение по образовательным программам ординатуры в ФГБОУ ВО ИвГМА Минздрава России и отзываю поданные документы. Прошу исключить меня из списков поступающих / зачисленных в  ФГБОУ ВО ИвГМА Минздрава России."
+      end
       pdf.move_down 6
       pdf.text "Подпись ___________________", align: :right
       
