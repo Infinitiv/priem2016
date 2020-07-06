@@ -55,7 +55,7 @@ class EntrantApplicationsController < ApplicationController
   
   def update
     if @entrant_application.update(entrant_application_params)
-      @entrant_application.update_attributes(status_id: 2)
+      @entrant_application.update_attributes(status_id: 2, status: 'внесены изменения')
       redirect_to @entrant_application
     else
       render action: 'edit'
