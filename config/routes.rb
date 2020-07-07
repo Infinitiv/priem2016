@@ -99,6 +99,7 @@ Rails.application.routes.draw do
       put 'add_comment'
       delete 'delete_comment'
       delete 'delete_request'
+      post 'add_document'
     end
   end
   

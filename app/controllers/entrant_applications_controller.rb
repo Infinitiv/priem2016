@@ -1,6 +1,6 @@
 class EntrantApplicationsController < ApplicationController
   load_and_authorize_resource
-  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates, :approve, :add_comment, :delete_comment, :toggle_competitive_group, :delete_request]
+  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates, :approve, :add_comment, :delete_comment, :toggle_competitive_group, :delete_request, :add_document]
   before_action :set_competitive_group, only: [:toggle_agreement, :toggle_contract, :toggle_competitive_group]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update, :show]
@@ -288,6 +288,26 @@ class EntrantApplicationsController < ApplicationController
     redirect_to @entrant_application
   end
   
+  def add_document
+    case params[:document_type]
+    when 'Документ на льготу'
+      benefit_document = @entrant_application.benefit_documents.new
+      @entrant_application.update_attributes(benefit: true, status_id: 2, status: 'внесены изменения') if benefit_document.save
+    when 'Диплом призера олимпиады'
+      olympic_document = @entrant_application.olympic_documents.new
+      @entrant_application.update_attributes(olympionic: true, status_id: 2, status: 'внесены изменения') if olympic_document.save
+    when 'Целевой договор'
+      @entrant_application.competitive_groups.where(education_source_id: 16).each do |competitive_group|
+        target_contract = @entrant_application.target_contracts.new(competitive_group_id: competitive_group.id)
+        @entrant_application.update_attributes(status_id: 2, status: 'внесены изменения') if target_contract.save
+      end
+    else
+      other_document = @entrant_application.other_documents.new
+      @entrant_application.update_attributes(status_id: 2, status: 'внесены изменения') if other_document.save
+    end
+    redirect_to @entrant_application
+  end
+  
   private
   
   def set_entrant_application
@@ -353,6 +373,7 @@ class EntrantApplicationsController < ApplicationController
                         name: "Приравнивание к лицам, набравшим максимальное количество баллов по ЕГЭ"
                         }]
     @institution_achievements = @entrant_application.campaign.institution_achievements
+    @documents = ['Документ на льготу', 'Диплом призера олимпиады', 'Целевой договор', 'Прочий документ']
   end
   
   def set_competitive_group
