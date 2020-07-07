@@ -26,6 +26,6 @@ class MarksController < ApplicationController
   end
   
   def mark_params
-    params.require(:mark).permit(:id, :entrant_application_id, :subject_id, :value, :form)
+    params.require(:mark).permit(:id, :entrant_application_id, :subject_id, :value, :form, :year, :organization_uid)
   end
 end

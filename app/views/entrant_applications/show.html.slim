@@ -92,13 +92,15 @@
               span.label.label-success= "зачислен #{@entrant_application.enrolled_date}" if @entrant_application.enrolled == competitive_group.id
               span.label.label-warning= "отказ #{@entrant_application.exeptioned_date}" if @entrant_application.exeptioned == competitive_group.id
   - if can? :toggle_competitive_group, @entrant_application
-    h3 Добавить конкурс
+    h3(data-toggle="collapse" href="#competitiveGroups" role="button" aria-expanded="false" aria-controls="competitiveGroups") Добавить конкурс
     - competitive_groups = @entrant_application.campaign.competitive_groups - @entrant_application.competitive_groups
-    - competitive_groups.each do |competitive_group|
-      p
-        = competitive_group.name
-        span &nbsp;
-        span= link_to '+', [@entrant_application.id, 'competitive_groups', competitive_group.id, 'toggle_competitive_group'].join('/'), method: :put, class: 'label label-success', title: 'Добавить конкурс'
+    .collapse#competitiveGroups
+      .card.card-body
+        - competitive_groups.each do |competitive_group|
+          p
+            = competitive_group.name
+            span &nbsp;
+            span= link_to '+', [@entrant_application.id, 'competitive_groups', competitive_group.id, 'toggle_competitive_group'].join('/'), method: :put, class: 'label label-success', title: 'Добавить конкурс'
   h2 Конкурсные баллы
   table.table
     thead
@@ -115,7 +117,15 @@
               .form-group.row
                 = f.label mark.value, class: 'col-sm-1 col-form-label'
                 .col-sm-6
-                  = f.select :form, options_for_select(["ЕГЭ", "Экзамен"], selected: mark.form), {}, {class: 'form-control'}
+                  - case @entrant_application.campaign.campaign_type_id
+                  - when 1
+                    = f.select :form, options_for_select(["ЕГЭ", "Экзамен"], selected: mark.form), {}, {class: 'form-control'}
+                  - when 4
+                    = f.select :form, options_for_select(["Аккредитация", "Экзамен"], selected: mark.form), {}, {class: 'form-control'}
+                    = f.number_field :value, value: mark.value, max: 100, class: 'form-control'
+                    = f.number_field :year, value: mark.year, min: Time.now.to_date.year - 1, max: Time.now.to_date.year, class: 'form-control'
+                    = f.text_field :organization_uid, class: 'form-control'
+                    
                 .col-sm-2
                   = f.submit 'Сохранить', class: 'btn btn-primary'
         td= @sum
