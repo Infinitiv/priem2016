@@ -207,7 +207,7 @@ class EntrantApplicationsController < ApplicationController
   
   def entrants_lists_ord_to_html
     @admission_volume_hash = EntrantApplication.admission_volume_hash(@campaign)
-    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign).sort_by{|k, v| k.application_number}
+    @applications_hash = EntrantApplication.entrant_applications_hash(@campaign).select{|k, v| k.application_number}.sort_by{|k, v| k.application_number}
     @target_organizations = TargetOrganization.order(:target_organization_name)
     html = render_to_string layout: 'entrants_lists_to_html'
     filename = "#{@campaign.id}-#{Time.now.to_datetime.strftime("%F %T")}.html".gsub(' ', '-')
