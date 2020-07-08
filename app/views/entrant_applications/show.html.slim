@@ -20,6 +20,10 @@
     h3.pull-right
       = link_to 'x', @entrant_application, method: :delete, class: 'label label-danger', title: 'Удалить заявление', data: { confirm: 'Вот тот механизм, который так ждали. Применить?'}
 .row
+  .pull-left
+    - @entrant_application.attachments.where(document_type: 'title_application', template: true).each do |attachment|
+      = link_to 'Титульный лист', attachment_path(attachment), target: :blank
+.row
   .label.label-info= @entrant_application.status
 - if @entrant_application.request
   .row

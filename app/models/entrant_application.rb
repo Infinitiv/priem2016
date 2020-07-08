@@ -927,9 +927,23 @@ class EntrantApplication < ActiveRecord::Base
       pdf.text "Подпись ___________________", size: 10, align: :right
       pdf.move_down 4
     end
-    string = "Страница <page> из <total>"
-    options = {:at => [pdf.bounds.right - 100, 0], :width => 150, :align => :center, :start_count_at => 1, size: 10}
-    pdf.number_pages string, options
+    
+    if campaign.campaign_type_id == 4 && marks.map(&:form).include?('Аккредитация')
+      pdf.text '__________________________________________________________________________', align: :center
+      pdf.move_down 6
+      pdf.move_down 6
+      pdf.move_down 6
+      pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", align: :right, size: 10
+      pdf.move_down 6
+      pdf.text "д.м.н., проф. Е. В. Борзову", align: :right, size: 10
+      pdf.move_down 6
+      pdf.move_down 6
+      pdf.text "Я, #{fio}, прошу учесть в качестве вступительного испытания результаты тестирования в рамках процедуры аккредитации, пройденной в ______ году на базе __________________________________________, по специальности ________________________", size: 10
+      pdf.move_down 6  
+      pdf.move_down 6  
+      pdf.text "Подпись ___________________", size: 10, align: :right
+    end
+
     pdf.render_file tempfile
     
     attachment = attachments.where(document_type: 'entrant_application', document_id: id, template: true).first || Attachment.new
@@ -1115,6 +1129,99 @@ class EntrantApplication < ActiveRecord::Base
       attachment = attachments.where(document_type: 'recall_application', document_id: id, template: true).first || Attachment.new
       attachment.entrant_application_id = id
       attachment.document_type = 'recall_application'
+      attachment.document_id = id
+      attachment.filename = "#{title}.pdf"
+      attachment.mime_type = 'application/pdf'
+      attachment.merged = false
+      attachment.template = true
+      md5 = ::Digest::MD5.file(tempfile).hexdigest
+      attachment.data_hash = md5
+      path = attachment.data_hash[0..2].split('').join('/')
+      if attachment.save
+        %x(mkdir -p #{Rails.root.join('storage', path)})
+        file_path = Rails.root.join('storage', path, attachment.data_hash)
+        %x(mv "#{tempfile}" "#{file_path}")
+        %x(touch "#{file_path}")
+      end
+      
+      title = "Титульный лист"
+      tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
+      pdf = Prawn::Document.new(page_size: "A4", :info => {
+        :Title => title,
+        :Author => "Vladimir Markovnin",
+        :Subject => "Прием ИвГМА",
+        :Creator => "ИвГМА",
+        :Producer => "Prawn",
+        :CreationDate => Time.now }
+        )
+      pdf.font_families.update("Ubuntu" => {
+        :normal => "vendor/fonts/Ubuntu-R.ttf",
+        :italic => "vendor/fonts/Ubuntu-RI.ttf",
+        :bold => "vendor/fonts/Ubuntu-B.ttf"
+        })
+      pdf.font "Ubuntu"
+      pdf.define_grid(:columns => 8, :rows => 7, :gutter => 5)
+      pdf.grid([0, 0], [0,1]).bounding_box do
+        pdf.text "#{application_number}", style: :bold, :size => 36
+      end
+      pdf.grid(0, 2).bounding_box do
+        pdf.text "Сумма", :size => 16
+      end
+      pdf.grid(0, 3).bounding_box do
+        pdf.text "ИД", :size => 16
+        pdf.move_down 6
+        pdf.text "#{'+' if achievements.count > 0}", :size => 16
+      end
+      case campaign.campaign_type_id
+      when 1
+        pdf.grid(0, 4).bounding_box do
+          pdf.text "Х", :size => 16, align: :center
+        end
+        pdf.grid(0, 5).bounding_box do
+          pdf.text "Б", :size => 16, align: :center
+        end
+        pdf.grid(0, 6).bounding_box do
+          pdf.text "Р", :size => 16, align: :center
+        end
+      when 4
+        pdf.grid(0, 4).bounding_box do
+          pdf.text "Тест", :size => 16, align: :center
+        end
+      end
+      pdf.grid([1, 0], [2, 7]).bounding_box do
+        competitive_groups.where(education_source_id: 14).order(direction_id: :desc).each do |competitive_group|
+          pdf.text "________  #{competitive_group.name}", :size => 14
+          pdf.move_down 14
+        end
+        competitive_groups.where(education_source_id: 16).order(direction_id: :desc).each do |competitive_group|
+          pdf.text "________  #{competitive_group.name} - #{target_contracts.where(competitive_group_id: competitive_group.id).map{|tc|tc.target_organization.target_organization_name}.compact.join(', ')}", :size => 14
+          pdf.move_down 14
+        end
+        competitive_groups.where(education_source_id: 20).order(direction_id: :desc).each do |competitive_group|
+          pdf.text "________  #{competitive_group.name}", :size => 14
+          pdf.move_down 14
+        end
+        competitive_groups.where(education_source_id: 15).order(direction_id: :desc).each do |competitive_group|
+          pdf.text "________  #{competitive_group.name}", :size => 14
+          pdf.move_down 14
+        end
+      end
+      pdf.grid([4, 0], [4, 7]).bounding_box do
+        pdf.text "#{fio}", :size => 32, align: :center
+      end
+      pdf.grid([6, 0], [6, 7]).bounding_box do
+        pdf.text "Адрес: #{address}", :size => 12
+        pdf.move_down 4
+        pdf.text "Телефон: #{phone}", :size => 12
+        pdf.move_down 4
+        pdf.text "Email: #{email}", :size => 12
+      end
+      
+      pdf.render_file tempfile
+    
+      attachment = attachments.where(document_type: 'title_application', document_id: id, template: true).first || Attachment.new
+      attachment.entrant_application_id = id
+      attachment.document_type = 'title_application'
       attachment.document_id = id
       attachment.filename = "#{title}.pdf"
       attachment.mime_type = 'application/pdf'
