@@ -33,6 +33,6 @@ class OlympicDocumentsController < ApplicationController
   end
   
   def olympic_document_params
-    params.require(:olympic_document).permit(:id, :olympic_profile_id, :diploma_type_id, :olympic_id, :olympic_profile_id, :class_number, :olympic_document_series, :olympic_document_number, :olympic_document_date, :olympic_subject_id, :ege_subject_id, :olympic_document_type_id)
+    params.require(:olympic_document).permit(:id, :olympic_profile_id, :diploma_type_id, :olympic_id, :olympic_profile_id, :class_number, :olympic_document_series, :olympic_document_number, :olympic_document_date, :olympic_subject_id, :ege_subject_id, :olympic_document_type_id, :benefit_type_id)
   end
 end

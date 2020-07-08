@@ -839,7 +839,7 @@ class EntrantApplication < ActiveRecord::Base
       olympic_documents.each do |olympic_document|
         pdf.text "Имею право на #{benefit_types.select{|item| item['id'] == olympic_document.benefit_type_id}[0]['name']}", size: 10
         pdf.move_down 4
-        pdf.text "Реквизиты документа, дающего особое право: #{document_types.select{|item| item['id'] == benefit_document.olympic_document_type_id}[0]['name']} #{olympic_document.olympic_document_data}", size: 10
+        pdf.text "Реквизиты документа, дающего особое право: #{document_types.select{|item| item['id'] == olympic_document.olympic_document_type_id}[0]['name']} #{olympic_document.olympic_document_data}", size: 10
         pdf.move_down 4
       end
       benefit_documents.each do |benefit_document|
