@@ -55,7 +55,11 @@ class EntrantApplicationsController < ApplicationController
   
   def update
     if @entrant_application.update(entrant_application_params)
-      @entrant_application.update_attributes(status_id: 2, status: 'внесены изменения')
+      value_name = 'status_update'
+      old_value = @entrant_application.status
+      new_value = 'внесены изменения'
+      Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+      @entrant_application.update_attributes(status_id: 2, status: new_value)
       redirect_to @entrant_application
     else
       render action: 'edit'
@@ -97,7 +101,11 @@ class EntrantApplicationsController < ApplicationController
       Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
     end
     if @entrant_application.save!
-      @entrant_application.update_attributes(status: 'принято')
+      value_name = 'status_update'
+      old_value = @entrant_application.status
+      new_value = 'принято'
+      Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+      @entrant_application.update_attributes(status: new_value)
       redirect_to @entrant_application
     end
   end
@@ -127,7 +135,11 @@ class EntrantApplicationsController < ApplicationController
     else
       @entrant_application.competitive_groups << @competitive_group
     end
-    @entrant_application.update_attributes(status_id: 2, status: 'внесены изменения')
+    value_name = 'status_update'
+    old_value = @entrant_application.status
+    new_value = 'внесены изменения'
+    Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+    @entrant_application.update_attributes(status_id: 2, status: new_value)
     redirect_to @entrant_application
   end
   
@@ -261,18 +273,30 @@ class EntrantApplicationsController < ApplicationController
     end
     @entrant_application.attachments.where(document_type: 'entrant_application', template: false).destroy_all
     @entrant_application.generate_templates
-    @entrant_application.update_attributes(request: nil, comment: nil, status: 'проверено, замечаний нет')
+    value_name = 'status_update'
+    old_value = @entrant_application.status
+    new_value = 'проверено, замечаний нет'
+    Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+    @entrant_application.update_attributes(request: nil, comment: nil, status: new_value)
     Events.generate_templates(@entrant_application).deliver_later if Rails.env == 'production'
     redirect_to @entrant_application
   end
   
   def approve
-    @entrant_application.update_attributes(status_id: 4, comment: nil, status: 'принято')
+    value_name = 'status_update'
+    old_value = @entrant_application.status
+    new_value = 'принято'
+    Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+    @entrant_application.update_attributes(status_id: 4, comment: nil, status: new_value)
     redirect_to :back
   end
   
   def add_comment
-    @entrant_application.update_attributes(comment: params[:comment], status: 'проверено, есть замечания')
+    value_name = 'status_update'
+    old_value = @entrant_application.status
+    new_value = 'проверено, есть замечания'
+    Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+    @entrant_application.update_attributes(comment: params[:comment], status: new_value)
     Events.add_comment(@entrant_application).deliver_later if Rails.env == 'production'
     redirect_to @entrant_application
   end
@@ -289,21 +313,25 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def add_document
+    value_name = 'status_update'
+    old_value = @entrant_application.status
+    new_value = 'внесены изменения'
+    Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
     case params[:document_type]
     when 'Документ на льготу'
       benefit_document = @entrant_application.benefit_documents.new
-      @entrant_application.update_attributes(benefit: true, status_id: 2, status: 'внесены изменения') if benefit_document.save
+      @entrant_application.update_attributes(benefit: true, status_id: 2, status: new_value) if benefit_document.save
     when 'Диплом призера олимпиады'
       olympic_document = @entrant_application.olympic_documents.new
-      @entrant_application.update_attributes(olympionic: true, status_id: 2, status: 'внесены изменения') if olympic_document.save
+      @entrant_application.update_attributes(olympionic: true, status_id: 2, status: new_value) if olympic_document.save
     when 'Целевой договор'
       @entrant_application.competitive_groups.where(education_source_id: 16).each do |competitive_group|
         target_contract = @entrant_application.target_contracts.new(competitive_group_id: competitive_group.id)
-        @entrant_application.update_attributes(status_id: 2, status: 'внесены изменения') if target_contract.save
+        @entrant_application.update_attributes(status_id: 2, status: new_value) if target_contract.save
       end
     else
       other_document = @entrant_application.other_documents.new
-      @entrant_application.update_attributes(status_id: 2, status: 'внесены изменения') if other_document.save
+      @entrant_application.update_attributes(status_id: 2, status: new_value) if other_document.save
     end
     redirect_to @entrant_application
   end

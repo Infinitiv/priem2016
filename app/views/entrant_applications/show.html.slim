@@ -343,6 +343,8 @@
           - 'Отзыв пакета документов'
         - when 'toggle_contract'
           - 'Изменение договора:'
+        - else
+          - 'Изменение статуса заявления:'
         - value_name = case journal_entry.value_name
         - when 'budget_arg'
           - 'бюджет'
@@ -359,6 +361,11 @@
           - when 'toggle_contract'
             span= " расторжение договора на #{@entrant_application.competitive_groups.find(journal_entry.old_value).name}" if journal_entry.old_value
             span= " заключение договора на #{@entrant_application.competitive_groups.find(journal_entry.new_value).name}" if journal_entry.new_value
+          - else
+            span &nbsp;с&nbsp;
+            strong= "#{journal_entry.old_value}"
+            span &nbsp;на&nbsp;
+            strong= "#{journal_entry.new_value}"
           - if can? :destroy, Journal
             span &nbsp;
             strong= link_to 'x', journal_path(journal_entry), class: 'label label-warning', method: :delete
