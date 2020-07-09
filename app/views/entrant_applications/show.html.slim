@@ -413,6 +413,10 @@
               .col-sm-4
                 = f.number_field :region_id, in: 1..200, class: 'form-control', placeholder: 'код региона'
             .form-group.row
+              = f.label :address, 'Адрес', class: 'label-control col-sm-4'
+              .col-sm-4
+                = f.text_field :address, in: 1..200, class: 'form-control', placeholder: 'адрес проживания'
+            .form-group.row
               = f.label :email, 'Адрес электронной почты', class: 'label-control col-sm-4'
               .col-sm-4
                 = f.email_field :email, in: 1..200, class: 'form-control', placeholder: 'user@email.com'
