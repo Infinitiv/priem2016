@@ -929,10 +929,7 @@ class EntrantApplication < ActiveRecord::Base
     end
     
     if campaign.campaign_type_id == 4 && marks.map(&:form).include?('Аккредитация')
-      pdf.text '__________________________________________________________________________', align: :center
-      pdf.move_down 6
-      pdf.move_down 6
-      pdf.move_down 6
+      pdf.start_new_page
       pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", align: :right, size: 10
       pdf.move_down 6
       pdf.text "д.м.н., проф. Е. В. Борзову", align: :right, size: 10
