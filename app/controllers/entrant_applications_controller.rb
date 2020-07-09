@@ -104,7 +104,7 @@ class EntrantApplicationsController < ApplicationController
       value_name = 'status_update'
       old_value = @entrant_application.status
       new_value = 'принято'
-      Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+      Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: 'status_update', value_name: value_name, old_value: old_value, new_value: new_value)
       @entrant_application.update_attributes(status: new_value)
       redirect_to @entrant_application
     end
