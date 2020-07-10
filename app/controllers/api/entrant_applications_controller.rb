@@ -23,7 +23,7 @@ class Api::EntrantApplicationsController < ApplicationController
     @entrant_application.gender_id = entrant_application_params[:gender_id]
     @entrant_application.birth_date = entrant_application_params[:birth_date]
     @entrant_application.email = entrant_application_params[:email]
-    @entrant_application.need_hostel = entrant_application_params[:need_hostel]
+    @entrant_application.need_hostel = true if entrant_application_params[:need_hostel]
     @entrant_application.special_entrant = entrant_application_params[:special_entrant]
     @entrant_application.registration_date = Time.now.to_date
     @entrant_application.nationality_type_id = 1 if entrant_application_params[:citizenship]
