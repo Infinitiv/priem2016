@@ -124,14 +124,14 @@ class EntrantApplication < ActiveRecord::Base
   def self.errors(campaign)
     errors = {}
     applications = campaign.entrant_applications.where.not(status_id: 6)
-    errors[:dups_numbers] = find_dups_numbers(applications)
-    errors[:lost_numbers] = find_lost_numbers(applications)
+#     errors[:dups_numbers] = find_dups_numbers(applications)
+#     errors[:lost_numbers] = find_lost_numbers(applications)
     errors[:dups_entrants] = find_dups_entrants(applications)
     target_competition_entrants_array = applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).uniq
     errors[:empty_target_entrants] = find_empty_target_entrants(target_competition_entrants_array, applications.joins(:target_organizations))
-    errors[:not_original_target_entrants] = find_not_original_target_entrants(target_competition_entrants_array, applications.joins(:education_document).where.not(education_documents: {original_received_date: nil}))
-    errors[:not_agreed_target_entrants] = find_not_agreed_entrants(applications)
-    errors[:expired_passports] = find_expired_passports(applications)
+#     errors[:not_original_target_entrants] = find_not_original_target_entrants(target_competition_entrants_array, applications.joins(:education_document).where.not(education_documents: {original_received_date: nil}))
+#     errors[:not_agreed_target_entrants] = find_not_agreed_entrants(applications)
+    errors[:expired_passports] = find_expired_passports(applications.where.not(birth_date: nil))
     errors
   end
   

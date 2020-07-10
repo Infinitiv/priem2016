@@ -9,10 +9,10 @@ class OlympicDocumentsController < ApplicationController
                          other_document_date: @olympic_document.olympic_document_date)
     entrant_application.attachments.where(document_id: @olympic_document.id).update_all(document_type: 'other_document', document_id: other_document.id)
     value_name = 'status_update'
-    old_value = @entrant_application.status
+    old_value = entrant_application.status
     new_value = 'внесены изменения'
-    Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
-    @olympic_document.entrant_application.update_attributes(status_id: 2, status: new_value)
+    Journal.create(user_id: current_user.id, entrant_application_id: entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+    entrant_application.update_attributes(status_id: 2, status: new_value)
     @olympic_document.destroy
     if entrant_application.olympic_documents.empty?
       entrant_application.update_attributes(olympionic: false)
@@ -23,9 +23,9 @@ class OlympicDocumentsController < ApplicationController
   def update
     @olympic_document.update(olympic_document_params)
     value_name = 'status_update'
-    old_value = @entrant_application.status
+    old_value = @olympic_document.entrant_application.status
     new_value = 'внесены изменения'
-    Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+    Journal.create(user_id: current_user.id, entrant_application_id: @olympic_document.entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
     @olympic_document.entrant_application.update_attributes(status_id: 2, status: new_value)
     redirect_to :back
   end
