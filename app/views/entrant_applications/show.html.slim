@@ -164,7 +164,14 @@
   h2 Персональные данные
   dl
     dt Пол
-    dd= @entrant_application.gender_id == 1 ? "Мужской" : "Женский"
+    dd
+      - case @entrant_application.gender_id
+      - when 1
+        span Мужской
+      - when 2
+        span Женский
+      - else
+        span.label.label-danger не указан
     dt Дата рождения
     dd= @entrant_application.birth_date
     dt Страна
