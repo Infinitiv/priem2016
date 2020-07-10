@@ -5,9 +5,9 @@ class MarksController < ApplicationController
   def create
     @mark = Mark.create(mark_params)
     value_name = 'status_update'
-    old_value = @entrant_application.status
+    old_value = @mark.entrant_application.status
     new_value = 'внесены изменения'
-    Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+    Journal.create(user_id: current_user.id, entrant_application_id: @mark.entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
     @mark.entrant_application.update_attributes(status_id: 2, status: new_value)
     redirect_to :back
   end
@@ -15,9 +15,9 @@ class MarksController < ApplicationController
   def update
     @mark.update(mark_params)
     value_name = 'status_update'
-    old_value = @entrant_application.status
+    old_value = @mark.entrant_application.status
     new_value = 'внесены изменения'
-    Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+    Journal.create(user_id: current_user.id, entrant_application_id: @mark.entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
     @mark.entrant_application.update_attributes(status_id: 2, status: new_value)
     redirect_to :back
   end

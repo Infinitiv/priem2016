@@ -5,9 +5,9 @@ class IdentityDocumentsController < ApplicationController
   def update
     @identity_document.update(identity_document_params)
     value_name = 'status_update'
-    old_value = @entrant_application.status
+    old_value = @identity_document.entrant_application.status
     new_value = 'внесены изменения'
-    Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+    Journal.create(user_id: current_user.id, entrant_application_id: @identity_document.entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
     @identity_document.entrant_application.update_attributes(status_id: 2, status: new_value)
     redirect_to :back
   end
