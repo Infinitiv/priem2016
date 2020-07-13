@@ -267,6 +267,13 @@
                 - if can? :destroy, attachment
                   span &nbsp;
                   span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
+        - @entrant_application.attachments.each do |attachment|
+          - if attachment.document_type == 'target_contract' && attachment.document_id == nil
+            dd
+              = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+              - if can? :destroy, attachment
+                span &nbsp;
+                span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     - unless @entrant_application.contracts.empty?
       dt
         h3 Договоры
