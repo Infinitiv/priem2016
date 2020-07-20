@@ -8,4 +8,10 @@
 <%= @entrant_application.comment %>
 Напоминаем, что Ваш личный кабинет доступен по ссылке: <%= "#{[host_name, 'entrants', @entrant_application.data_hash].join('/')}" %>
 
+<%- if @entrant_application.campaign.campaign_type_id == 1 %>
+  Это письмо сгенерировано автоматически, отвечать на него не нужно. Для переписки с приемной комиссией используйте адрес priem@isma.ivanovo.ru
+<%- else %>
+  Это письмо сгенерировано автоматически, отвечать на него не нужно. Для переписки с приемной комиссией используйте адрес priemordinatura@isma.ivanovo.ru
+<%- end %>
+
 С уважением, приемная комиссия ИвГМА
