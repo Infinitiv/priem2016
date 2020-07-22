@@ -602,3 +602,5 @@
             .modal-footer
               button.btn.btn-secondary(type="button" data-dismiss="modal") Закрыть
               = f.submit 'Сохранить', class: 'btn btn-primary'
+.row
+  = link_to 'Допустить к участию в конкурсе ни смотря ни на что', approve_entrant_application_path(@entrant_application), method: :put, class: 'pull-left', data: { confirm: 'Уверены?'}

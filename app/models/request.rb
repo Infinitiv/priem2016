@@ -412,7 +412,7 @@ end
                           dr.UID ["benefit", campaign.year_start, item.application_number, benefit_document.id].join('-')
                           dr.OrphanCategoryID benefit_document.benefit_type_id
                           dr.DocumentName "Документ, подтверждающий сиротство"
-                          dr.DocumentSeries benefit_document.benefit_document_series? benefit_document.benefit_document_series : 'нет' 
+                          dr.DocumentSeries benefit_document.benefit_document_series ? benefit_document.benefit_document_series : 'нет' 
                           dr.DocumentNumber benefit_document.benefit_document_number if benefit_document.benefit_document_number
                           dr.DocumentDate benefit_document.benefit_document_date if benefit_document.benefit_document_date
                           dr.DocumentOrganization benefit_document.benefit_document_organization if benefit_document.benefit_document_organization
