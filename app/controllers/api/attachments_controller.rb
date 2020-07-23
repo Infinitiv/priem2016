@@ -29,6 +29,9 @@ class Api::AttachmentsController < ApplicationController
     if @attachment.document_type == 'withdraw_application' && @attachment.template == false
       @attachment.entrant_application.update_attributes(status: 'подан отказ от зачисления')
     end
+    if @attachment.document_type == 'recall_application' && @attachment.template == false
+      @attachment.entrant_application.update_attributes(status: 'подано заявление об отзыве документов')
+    end
     render text: 'ok'
   end
   
