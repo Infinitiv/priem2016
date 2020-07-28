@@ -904,7 +904,7 @@ class EntrantApplication < ActiveRecord::Base
       end
     when 4
       unless (competitive_groups.map(&:education_source_id) - [15]).empty?
-        pdf.text "Потверждаю отсутствие у меня диплома об окончании ординатруры или диплома об окончании интернатуры", size: 10
+        pdf.text "Потверждаю отсутствие у меня диплома об окончании ординатуры или диплома об окончании интернатуры", size: 10
         pdf.move_down 4
         pdf.text "Подпись ___________________", size: 10, align: :right
         pdf.move_down 4
