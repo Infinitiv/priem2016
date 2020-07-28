@@ -454,7 +454,9 @@ end
               other_identity_documents = identity_documents - [identity_documents.last]
               ads.IdentityDocument do |id|
                 id.UID ["id", campaign.year_start, identity_document.id].join('-')
-                id.DocumentSeries identity_document.identity_document_series ?  identity_document.identity_document_series : "нет серии"
+                unless identity_document.identity_document_series.nil? || identity_document.identity_document_series.empty?
+                  id.DocumentSeries identity_document.identity_document_series
+                end
                 id.DocumentNumber identity_document.identity_document_number
                 id.DocumentDate identity_document.identity_document_date
                 id.IdentityDocumentTypeID identity_document.identity_document_type
