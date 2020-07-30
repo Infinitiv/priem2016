@@ -286,6 +286,41 @@ namespace :priem do
     request(status_id: 2)
   end
   
+  task check_application: :environment do 
+    campaign = Campaign.where(campaign_type_id: 1).last
+    applications = campaign.entrant_applications.includes(:marks).where(status_id: 4).first(2)
+    applications.each do |application|
+      case Rails.env
+        when 'development'
+          url = 'priem.edu.ru:8000'
+          proxy_ip = nil
+          proxy_port = nil
+        when 'production' 
+          url = '127.0.0.1:8080'
+          proxy_ip = nil
+          proxy_port = nil
+      end
+      method = '/checkapplication/single'
+      data = ::Builder::XmlMarkup.new(indent: 2)
+      data.Root do |root|
+        Request.auth_data(root)
+        data.CheckApp do |ca|
+          ca.RegistrationDate application.registration_date.to_datetime.to_s.gsub('+00', '+03')
+          ca.ApplicationNumber application.application_number
+        end
+      end
+      request = data
+      uri = URI.parse('http://' + url + '/import/importservice.svc')
+      http = Net::HTTP.new(uri.host, uri.port, proxy_ip, proxy_port)
+      headers = {'Content-Type' => 'text/xml'}
+      response = http.post(uri.path + method, request, headers)
+      xml = Nokogiri::XML(response.body)
+      xml.css('Mark').each do |mark|
+        application.marks.where(subject_id: mark.at_css('SubjectID').text.to_i, form: 'ЕГЭ').update_all(value: mark.at_css('SubjectMark').text.to_i, checked: Time.now.to_date)
+      end
+    end
+  end
+  
   task target_xml: :environment do
     campaign = Campaign.first
     applications = campaign.entrant_applications.includes(:marks, :target_organization).where(enrolled: [6, 12, 18])

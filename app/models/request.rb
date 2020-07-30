@@ -32,8 +32,8 @@ end
           gdc.DictionaryCode params[:dictionary_number]
         end
       end
-    when '/checkapplication'
-      application = Application.select(:id, :number, :registration_date).find_by_number(params[:application_number])
+    when '/checkapplication/single'
+      application = Application.select(:id, :application_number, :registration_date).find_by_number(params[:application_number])
       data = ::Builder::XmlMarkup.new(indent: 2)
       data.Root do |root|
         auth_data(root)
