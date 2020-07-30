@@ -64,7 +64,7 @@
     tbody
       - @entrant_application.competitive_groups.order(:name).each do |competitive_group|
         - agreement_exists = @entrant_application.budget_agr == competitive_group.id || @entrant_application.paid_agr == competitive_group.id
-        - contract_exists = @entrant_application.contracts.include?(competitive_group.id)
+        - contract_exists = @entrant_application.contracts.map(&:competitive_group_id).include?(competitive_group.id)
         - agreement_sign = ''
         - if agreement_exists
           - agreement_sign = 'x'

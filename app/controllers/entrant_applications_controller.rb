@@ -113,13 +113,13 @@ class EntrantApplicationsController < ApplicationController
   def toggle_contract
     if @competitive_group.education_source_id == 15
       value_name = 'contracts'
-      if @entrant_application.contracts.include?(@competitive_group.id)
+      if @entrant_application.contracts.map(&:competitive_group_id).include?(@competitive_group.id)
         old_value = @competitive_group.id
-        @entrant_application.contracts.delete(@competitive_group.id)
+        @entrant_application.contracts.where(competitive_group_id: @competitive_group.id).destroy_all
         new_value = nil
       else
         old_value = nil
-        @entrant_application.contracts << @competitive_group.id
+        @entrant_application.contracts.create(competitive_group_id: @competitive_group.id)
         new_value = @competitive_group.id
       end
       Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
