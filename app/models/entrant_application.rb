@@ -257,15 +257,8 @@ class EntrantApplication < ActiveRecord::Base
       applications.each do |application|
         application.competitive_groups.each do |competitive_group|
           citizenship = application.nationality_type_id == 1 ? 643 : ''
-          test_result_type = application.marks.map(&:form).include?('аккредитация') ? 'аккредитация' : 'ординатура'
-          test_result_year = case true
-                              when test_result_type == 'ординатура'
-                                2019
-                              when test_result_type == 'аккредитация' && application.education_document.education_document_date.year == 2019
-                                2019
-                              else
-                                2018
-                              end
+          test_result_type = application.marks.map(&:form).include?('Аккредитация') ? 'аккредитация' : 'ординатура'
+          test_result_year = application.marks.map(&:year).first
           row = [
             application.snils,
             application.entrant_last_name,

@@ -55,6 +55,7 @@ class RequestsController < ApplicationController
   
   def set_selects
     @queries = ['checkapplication',
+                'checkapplication/single',
                 'delete',
                 'delete/result',
                 'dictionary',
