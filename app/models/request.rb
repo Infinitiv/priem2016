@@ -581,9 +581,7 @@ end
                       etr.ResultSourceTypeID 1
                     when sub_item.form == "Экзамен"
                       etr.ResultSourceTypeID 2
-                    when sub_item.form == "аккредитация"
-                      etr.ResultSourceTypeID 2
-                    when sub_item.form == "тест"
+                    when sub_item.form == "Аккредитация"
                       etr.ResultSourceTypeID 2
                     else
                       etr.ResultSourceTypeID 3
@@ -599,17 +597,17 @@ end
                         rd.InstitutionDocument do |id|
                           case sub_item.subject.subject_id
                           when 11
-                            id.DocumentNumber "2019-1"
-                            id.DocumentDate "2019-07-12"
+                            id.DocumentNumber "2020-1"
+                            id.DocumentDate "2020-08-04"
                           when 4
-                            id.DocumentNumber "2019-2"
-                            id.DocumentDate "2019-07-16"
+                            id.DocumentNumber "2020-2"
+                            id.DocumentDate "2020-08-10"
                           when 1
-                            id.DocumentNumber "2019-3"
-                            id.DocumentDate "2019-07-18"
+                            id.DocumentNumber "2020-3"
+                            id.DocumentDate "2020-08-13"
                           else
-                            id.DocumentNumber "2019-1"
-                            id.DocumentDate "2019-08-06"
+                            id.DocumentNumber "2020-1"
+                            id.DocumentDate "2020-08-06"
                           end
                           id.DocumentTypeID 1
                         end
