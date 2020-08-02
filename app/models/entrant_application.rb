@@ -260,10 +260,10 @@ class EntrantApplication < ActiveRecord::Base
           test_result_type = application.marks.map(&:form).include?('Аккредитация') ? 'аккредитация' : 'ординатура'
           test_result_year = application.marks.map(&:year).first
           row = [
-            application.snils,
-            application.entrant_last_name,
-            application.entrant_first_name,
-            application.entrant_middle_name,
+            application.snils.strip,
+            application.entrant_last_name.strip,
+            application.entrant_first_name.strip,
+            application.entrant_middle_name.strip,
             oid,
             2,
             application.birth_date.strftime("%d.%m.%Y"),
