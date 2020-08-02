@@ -273,7 +273,7 @@ class EntrantApplication < ActiveRecord::Base
             application.registration_date.strftime("%d.%m.%Y"),
             (competitive_group.education_source_id == 16 ? 'да' : 'нет'),
             test_result_type,
-            application.marks.map(&:organization_uid).first,
+            application.marks.map(&:organization_uid).first.strip,
             test_result_year
             ]
           csv << row
