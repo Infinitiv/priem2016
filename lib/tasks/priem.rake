@@ -500,6 +500,42 @@ namespace :priem do
     end
   end
   
+  desc 'mailing to exam entrants'
+  task mailing_to_exam: :environment do
+    applications = EntrantApplication.order(:application_number).joins(:marks).where(campaign_id: 7, status_id: 4, marks: {form: 'Экзамен', subject_id: 3}).uniq
+    test_id = 1963
+    exam_ids = {1 => 1942, 2 => 1945, 3 => 1947, 4 => 1948, 5 => 1949, 6 => 1950, 7 => 1951, 8 => 1952, 9 => 1953, 10 => 1954, 11 => 1956, 12 => 1957, 13 => 1958, 14 => 1959, 15 => 1960}
+    rows = []
+    n = 1
+    while applications.length > 0
+      applications.first(9).each do |application|
+        row = {}
+        row[:application_number] = application.application_number
+        row[:username] = "priem2020_#{application.application_number}"
+        row[:lastname] = application.entrant_last_name
+        row[:firstname] = application.entrant_first_name
+        row[:middlename] = application.entrant_middle_name
+        row[:email] = application.email
+        row[:password] = %x(pwgen).strip
+        row[:start_time] = n <= 8 ? '9:00' : '13:00'
+        row[:course1] = 'ОТ2020'
+        row[:course2] = "Химия2020_#{n}"
+        row[:test_link] = "https://moodle.isma.ivanovo.ru/mod/lti/view.php?id=#{test_id}"
+        row[:exam_link] = "https://moodle.isma.ivanovo.ru/mod/lti/view.php?id=#{exam_ids[n]}"
+        rows << row
+        Events.mailing_to_exam(row).deliver_later if Rails.env == 'production'
+      end
+      n += 1
+      applications = applications - applications.first(9)
+    end
+    CSV.open("mailing_to_exam.csv", "wb") do |csv|
+      csv << rows.first.keys
+      rows.sample(5).each do |row|
+        csv << row.values
+      end
+    end
+  end
+  
   private
   
   def http_params
