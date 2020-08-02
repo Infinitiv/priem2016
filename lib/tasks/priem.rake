@@ -247,7 +247,7 @@ namespace :priem do
     end
     CSV.open("mailing_to_exam.csv", "wb") do |csv|
       csv << rows.first.keys
-      rows.sample(5).each do |row|
+      rows.each do |row|
         csv << row.values
       end
     end

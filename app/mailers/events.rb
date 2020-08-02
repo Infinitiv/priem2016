@@ -19,7 +19,6 @@ class Events < ActionMailer::Base
   
   def mailing_to_exam(row)
     @row = row
-#     mail(to: @row[:email], subject: 'Приемная комиссия ИвГМА сообщает')
-    mail(to: 'markovnin@isma.ivanovo.ru', subject: 'Приемная комиссия ИвГМА сообщает')
+    mail(to: @row[:email], subject: 'Приемная комиссия ИвГМА сообщает')
   end
 end
