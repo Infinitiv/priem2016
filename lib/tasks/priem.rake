@@ -217,11 +217,11 @@ namespace :priem do
   
   desc 'mailing to exam entrants'
   task mailing_to_exam: :environment do
-    applications = EntrantApplication.order(:application_number).joins(:marks).where(campaign_id: 7, status_id: 4, marks: {form: 'Экзамен', subject_id: 3}).uniq
+    applications = EntrantApplication.order(:application_number).joins(:marks).where(campaign_id: 7, status_id: 4, marks: {form: 'Экзамен', subject_id: 3}).where("application_number > ?", 939).uniq
     test_id = 1963
     exam_ids = {1 => 1942, 2 => 1945, 3 => 1947, 4 => 1948, 5 => 1949, 6 => 1950, 7 => 1951, 8 => 1952, 9 => 1953, 10 => 1954, 11 => 1956, 12 => 1957, 13 => 1958, 14 => 1959, 15 => 1960}
     rows = []
-    n = 1
+    n = 11
     while applications.length > 0
       applications.first(9).each do |application|
         row = {}
@@ -238,9 +238,6 @@ namespace :priem do
         row[:test_link] = "https://moodle.isma.ivanovo.ru/mod/lti/view.php?id=#{test_id}"
         row[:exam_link] = "https://moodle.isma.ivanovo.ru/mod/lti/view.php?id=#{exam_ids[n]}"
         rows << row
-        if Rails.env == 'production'
-          Events.mailing_to_exam(row).deliver_later 
-        end
       end
       n += 1
       applications = applications - applications.first(9)
@@ -249,6 +246,11 @@ namespace :priem do
       csv << rows.first.keys
       rows.each do |row|
         csv << row.values
+      end
+    end
+    if Rails.env == 'production'
+      rows.each do |row|
+        Events.mailing_to_exam(row).deliver_later 
       end
     end
   end
