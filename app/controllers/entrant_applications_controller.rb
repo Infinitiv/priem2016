@@ -4,7 +4,7 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_competitive_group, only: [:toggle_agreement, :toggle_contract, :toggle_competitive_group]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update, :show]
-  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export, :target_report, :entrants_lists_to_html, :entrants_lists_ord_to_html]
+  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export, :ord_access_request, :target_report, :entrants_lists_to_html, :entrants_lists_ord_to_html]
   
   def index
     @entrant_applications = EntrantApplication.includes(:education_document, :marks).select(:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :status_id, :campaign_id, :data_hash, :registration_date, :status, :comment, :request).where(campaign_id: @campaign)
@@ -258,6 +258,11 @@ class EntrantApplicationsController < ApplicationController
   def ord_result_export
     @applications_hash = EntrantApplication.entrant_applications_hash(@campaign)
     send_data EntrantApplication.ord_result_export(@applications_hash), filename: "entrant_ord_result_export-#{Date.today}.csv", type: 'text/csv', disposition: "attachment"
+  end
+  
+  def ord_access_request
+    @entrant_applications = @campaign.entrant_applications.select(:id, :snils, :birth_date, :nationality_type_id).includes(:education_document).joins(:marks).where(nationality_type_id: 1, status_id: [2, 4], marks: {form: 'Экзамен', organization_uid: '1.2.643.5.1.13.13.12.4.37.21', year: 2020})
+    send_data EntrantApplication.ord_access_request(@entrant_applications), filename: "entrant_ord_access_request-#{Date.today}.csv", type: 'text/csv', disposition: "attachment"
   end
   
   def target_report

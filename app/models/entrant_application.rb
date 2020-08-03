@@ -265,7 +265,7 @@ class EntrantApplication < ActiveRecord::Base
             application.entrant_first_name.strip,
             application.entrant_middle_name.strip,
             oid,
-            2,
+            3,
             application.birth_date.strftime("%d.%m.%Y"),
             citizenship,
             competitive_group.edu_programs.last.code,
@@ -303,7 +303,7 @@ class EntrantApplication < ActiveRecord::Base
           row = [
             application.snils,
             oid,
-            1,
+            3,
             application.birth_date.strftime("%d.%m.%Y"),
             competitive_group.edu_programs.last.code,
             (competitive_group.education_source_id == 15 ? 'договор' : 'бюджет'),
@@ -349,6 +349,34 @@ class EntrantApplication < ActiveRecord::Base
           test_result_year,
           application.marks.map(&:organization_uid).first,
           application.education_document.education_speciality_code
+          ]
+        csv << row
+      end
+    end
+  end
+  
+  def self.ord_access_request(applications)
+    oid = '1.2.643.5.1.13.13.12.4.37.21'
+    headers = [
+      'snils',
+      'oid',
+      'dateOfBirth',
+      'specialty',
+      'date',
+      'attemptType',
+      'retryReason'
+    ]
+
+    CSV.generate(headers: true, col_sep: ';') do |csv|
+      csv << headers
+      applications.each do |application|
+        row = [
+          application.snils,
+          oid,
+          application.birth_date.strftime("%d.%m.%Y"),
+          application.education_document.education_speciality_code,
+          Time.now.to_date == '2020-08-03'.to_date ? '06.08.2020' : '07.08.2020',
+          1
           ]
         csv << row
       end

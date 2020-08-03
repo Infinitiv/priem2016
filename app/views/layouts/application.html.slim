@@ -68,6 +68,7 @@ body
                 li= link_to "Конкурс #{campaign.name} #{campaign.year_start}", competition_lists_entrant_applications_path + "?campaign_id=#{campaign.id}"
                 li= link_to "Выгрузка в ИАС #{campaign.name} #{campaign.year_start}", ord_export_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
                 li= link_to "Выгрузка в ИАС (отзыв заявлений) #{campaign.name} #{campaign.year_start}", ord_return_export_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
+                li= link_to "Выгрузка в ИАС (запрос логинов) #{campaign.name} #{campaign.year_start}", ord_access_request_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
                 li= link_to "Отчет в ИАС #{campaign.name} #{campaign.year_start}", ord_result_export_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
                 li= link_to "Отчет по целевикам #{campaign.name} #{campaign.year_start}", target_report_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(5)
                 li= link_to "Запрос оценок из ИАС #{campaign.name} #{campaign.year_start}", ord_marks_request_entrant_applications_path + "?campaign_id=#{campaign.id}" if campaign.education_levels.include?(18)
