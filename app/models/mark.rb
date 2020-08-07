@@ -26,8 +26,8 @@ class Mark < ActiveRecord::Base
       test_result = marks.find_by_subject_id(4) || entrant_application.marks.new
       test_result.subject_id = 4
       test_result.value = row['test_result'].to_i
-      test_result.form = row['test_form']
-      test_result.organization_uid = row['organization_uid']
+      test_result.form = row['test_form'] if row['test_form']
+      test_result.organization_uid = row['organization_uid'] if row['organization_uid']
       test_result.save!
     end
   end

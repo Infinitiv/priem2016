@@ -54,7 +54,7 @@ class EntrantApplication < ActiveRecord::Base
           end
         end
       end
-      entrant_application.contracts = []
+      entrant_application.contracts = [] if row['contract_lech'] || row['contract_ped'] || row['contract_stomat']
       entrant_application.contracts << competitive_groups.find_by_name('Лечебное дело. Внебюджет.').id if row['contract_lech']
       entrant_application.contracts << competitive_groups.find_by_name('Педиатрия. Внебюджет.').id if row['contract_ped']
       entrant_application.contracts << competitive_groups.find_by_name('Стоматология. Внебюджет.').id if row['contract_stomat']
@@ -83,8 +83,8 @@ class EntrantApplication < ActiveRecord::Base
             end
           end
         when campaign.education_levels.include?(18)
-          entrant_application.competitive_groups = [] unless row.keys.include?('enrolled')
           if row['spec1']
+            entrant_application.competitive_groups = [] unless row.keys.include?('enrolled')
             entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec1']}).where(education_source_id: 14) if row['budg1']
             entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec1']}).where(education_source_id: 15) if row['paid1']
             if row['target1']
@@ -94,6 +94,7 @@ class EntrantApplication < ActiveRecord::Base
             end
           end
           if row['spec2']
+            entrant_application.competitive_groups = [] unless row.keys.include?('enrolled')
             entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec2']}).where(education_source_id: 14) if row['budg2']
             entrant_application.competitive_groups << competitive_groups.joins(:edu_programs).where(edu_programs: {name: row['spec2']}).where(education_source_id: 15) if row['paid2']
             if row['target2']
@@ -332,22 +333,15 @@ class EntrantApplication < ActiveRecord::Base
     CSV.generate(headers: true, col_sep: ';') do |csv|
       csv << headers
       applications.each do |application|
-        test_result_type = application.marks.map(&:form).include?('аккредитация') ? 'аккредитация' : 'ординатура'
-        test_result_year = case true
-                            when test_result_type == 'ординатура'
-                              2019
-                            when test_result_type == 'аккредитация' && application.education_document.education_document_date.year == 2019
-                              2019
-                            else
-                              2018
-                            end
+        test_result_type = application.marks.map(&:form).include?('Аккредитация') ? 'аккредитация' : 'ординатура'
+        test_result_year = application.marks.map(&:year).first
         row = [
-          application.snils,
+          application.snils.strip,
           oid,
           application.birth_date.strftime("%d.%m.%Y"),
           test_result_type,
           test_result_year,
-          application.marks.map(&:organization_uid).first,
+          application.marks.map(&:organization_uid).first.strip,
           application.education_document.education_speciality_code
           ]
         csv << row

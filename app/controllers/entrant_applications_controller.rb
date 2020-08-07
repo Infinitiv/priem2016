@@ -251,7 +251,7 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def ord_marks_request
-    @entrant_applications = @campaign.entrant_applications.select(:id, :snils, :birth_date).includes(:marks, :education_document).joins(:marks).where(marks: {value: 0}, nationality_type_id: 1)
+    @entrant_applications = @campaign.entrant_applications.select(:id, :snils, :birth_date, :status_id).includes(:marks, :education_document).joins(:marks).where(status_id: [2, 4], marks: {value: 0}, nationality_type_id: 1).where.not(application_number: nil)
     send_data @entrant_applications.ord_marks_request(@entrant_applications), filename: "entrant_marks_request-#{Date.today}.csv", type: 'text/csv', disposition: "attachment"
   end
   
