@@ -3,7 +3,7 @@ namespace :priem do
   
   task check_application: :environment do 
     campaign = Campaign.where(campaign_type_id: 1).last
-    applications = campaign.entrant_applications.includes(:marks).where(status_id: 4).first(2)
+    applications = campaign.entrant_applications.includes(:marks).where(status_id: 4)
     applications.each do |application|
       application_number = [application.campaign.year_start, "%04d" % application.application_number, 's'].join('-')
       case Rails.env
