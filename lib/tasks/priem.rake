@@ -35,14 +35,17 @@ namespace :priem do
       puts response.body
       xml = Nokogiri::XML(response.body)
       xml.css('Mark').each do |mark|
-        if mark.at_css('SubjectMark').text.to_i > application.marks.where(subject_id: mark.at_css('SubjectID').text.to_i, form: 'ЕГЭ').value
-          application.marks.where(subject_id: mark.at_css('SubjectID').text.to_i, form: 'ЕГЭ').update_all(value: mark.at_css('SubjectMark').text.to_i, checked: Time.now.to_date)
-          puts "оценка по #{mark.at_css('SubjectID').text.to_i} обновлена"
-        end
-        if application.olympionic
-          application.olympic_documents.each do |olympic_document|
-            if olympic_document.benefit_type_id == 3 && olympic_document.ege_subject_id == mark.at_css('SubjectID').text.to_i
-              application.marks.where(subject_id: mark.at_css('SubjectID').text.to_i, form: 'ЕГЭ').update_all(value: 100, checked: Time.now.to_date) if mark.at_css('SubjectMark').text.to_i > 74
+        if Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i)
+          unless mark.at_css('SubjectMark').text.to_i == application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').map(&:value).max
+            application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').update_all(value: mark.at_css('SubjectMark').text.to_i, checked: Time.now.to_date)
+            puts "оценка по предмету #{mark.at_css('SubjectName').text} обновлена"
+          end
+          if application.olympionic
+            application.olympic_documents.each do |olympic_document|
+              if olympic_document.benefit_type_id == 3 && olympic_document.ege_subject_id == mark.at_css('SubjectID').text.to_i
+                application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').update_all(value: 100, checked: Time.now.to_date) if mark.at_css('SubjectMark').text.to_i > 74
+                puts "добавлена оценка за олимпиаду по #{mark.at_css('SubjectName').text}"
+              end
             end
           end
         end
