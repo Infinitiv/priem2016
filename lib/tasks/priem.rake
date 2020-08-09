@@ -5,6 +5,7 @@ namespace :priem do
     campaign = Campaign.where(campaign_type_id: 1).last
     applications = campaign.entrant_applications.includes(:marks).where(status_id: 4).first(2)
     applications.each do |application|
+      application_number = [application.campaign.year_start, "%04d" % application.application_number, 's'].join('-')
       case Rails.env
         when 'development'
           url = 'priem.edu.ru:8000'
@@ -21,18 +22,22 @@ namespace :priem do
         Request.auth_data(root)
         data.CheckApp do |ca|
           ca.RegistrationDate application.registration_date.to_datetime.to_s.gsub('+00', '+03')
-          ca.ApplicationNumber application.application_number
+          ca.ApplicationNumber application_number
         end
       end
-      request = data
+      puts data.to_xml
+      request = data.target!
       uri = URI.parse('http://' + url + '/import/importservice.svc')
       http = Net::HTTP.new(uri.host, uri.port, proxy_ip, proxy_port)
       headers = {'Content-Type' => 'text/xml'}
+      puts "поступающий #{application_number} - отправляем запрос"
       response = http.post(uri.path + method, request, headers)
+      puts response.body
       xml = Nokogiri::XML(response.body)
       xml.css('Mark').each do |mark|
         if mark.at_css('SubjectMark').text.to_i > application.marks.where(subject_id: mark.at_css('SubjectID').text.to_i, form: 'ЕГЭ').value
           application.marks.where(subject_id: mark.at_css('SubjectID').text.to_i, form: 'ЕГЭ').update_all(value: mark.at_css('SubjectMark').text.to_i, checked: Time.now.to_date)
+          puts "оценка по #{mark.at_css('SubjectID').text.to_i} обновлена"
         end
         if application.olympionic
           application.olympic_documents.each do |olympic_document|
