@@ -422,30 +422,30 @@ end
                     acb.BenefitKindID benefit_document.benefit_type_id
                   end
                 end
-#                 unless olympic_documents.empty?
-#                   acbs.ApplicationCommonBenefit do |acb|
-#                     acb.UID ["olympic", campaign.year_start, item.application_number].join('-')
-#                     acb.CompetitiveGroupUID item.budget_agr
-#                     olympic_document = olympic_documents.last
-#                     acb.DocumentTypeID 9
-#                     acb.DocumentReason do |dr|
-#                       dr.OlympicDocument do |od|
-#                         od.UID ["olympic", campaign.year_start, item.application_number, olympic_document.id].join('-')
-#                         od.OriginalReceivedDate item.education_document.original_received_date if item.education_document.original_received_date
-#                         od.DocumentSeries olympic_document.olympic_document_series if olympic_document.olympic_document_series
-#                         od.DocumentNumber olympic_document.olympic_document_number if olympic_document.olympic_document_number
-#                         od.DocumentDate olympic_document.olympic_document_date if olympic_document.olympic_document_date
-#                         od.DiplomaTypeID olympic_document.diploma_type_id
-#                         od.OlympicID olympic_document.olympic_id
-#                         od.ProfileID olympic_document.olympic_profile_id
-#                         od.ClassNumber  olympic_document.class_number
-#                         od.OlympicSubjectID olympic_document.olympic_subject_id if olympic_document.olympic_subject_id
-#                         od.EgeSubjectID olympic_document.ege_subject_id if olympic_document.ege_subject_id
-#                       end
-#                     end
-#                     acb.BenefitKindID olympic_document.benefit_type_id
-#                   end
-#                 end
+                unless olympic_documents.empty?
+                  acbs.ApplicationCommonBenefit do |acb|
+                    acb.UID ["olympic", campaign.year_start, item.application_number].join('-')
+                    acb.CompetitiveGroupUID item.budget_agr
+                    olympic_document = olympic_documents.last
+                    acb.DocumentTypeID 9
+                    acb.DocumentReason do |dr|
+                      dr.OlympicDocument do |od|
+                        od.UID ["olympic", campaign.year_start, item.application_number, olympic_document.id].join('-')
+                        od.OriginalReceivedDate item.education_document.original_received_date if item.education_document.original_received_date
+                        od.DocumentSeries olympic_document.olympic_document_series if olympic_document.olympic_document_series
+                        od.DocumentNumber olympic_document.olympic_document_number if olympic_document.olympic_document_number
+                        od.DocumentDate olympic_document.olympic_document_date if olympic_document.olympic_document_date
+                        od.DiplomaTypeID olympic_document.diploma_type_id
+                        od.OlympicID olympic_document.olympic_id
+                        od.ProfileID olympic_document.olympic_profile_id
+                        od.ClassNumber  olympic_document.class_number
+                        od.OlympicSubjectID olympic_document.olympic_subject_id if olympic_document.olympic_subject_id
+                        od.EgeSubjectID olympic_document.ege_subject_id if olympic_document.ege_subject_id
+                      end
+                    end
+                    acb.BenefitKindID olympic_document.benefit_type_id
+                  end
+                end
               end
             end
             a.ApplicationDocuments do |ads|
