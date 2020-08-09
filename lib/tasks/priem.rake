@@ -31,7 +31,16 @@ namespace :priem do
       response = http.post(uri.path + method, request, headers)
       xml = Nokogiri::XML(response.body)
       xml.css('Mark').each do |mark|
-        application.marks.where(subject_id: mark.at_css('SubjectID').text.to_i, form: 'ЕГЭ').update_all(value: mark.at_css('SubjectMark').text.to_i, checked: Time.now.to_date)
+        if mark.at_css('SubjectMark').text.to_i > application.marks.where(subject_id: mark.at_css('SubjectID').text.to_i, form: 'ЕГЭ').value
+          application.marks.where(subject_id: mark.at_css('SubjectID').text.to_i, form: 'ЕГЭ').update_all(value: mark.at_css('SubjectMark').text.to_i, checked: Time.now.to_date)
+        end
+        if application.olympionic
+          application.olympic_documents.each do |olympic_document|
+            if olympic_document.benefit_type_id == 3 && olympic_document.ege_subject_id == mark.at_css('SubjectID').text.to_i
+              application.marks.where(subject_id: mark.at_css('SubjectID').text.to_i, form: 'ЕГЭ').update_all(value: 100, checked: Time.now.to_date) if mark.at_css('SubjectMark').text.to_i > 74
+            end
+          end
+        end
       end
     end
   end
