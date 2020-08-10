@@ -43,5 +43,8 @@ dl
           tr
             td= target_number.target_organization.target_organization_name
             td= "#{[target_number.number_target_o, target_number.number_target_oz, target_number.number_target_z].sum}"
-            td= link_to 'Удалить', target_number, method: :delete
+            td
+              = link_to 'Редактироваь', edit_target_number_path(target_number)
+              br
+              = link_to 'Удалить', target_number, method: :delete
 = link_to "К списку конкурсов", competitive_groups_path, class: 'btn btn-primary'
