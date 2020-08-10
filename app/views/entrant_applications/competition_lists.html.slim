@@ -12,14 +12,10 @@ css:
   = "Конкурсный список"
 h1= "Приемная кампания #{@campaign.name} #{@campaign.year_start}" 
 h2= "Конкурсный список"
-p 
-  span Зеленым цветом выделены абитуриенты гарантированно поступающие на обучение при 
-  strong наличии 
-  span в академии оригинала документа об образовании и заявления о согласии на зачисление на данный конкурс
 .checkbox
   label
     = check_box_tag 'tr-hide', 'yes', false, id: 'tr-hide'
-    span Показать только поступающих с оригиналами и согласиями
+    span Показать только поступающих с согласиями
 - @admission_volume_hash.each do |direction_id, competitive_groups|
   - competitive_groups.sort_by{|competitive_group, numbers| competitive_group.name}.select{|competitive_group, numbers| competitive_group.last_admission_date > Time.now.to_date}.each do |competitive_group, numbers|
     - applications = @applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.status_id == 4 && v[:mark_values].select{|m| m > 41}.count == @entrance_test_items.size}
@@ -64,7 +60,6 @@ p
               th №№
               th № личного дела
               th Ф.И.О.
-              th Наличие оригинала документа об образовании
               th Наличие согласия на зачисление
               th Сумма конкурсных баллов
               - @entrance_test_items.each do |entrance_test_item|
@@ -77,13 +72,11 @@ p
             - n = 0
             - applications.each do |application, values|
               - n += 1
-              - label_class = "success" if n <= numbers
-              - label_class = [label_class, 'tr-hide'].compact.join(' ') unless values[:original_received] && (application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id)
+              - label_class = ['tr-hide'].compact.join(' ') unless application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id
               tr class=label_class
                 td
                 td= "%04d" % application.application_number
                 td= application.fio
-                td.text-center= "+" if values[:original_received]
                 td.text-center= "+" if [application.budget_agr, application.paid_agr].include?(competitive_group.id)
                 td= values[:full_summa] unless values[:mark_values].include?(0)
                 - values[:mark_values].each do |mark_value|

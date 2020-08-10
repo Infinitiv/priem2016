@@ -2,17 +2,12 @@
   = "Приемная кампания #{@campaign.name} #{@campaign.year_start}. Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%d.%m.%Y %T")}"
 h1= "Приемная кампания #{@campaign.name} #{@campaign.year_start}." 
 h2= "Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%d.%m.%Y %T")}"
-p 
-  span Зеленым цветом выделены абитуриенты гарантированно поступающие на обучение при 
-  strong наличии 
-  span в академии пакета документов, необходимых для зачисления.
-
 - applications = @applications_hash.select{|k, v| k.status_id == 4 && v[:mark_values].select{|m| m > 69}.count == @entrance_test_items.size && k.nationality_type_id != 1}
 .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
   .panel.panel-default
     .panel-heading(role="tab" id="headinginter")
       .panel-title
-        = link_to "Квота для иностранных граждан и лиц без гражданства (всего мест в конкурсе - 10)", "#collapseinter", data: {toggle: "collapse", parent: "#accordion"}, aria: {expanded: "false", controls: "#collapseinter"}
+        = link_to "Квота для иностранных граждан и лиц без гражданства (всего мест в конкурсе - 15)", "#collapseinter", data: {toggle: "collapse", parent: "#accordion"}, aria: {expanded: "false", controls: "#collapseinter"}
 .panel-collapse.collapse(id="collapseinter" role="tabpanel" aria-labelledby="headinginter")
   .panel-body
     table.table
@@ -21,7 +16,7 @@ p
           th №№
           th № личного дела
           th Ф.И.О.
-          th Наличие оригинала документа об образовании или согласия на зачисление
+          th Наличие согласия на зачисление
           th Сумма конкурсных баллов
           th Баллы за вступительное испытание
           th Баллы за индивидуальные достижения
@@ -29,13 +24,12 @@ p
         - n = 0
         - applications.each do |application, values|
           - n += 1
-          - label_class = "success" if n <= 10
-          tr class=label_class
+          tr
             td
             td= "%04d" % application.application_number
             td= application.fio
             td.text-center
-              - if values[:original_received] || application.paid_agr
+              - if application.paid_agr
                 span.glyphicon.glyphicon-plus(aria-hidden="true")
             td= values[:full_summa] if values[:mark_values].select{|m| m > 69}.count == 1
             td= values[:summa]
@@ -58,27 +52,32 @@ p
                 th №№
                 th № личного дела
                 th Ф.И.О.
-                th Наличие оригинала документа об образовании или согласия на зачисление
+                th Наличие согласия на зачисление
                 th Сумма конкурсных баллов
                 th Баллы за вступительное испытание
                 th Баллы за индивидуальные достижения
-                th= "Зачислен по другому конкурсу"
+                - if competitive_group.education_source_id == 16
+                  th= "Заказчик целевого приема"
+                - unless competitive_group.education_source_id == 16
+                  th= "Зачислен по другому конкурсу"
             tbody
               - n = 0
               - applications.each do |application, values|
                 - unless application.enrolled == competitive_group.id || application.exeptioned == competitive_group.id
                   - n += 1
-                  - label_class = "success" if n <= numbers
-                  tr class=label_class
+                  tr
                     td
                     td= "%04d" % application.application_number
                     td= application.fio
                     td.text-center
-                      - if values[:original_received] || application.paid_agr
+                      - if application.paid_agr == competitive_group.id || application.budget_agr == competitive_group.id
                         span.glyphicon.glyphicon-plus(aria-hidden="true")
                     td= values[:full_summa] if values[:mark_values].select{|m| m > 69}.count == 1
                     td= values[:summa]
                     td= values[:achievements_sum] if values[:achievements_sum] > 0
-                    td.text-center
-                      - if application.enrolled && application.enrolled != competitive_group.id
-                        span.glyphicon.glyphicon-plus(aria-hidden="true")
+                    - if competitive_group.education_source_id == 16
+                      td= application.target_contracts.where(competitive_group_id: competitive_group).map{|target_contract| target_contract.target_organization.target_organization_name}.join(', ') 
+                    - unless competitive_group.education_source_id == 16
+                      td.text-center
+                        - if application.enrolled && application.enrolled != competitive_group.id
+                          span.glyphicon.glyphicon-plus(aria-hidden="true")

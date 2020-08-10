@@ -2,15 +2,10 @@
   = "Приемная кампания #{@campaign.name} #{@campaign.year_start}. Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%d.%m.%Y %T")}"
 h1= "Приемная кампания #{@campaign.name} #{@campaign.year_start}." 
 h2= "Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%d.%m.%Y %T")}"
-p 
-  span Зеленым цветом выделены абитуриенты гарантированно поступающие на обучение при 
-  strong наличии 
-  span в академии оригинала документа об образовании и заявления о согласии на зачисление на данный конкурс.
-p Обращаем Ваше внимание, что возможны изменения в списках, в части подачи оригиналов и заявлений о согласии на зачисление, а также в рейтинговых списках на внебюджетные конкурсы в связи с продолжающимся до 5 августа приемом документов на обучение с оплатой стоимости.
 .checkbox
   label
     = check_box_tag 'tr-hide', 'yes', false, id: 'tr-hide'
-    span Показать только поступающих с оригиналами и согласиями
+    span Показать только поступающих с согласиями
     
 - @admission_volume_hash.each do |direction_id, competitive_groups|
   - competitive_groups.sort_by{|competitive_group, numbers| competitive_group.name}.select{|competitive_group, numbers| competitive_group.last_admission_date > Time.now.to_date}.each do |competitive_group, numbers|
@@ -77,8 +72,7 @@ p Обращаем Ваше внимание, что возможны измен
             - applications.each do |application, values|
               - unless application.enrolled == competitive_group.id || application.exeptioned == competitive_group.id
                 - n += 1
-                - label_class = "success" if n <= last_numbers
-                - label_class = [label_class, 'tr-hide'].compact.join(' ') unless values[:original_received] && (application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id)
+                - label_class = ['tr-hide'].compact.join(' ') unless application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id
                 tr class=label_class
                   td
                   td= "%04d" % application.application_number
