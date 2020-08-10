@@ -3,7 +3,7 @@ namespace :priem do
   
   task check_application: :environment do 
     campaign = Campaign.where(campaign_type_id: 1).last
-    applications = campaign.entrant_applications.includes(:marks).where(status_id: 4)
+    applications = campaign.entrant_applications.order(:application_number).includes(:marks).where(status_id: 4)
     applications.each do |application|
       application_number = [application.campaign.year_start, "%04d" % application.application_number, 's'].join('-')
       case Rails.env
@@ -26,13 +26,11 @@ namespace :priem do
         end
       end
       puts data.to_xml
-      request = data.target!
       uri = URI.parse('http://' + url + '/import/importservice.svc')
       http = Net::HTTP.new(uri.host, uri.port, proxy_ip, proxy_port)
       headers = {'Content-Type' => 'text/xml'}
       puts "поступающий #{application_number} - отправляем запрос"
       response = http.post(uri.path + method, request, headers)
-      puts response.body
       xml = Nokogiri::XML(response.body)
       xml.css('Mark').each do |mark|
         if Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i)

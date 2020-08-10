@@ -39,7 +39,7 @@ class TargetNumbersController < ApplicationController
   
   def destroy
     @target_number.destroy
-    redirect_to target_numbers_path
+    redirect_to :back
   end
   
   private
