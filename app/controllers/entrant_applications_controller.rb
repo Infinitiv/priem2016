@@ -34,6 +34,14 @@ class EntrantApplicationsController < ApplicationController
     @target_contracts = @entrant_application.target_contracts
     @journal_entries = Journal.includes(:user).where(entrant_application_id: @entrant_application.id)
     @achievement = @entrant_application.achievements.new
+    @dup = @entrant_application.campaign.identity_documents.where(identity_document_series: @entrant_application.identity_documents.map(&:identity_document_series), identity_document_number: @entrant_application.identity_documents.map(&:identity_document_number))
+    if @dup.count > 1
+      @dup_entrants = []
+      @dup.each do |identity_document|
+        @dup_entrants << identity_document.entrant_application
+      end
+      @dup_entrants = @dup_entrants - [@entrant_application]
+    end
   end
   
   def new

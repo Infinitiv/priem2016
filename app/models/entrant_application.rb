@@ -140,7 +140,7 @@ class EntrantApplication < ActiveRecord::Base
   end
   
   def self.find_elders(applications)
-    applications.select{|a| Time.now.to_date > a.birth_date + 20.years}.select{|a| a.identity_documents.count == 1}
+    applications.select{|a| Time.now.to_date > a.birth_date + 20.years}.select{|a| a.identity_documents.count == 1 && a.marks.map(&:form).count('Экзамен') != 3}
   end
   
   def self.find_empty_achievements(applications)
