@@ -1,41 +1,54 @@
 h1 Отчет об ошибках
 h2= @campaign.name
-  - unless @errors[:dups_numbers].nil? || @errors[:dups_numbers].empty?
-    h3= "Повторяющиеся номера заявлений"
-    ul
-      - @errors[:dups_numbers].each do |applications|
-        - applications.each do |application|
-          li= link_to "%04d" % EntrantApplication.find(application).application_number, entrant_application_path(application)
+- unless @errors[:dups_numbers].nil? || @errors[:dups_numbers].empty?
+  h3= "Повторяющиеся номера заявлений"
+  ul
+    - @errors[:dups_numbers].each do |applications|
+      - applications.each do |application|
+        li= link_to "%04d" % EntrantApplication.find(application).application_number, entrant_application_path(application)
+    
+- unless @errors[:lost_numbers].nil? || @errors[:lost_numbers].empty?
+  h2= "Пропущенные номера заявлений"
+  p= @errors[:lost_numbers].join(', ')
+
+- unless @errors[:dups_entrants].nil? || @errors[:dups_entrants].empty?
+  h2= "Повторяющиеся абитуриенты"
+  ul
+    - @errors[:dups_entrants].each do |application|
+      li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
       
-  - unless @errors[:lost_numbers].nil? || @errors[:lost_numbers].empty?
-    h2= "Пропущенные номера заявлений"
-    p= @errors[:lost_numbers].join(', ')
+- unless @errors[:empty_achievements].nil? || @errors[:empty_achievements].empty?
+  h2= "Не проставленные ИД"
+  ul
+    - @errors[:empty_achievements].each do |application|
+      li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
+      
+- unless @errors[:elders].nil? || @errors[:elders].empty?
+  h2= "Старше 20 лет c 1 паспортом"
+  ul
+    - @errors[:elders].each do |application|
+      li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
+      
+- unless @errors[:expired_passports].nil? || @errors[:expired_passports].empty?
+  h2= 'Просроченные паспорта'
+  ul
+    - @errors[:expired_passports].each do |application|
+      li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
+  
+- unless @errors[:empty_target_entrants].nil? || @errors[:empty_target_entrants].empty?
+  h2= "Целевики без региона или конкурса" 
+  ul
+    - @errors[:empty_target_entrants].each do |application|
+      li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
+  
+- unless @errors[:not_original_target_entrants].nil? || @errors[:not_original_target_entrants].empty?
+  h2= "Целевики без оригинала" 
+  ul
+    - @errors[:not_original_target_entrants].each do |application|
+      li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
 
-  - unless @errors[:dups_entrants].nil? || @errors[:dups_entrants].empty?
-    h2= "Повторяющиеся абитуриенты"
-    ul
-      - @errors[:dups_entrants].each do |application|
-        li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
-  - unless @errors[:expired_passports].nil? || @errors[:expired_passports].empty?
-    h2= 'Просроченные паспорта'
-    ul
-      - @errors[:expired_passports].each do |application|
-        li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
-    
-  - unless @errors[:empty_target_entrants].nil? || @errors[:empty_target_entrants].empty?
-    h2= "Целевики без региона или конкурса" 
-    ul
-      - @errors[:empty_target_entrants].each do |application|
-        li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
-    
-  - unless @errors[:not_original_target_entrants].nil? || @errors[:not_original_target_entrants].empty?
-    h2= "Целевики без оригинала" 
-    ul
-      - @errors[:not_original_target_entrants].each do |application|
-        li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
-
-  - unless @errors[:not_agreed_target_entrants].nil? || @errors[:not_agreed_target_entrants].empty?
-    h2= "Целевики без согласия" 
-    ul
-      - @errors[:not_agreed_target_entrants].each do |application|
-    li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
+- unless @errors[:not_agreed_target_entrants].nil? || @errors[:not_agreed_target_entrants].empty?
+  h2= "Целевики без согласия" 
+  ul
+    - @errors[:not_agreed_target_entrants].each do |application|
+  li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)

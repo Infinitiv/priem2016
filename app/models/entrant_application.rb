@@ -125,16 +125,26 @@ class EntrantApplication < ActiveRecord::Base
   
   def self.errors(campaign)
     errors = {}
-    applications = campaign.entrant_applications.where.not(status_id: 6)
-#     errors[:dups_numbers] = find_dups_numbers(applications)
-#     errors[:lost_numbers] = find_lost_numbers(applications)
+    applications = campaign.entrant_applications.order(:application_number).where(status_id: [2, 4]).where.not(application_number: nil)
+    errors[:dups_numbers] = find_dups_numbers(applications)
+    errors[:lost_numbers] = find_lost_numbers(applications, campaign)
     errors[:dups_entrants] = find_dups_entrants(applications)
-    target_competition_entrants_array = applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).uniq
-    errors[:empty_target_entrants] = find_empty_target_entrants(target_competition_entrants_array, applications.joins(:target_organizations))
+#     target_competition_entrants_array = applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).uniq
+#     errors[:empty_target_entrants] = find_empty_target_entrants(target_competition_entrants_array, applications.joins(:target_organizations))
 #     errors[:not_original_target_entrants] = find_not_original_target_entrants(target_competition_entrants_array, applications.joins(:education_document).where.not(education_documents: {original_received_date: nil}))
 #     errors[:not_agreed_target_entrants] = find_not_agreed_entrants(applications)
     errors[:expired_passports] = find_expired_passports(applications.where.not(birth_date: nil))
+    errors[:empty_achievements] = find_empty_achievements(applications)
+    errors[:elders] = find_elders(applications)
     errors
+  end
+  
+  def self.find_elders(applications)
+    applications.select{|a| Time.now.to_date > a.birth_date + 20.years}.select{|a| a.identity_documents.count == 1}
+  end
+  
+  def self.find_empty_achievements(applications)
+    applications.joins(:achievements).where(status_id: 4, achievements: {value: 0}).uniq
   end
   
   def self.find_dups_numbers(applications)
@@ -144,16 +154,15 @@ class EntrantApplication < ActiveRecord::Base
     find_dups_numbers
   end
   
-  def self.find_lost_numbers(applications)
+  def self.find_lost_numbers(applications, campaign)
     application_numbers = applications.map(&:application_number)
-    revoked_application_numbers = EntrantApplication.where(status_id: 6).map(&:application_number)
+    revoked_application_numbers = EntrantApplication.where(status_id: 6, campaign_id: campaign).map(&:application_number)
     max_number = application_numbers.max
     max_number ? (1..max_number).to_a - application_numbers - revoked_application_numbers : []
   end
   
   def self.find_dups_entrants(applications)
     IdentityDocument.joins(:entrant_application).where(entrant_applications: {id: applications}).group_by{|i| i.sn}.select{|k, v| v.size > 1}.map{|k, v| applications.joins(:identity_documents).where(identity_documents: {id: v})}.flatten.uniq
-    
   end
   
   def self.find_empty_target_entrants(target_competition_entrants_array, target_organizations_array)
