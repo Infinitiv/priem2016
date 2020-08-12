@@ -989,7 +989,7 @@ class EntrantApplication < ActiveRecord::Base
     competitive_groups.each do |competitive_group|
       title = "Заявление о согласии на зачисление в ИвГМА"
       tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
-      pdf = Prawn::Document.new(page_size: "A5", page_layout: :landscape, :info => {
+      pdf = Prawn::Document.new(page_size: "A4", :info => {
         :Title => title,
         :Author => "Vladimir Markovnin",
         :Subject => "Прием ИвГМА",
@@ -1040,6 +1040,10 @@ class EntrantApplication < ActiveRecord::Base
       pdf.move_down 6
       pdf.move_down 6
       pdf.text "Подпись ___________________", align: :right
+      if campaign.campaign_type_id == 1
+        pdf.move_down 12
+        pdf.text "ОБРАТИТЕ ВНИМАНИЕ!!! Единовременно можно подать только ОДНО заявление о согласии на зачисление (только по ОДНОМУ конкурсу). Если Вы подадите одновременно несколько заявлений о согласии, это будет являться нарушением правил приема, и Вы не будете зачислены в нашу академию. При необходимости Вы сможете отозвать заявление о согласии (написав и прикрепив заявление об отзыве согласия) и подать согласие на другой конкурс. На бюджетные конкурсы можно последовательно подать лишь ДВА согласия, на внебюджетные - неограниченное количество раз."
+      end
       
       pdf.render_file tempfile
     
