@@ -68,16 +68,18 @@ class EntrantApplication < ActiveRecord::Base
         case true
         when campaign.education_levels.include?(5)
           unless row.keys.include?('benefit_document_type_id') || row.keys.include?('alt_entrant_last_name') || row.keys.include?('olympic_id') || row.keys.include?('enrolled') || row.keys.include?('contract_lech')
-            entrant_application.competitive_groups = [] 
+            entrant_application.competitive_groups = [] unless row.keys.include?('enrolled') || row.keys.include?('chemistry') || row.keys.include?('biology') || row.keys.include?('russian')
             competitive_groups.each do |competitive_group|
               entrant_application.competitive_groups << competitive_group if row[competitive_group.name]
             end
+            if row['target_organization_id_lech'] || row['target_organization_id_ped'] || row['target_organization_id_stomat']
             entrant_application.target_contracts.destroy_all
-            target_compeitive_group_names = ['Лечебное дело. Целевые места.', 'Педиатрия. Целевые места.', 'Стоматология. Целевые места.']
-            [row['target_organization_id_lech'], row['target_organization_id_ped'], row['target_organization_id_stomat']].each_with_index do |target_organization_ids, index|
-              if target_organization_ids
-                target_organization_ids.split(',').each do |target_organization_id|
-                  entrant_application.target_contracts.create(target_organization_id: target_organization_id, competitive_group_id: competitive_groups.find_by_name(target_compeitive_group_names[index]).id)
+              target_compeitive_group_names = ['Лечебное дело. Целевые места.', 'Педиатрия. Целевые места.', 'Стоматология. Целевые места.']
+              [row['target_organization_id_lech'], row['target_organization_id_ped'], row['target_organization_id_stomat']].each_with_index do |target_organization_ids, index|
+                if target_organization_ids
+                  target_organization_ids.split(',').each do |target_organization_id|
+                    entrant_application.target_contracts.create(target_organization_id: target_organization_id, competitive_group_id: competitive_groups.find_by_name(target_compeitive_group_names[index]).id)
+                  end
                 end
               end
             end

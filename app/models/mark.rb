@@ -9,17 +9,17 @@ class Mark < ActiveRecord::Base
     when entrant_application.campaign.education_levels.include?(5)
       chemistry = marks.find_by_subject_id(3) || entrant_application.marks.new
       chemistry.subject_id = 3
-      chemistry.value = row['chemistry'].to_i
+      chemistry.value = row['chemistry'].to_i if row['chemistry']
       chemistry.form = row['chemistry_form'] if row['chemistry_form']
       chemistry.save!
       biology = marks.find_by_subject_id(2) || entrant_application.marks.new
       biology.subject_id = 2
-      biology.value = row['biology'].to_i
+      biology.value = row['biology'].to_i if row['biology']
       biology.form = row['biology_form'] if row['biology_form']
       biology.save!
       russian = marks.find_by_subject_id(1) || entrant_application.marks.new
       russian.subject_id = 1
-      russian.value = row['russian'].to_i
+      russian.value = row['russian'].to_i if row['russian']
       russian.form = row['russian_form'] if row['russian_form']
       russian.save!
     when entrant_application.campaign.education_levels.include?(18)
