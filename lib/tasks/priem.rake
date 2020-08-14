@@ -36,8 +36,8 @@ namespace :priem do
         if Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i)
           new_value = mark.at_css('SubjectMark').text.to_i
           old_value = application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').map(&:value).max.to_i
-          application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').each do |mark|
-            mark.update_attributes(value: mark.at_css('SubjectMark').text.to_i, checked: Time.now.to_date)
+          application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').each do |m|
+            m.update_attributes(value: mark.at_css('SubjectMark').text.to_i, checked: Time.now.to_date)
             puts "оценка по предмету #{mark.at_css('SubjectName').text} обновлена с #{old_value} на #{new_value}"
           end
           if application.olympionic
