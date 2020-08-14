@@ -34,9 +34,11 @@ namespace :priem do
       xml = Nokogiri::XML(response.body)
       xml.css('Mark').each do |mark|
         if Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i)
-          unless mark.at_css('SubjectMark').text.to_i == application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').map(&:value).max
+          new_value = mark.at_css('SubjectMark').text.to_i
+          old_value = application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').map(&:value).max.to_i
+          unless new_value == old_value
             application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').update_all(value: mark.at_css('SubjectMark').text.to_i, checked: Time.now.to_date)
-            puts "оценка по предмету #{mark.at_css('SubjectName').text} обновлена"
+            puts "оценка по предмету #{mark.at_css('SubjectName').text} обновлена с #{old_value} на #{new_value}"
           end
           if application.olympionic
             application.olympic_documents.each do |olympic_document|

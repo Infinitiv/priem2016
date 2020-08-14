@@ -775,7 +775,7 @@ end
   
   def self.applications_del(pd, params)
     campaign = Campaign.find(params[:campaign_id])
-    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects)
+    applications = campaign.entrant_applications.includes(:identity_documents, :education_document, :marks, :competitive_groups, :subjects).where(status_id: [4, 6])
     postfix = case true
               when campaign.education_levels.include?(5)
                 's'
