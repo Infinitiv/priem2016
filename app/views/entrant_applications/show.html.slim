@@ -11,7 +11,7 @@
 .row
   .pull-left = link_to 'К списку заявлений', entrant_applications_path + "?campaign_id=#{@entrant_application.campaign.id}"
 .row
-  - if @dup.count == 1
+  - if @dup_entrants.count == 1
     h1.pull-left class=label_class
       = @entrant_application.application_number ? "#{"%04d" % @entrant_application.application_number}" : "на рассмотрении"
   - else
