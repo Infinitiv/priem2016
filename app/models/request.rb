@@ -471,7 +471,9 @@ end
                       id.LastName identity_document.alt_entrant_last_name ? identity_document.alt_entrant_last_name : item.entrant_last_name
                       id.FirstName identity_document.alt_entrant_first_name ? identity_document.alt_entrant_first_name : item.entrant_first_name
                       id.MiddleName (identity_document.alt_entrant_middle_name ? identity_document.alt_entrant_middle_name : item.entrant_middle_name) if item.entrant_middle_name
-                      id.DocumentSeries identity_document.identity_document_series ?  identity_document.identity_document_series : "нет серии"
+                      unless identity_document.identity_document_series.nil? || identity_document.identity_document_series.empty? 
+                        id.DocumentSeries identity_document.identity_document_series
+                      end
                       id.DocumentNumber identity_document.identity_document_number
                       oid.DocumentDate identity_document.identity_document_date ? identity_document.identity_document_date : item.birth_date + 14.day
                       id.IdentityDocumentTypeID identity_document.identity_document_type
