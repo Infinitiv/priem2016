@@ -138,7 +138,12 @@ class EntrantApplication < ActiveRecord::Base
     errors[:expired_passports] = find_expired_passports(applications.where.not(birth_date: nil))
     errors[:empty_achievements] = find_empty_achievements(applications)
     errors[:elders] = find_elders(applications)
+    errors[:empty_marks] = find_empty_marks(applications)
     errors
+  end
+  
+  def self.find_empty_marks(applications)
+    applications.joins(:marks).where(status_id: 4, marks: {value: 0, form: 'ЕГЭ'}).uniq
   end
   
   def self.find_elders(applications)

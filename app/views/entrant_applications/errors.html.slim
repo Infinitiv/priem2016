@@ -18,19 +18,25 @@ h2= @campaign.name
       li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
       
 - unless @errors[:empty_achievements].nil? || @errors[:empty_achievements].empty?
-  h2= "Не проставленные ИД"
+  h2= "Не проставленные ИД (#{@errors[:empty_achievements].count})"
   ul
     - @errors[:empty_achievements].each do |application|
       li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
       
+- unless @errors[:empty_marks].nil? || @errors[:empty_marks].empty?
+  h2= "Нет ЕГЭ (#{@errors[:empty_marks].count})"
+  ul
+    - @errors[:empty_marks].each do |application|
+      li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
+      
 - unless @errors[:elders].nil? || @errors[:elders].empty?
-  h2= "Старше 20 лет c 1 паспортом"
+  h2= "Старше 20 лет c 1 паспортом (#{@errors[:elders].count})"
   ul
     - @errors[:elders].each do |application|
       li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
       
 - unless @errors[:expired_passports].nil? || @errors[:expired_passports].empty?
-  h2= 'Просроченные паспорта'
+  h2= "Просроченные паспорта (#{@errors[:expired_passports].count})"
   ul
     - @errors[:expired_passports].each do |application|
       li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
