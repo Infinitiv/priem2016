@@ -1,7 +1,7 @@
 - content_for :title do
   = "Приемная кампания #{@campaign.name} #{@campaign.year_start}. Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%d.%m.%Y %T")}"
 h1= "Приемная кампания #{@campaign.name} #{@campaign.year_start}." 
-h2= "Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%d.%m.%Y %T")}"
+h2= "Конкурсные списки по состоянию на #{(Time.now.to_datetime + 3.hours).strftime("%d.%m.%Y %T")}"
 .checkbox
   label
     = check_box_tag 'tr-hide', 'yes', false, id: 'tr-hide'
@@ -23,7 +23,8 @@ h2= "Конкурсные списки по состоянию на #{Time.now.t
       .panel.panel-default
         .panel-heading(role="tab" id="heading#{competitive_group.id}")
           .panel-title
-            = link_to "#{competitive_group.name} (всего мест в конкурсе - #{numbers}, будет зачислено во 2 волну - #{last_numbers})", "#collapse#{competitive_group.id}", data: {toggle: "collapse", parent: "#accordion"}, aria: {expanded: "false", controls: "#collapse#{competitive_group.id}"}
+            = link_to "#{competitive_group.name} (всего мест в конкурсе - #{numbers})", "#collapse#{competitive_group.id}", data: {toggle: "collapse", parent: "#accordion"}, aria: {expanded: "false", controls: "#collapse#{competitive_group.id}"}
+            / , будет зачислено во 2 волну - #{last_numbers})/
     .panel-collapse.collapse(id="collapse#{competitive_group.id}" role="tabpanel" aria-labelledby="heading#{competitive_group.id}")
       .panel-body
         - unless examless_applications.empty?
@@ -49,58 +50,105 @@ h2= "Конкурсные списки по состоянию на #{Time.now.t
           h3 Общий конкурс
           p
             strong= "мест без учета абитуриентов, имеющих право поступления без вступительных испытаний - #{numbers - examless_applications.count}"
-        table.table
-          thead
-            tr
-              th №№
-              th № личного дела
-              th Ф.И.О.
-              th Наличие оригинала документа об образовании
-              th Наличие согласия на зачисление
-              - if competitive_group.education_source_id == 15
-                th Наличие договора на обучение
-              th Сумма конкурсных баллов
-              - @entrance_test_items.each do |entrance_test_item|
-                th= entrance_test_item.subject.subject_name
-              th Сумма баллов за вступительные испытания
-              th Баллы за индивидуальные достижения
-              th Наличие преимущественного права на зачисление
-              th= "Зачислен по другому конкурсу"
-              th= "Заказчик целевого приема" if competitive_group.education_source_id == 16
-          tbody
-            - n = 0
-            - applications.each do |application, values|
-              - unless application.enrolled == competitive_group.id || application.exeptioned == competitive_group.id
-                - n += 1
-                - label_class = ['tr-hide'].compact.join(' ') unless application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id
-                tr class=label_class
-                  td
-                  td= "%04d" % application.application_number
-                  td= application.fio
-                  td.text-center
-                    - if values[:original_received]
-                      span.glyphicon.glyphicon-plus(aria-hidden="true")
-                  td.text-center
-                    - if [application.budget_agr, application.paid_agr].include?(competitive_group.id)
-                      span.glyphicon.glyphicon-plus(aria-hidden="true")
-                  - if competitive_group.education_source_id == 15
-                    td.text-center
-                      - if application.contracts.include?(competitive_group.id)
-                        span.glyphicon.glyphicon-plus(aria-hidden="true")
-                  td= values[:full_summa] if values[:mark_values].select{|m| m > 41}.count == 3
-                  - values[:mark_values].each_with_index do |mark_value, index|
+        - if competitive_group.education_source_id == 16
+          - competitive_group.target_organizations.order(:target_organization_name).each do |target_organization|
+            table.table
+              caption
+                strong= "#{target_organization.target_organization_name} (количество мест - #{competitive_group.target_numbers.where(target_organization_id: target_organization.id).map(&:number_target_o).join()})"
+              thead
+                tr
+                  th №№
+                  th № личного дела
+                  th Ф.И.О.
+                  th Наличие согласия на зачисление
+                  th Сумма конкурсных баллов
+                  - @entrance_test_items.each do |entrance_test_item|
+                    th= entrance_test_item.subject.subject_name
+                  th Сумма баллов за вступительные испытания
+                  th Баллы за индивидуальные достижения
+                  th Наличие преимущественного права на зачисление
+                  th= "Зачислен по другому конкурсу"
+              tbody
+                - n = 0
+                - applications.each do |application, values|
+                  - if application.target_contracts.map(&:target_organization_id).include?(target_organization.id)
+                    - unless application.enrolled == competitive_group.id || application.exeptioned == competitive_group.id
+                      - n += 1
+                      - label_class = ['tr-hide'].compact.join(' ') unless application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id
+                      tr class=label_class
+                        td
+                        td= "%04d" % application.application_number
+                        td= application.fio
+                        td.text-center
+                          - if [application.budget_agr, application.paid_agr].include?(competitive_group.id)
+                            span.glyphicon.glyphicon-plus(aria-hidden="true")
+                        - if competitive_group.education_source_id == 15
+                          td.text-center
+                            - if application.contracts.include?(competitive_group.id)
+                              span.glyphicon.glyphicon-plus(aria-hidden="true")
+                        td= values[:full_summa] if values[:mark_values].select{|m| m > 41}.count == 3
+                        - values[:mark_values].each_with_index do |mark_value, index|
+                          td
+                            - if mark_value > 0
+                              span= mark_value
+                              sup= values[:mark_forms][index]
+                            - else
+                              span= values[:mark_forms][index]
+                        td= values[:summa]
+                        td= values[:achievements_sum] if values[:achievements_sum] > 0
+                        td.text-center
+                          - if application.benefit
+                            span.glyphicon.glyphicon-plus(aria-hidden="true")
+                        td.text-center
+                          - if application.enrolled && application.enrolled != competitive_group.id
+                            span.glyphicon.glyphicon-plus(aria-hidden="true")
+        - else
+          table.table
+            thead
+              tr
+                th №№
+                th № личного дела
+                th Ф.И.О.
+                th Наличие согласия на зачисление
+                - if competitive_group.education_source_id == 15
+                  th Наличие договора на обучение
+                th Сумма конкурсных баллов
+                - @entrance_test_items.each do |entrance_test_item|
+                  th= entrance_test_item.subject.subject_name
+                th Сумма баллов за вступительные испытания
+                th Баллы за индивидуальные достижения
+                th Наличие преимущественного права на зачисление
+                th= "Зачислен по другому конкурсу"
+            tbody
+              - n = 0
+              - applications.each do |application, values|
+                - unless application.enrolled == competitive_group.id || application.exeptioned == competitive_group.id
+                  - n += 1
+                  - label_class = ['tr-hide'].compact.join(' ') unless application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id
+                  tr class=label_class
                     td
-                      - if mark_value > 0
-                        span= mark_value
-                        sup= values[:mark_forms][index]
-                      - else
-                        span= values[:mark_forms][index]
-                  td= values[:summa]
-                  td= values[:achievements_sum] if values[:achievements_sum] > 0
-                  td.text-center
-                    - if application.benefit
-                      span.glyphicon.glyphicon-plus(aria-hidden="true")
-                  td.text-center
-                    - if application.enrolled && application.enrolled != competitive_group.id
-                      span.glyphicon.glyphicon-plus(aria-hidden="true")
-                  td= application.target_contracts.where(competitive_group_id: competitive_group).map{|target_contract| target_contract.target_organization.target_organization_name}.join(', ') if competitive_group.education_source_id == 16
+                    td= "%04d" % application.application_number
+                    td= application.fio
+                    td.text-center
+                      - if [application.budget_agr, application.paid_agr].include?(competitive_group.id)
+                        span.glyphicon.glyphicon-plus(aria-hidden="true")
+                    - if competitive_group.education_source_id == 15
+                      td.text-center
+                        - if application.contracts.map(&:competitive_group_id).include?(competitive_group.id)
+                          span.glyphicon.glyphicon-plus(aria-hidden="true")
+                    td= values[:full_summa] if values[:mark_values].select{|m| m > 41}.count == 3
+                    - values[:mark_values].each_with_index do |mark_value, index|
+                      td
+                        - if mark_value > 0
+                          span= mark_value
+                          sup= values[:mark_forms][index]
+                        - else
+                          span= values[:mark_forms][index]
+                    td= values[:summa]
+                    td= values[:achievements_sum] if values[:achievements_sum] > 0
+                    td.text-center
+                      - if application.benefit
+                        span.glyphicon.glyphicon-plus(aria-hidden="true")
+                    td.text-center
+                      - if application.enrolled && application.enrolled != competitive_group.id
+                        span.glyphicon.glyphicon-plus(aria-hidden="true")
