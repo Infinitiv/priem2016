@@ -71,7 +71,7 @@ h2= "Конкурсные списки по состоянию на #{(Time.now.
               tbody
                 - n = 0
                 - applications.each do |application, values|
-                  - if application.target_contracts.map(&:target_organization_id).include?(target_organization.id)
+                  - unless application.target_contracts.where(target_organization_id: target_organization.id,  competitive_group_id: competitive_group.id).empty?
                     - unless application.enrolled == competitive_group.id || application.exeptioned == competitive_group.id
                       - n += 1
                       - label_class = ['tr-hide'].compact.join(' ') unless application.budget_agr == competitive_group.id || application.paid_agr == competitive_group.id

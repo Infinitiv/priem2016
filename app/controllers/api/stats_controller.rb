@@ -29,7 +29,7 @@ class Api::StatsController < ApplicationController
       :olympic_documents,
       :target_contracts,
       :target_organizations
-    )
+    ).where(status_id: [4, 6])
   end
 
   def campaigns
