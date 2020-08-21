@@ -203,7 +203,7 @@
         h3 Заявления
         - @entrant_application.attachments.select{|attachment| attachment.document_type =~ /_application/ && !attachment.template}.each do |attachment|
           dd
-            = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+            = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
             - if can? :destroy, attachment
               span &nbsp;
               span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
