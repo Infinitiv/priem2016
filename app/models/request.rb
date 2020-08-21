@@ -369,7 +369,15 @@ end
             a.FinSourceAndEduForms do |fsaefs|
               item.competitive_groups.each do |sub_item|
                 fsaefs.FinSourceEduForm do |fsef|
+                  if sub_item.id == item.budget_agr || sub_item.id == item.paid_agr
+                    unless item.attachments.where(document_type: 'consent_application', template: false).order(:created_at).empty?
+                      agreed_date = item.attachments.where(document_type: 'consent_application', template: false).order(:created_at).last.created_at.to_datetime.to_s
+                    end
+                  end
                   fsef.CompetitiveGroupUID sub_item.id
+                  if agreed_date
+                    fsef.IsAgreedDate  agreed_date
+                  end
                   fsef.TargetOrganizationUID item.target_contracts.where(competitive_group_id: sub_item.id).first.target_organization_id if sub_item.education_source_id == 16
                   if item.education_document.original_received_date
                     fsef.IsAgreedDate item.registration_date.to_datetime.to_s.gsub('+00', '+03') if item.budget_agr == sub_item.id || item.paid_agr == sub_item.id
