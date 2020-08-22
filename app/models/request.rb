@@ -378,10 +378,12 @@ end
                   if agreed_date
                     fsef.IsAgreedDate  agreed_date
                   end
-                  fsef.TargetOrganizationUID item.target_contracts.where(competitive_group_id: sub_item.id).first.target_organization_id if sub_item.education_source_id == 16
-                  if item.education_document.original_received_date
-                    fsef.IsAgreedDate item.registration_date.to_datetime.to_s.gsub('+00', '+03') if item.budget_agr == sub_item.id || item.paid_agr == sub_item.id
+                  if sub_item.education_source_id == 16
+                    fsef.TargetOrganizationUID item.target_contracts.where(competitive_group_id: sub_item.id).first.target_organization_id
                   end
+#                   if item.education_document.original_received_date
+#                     fsef.IsAgreedDate item.registration_date.to_datetime.to_s.gsub('+00', '+03') if item.budget_agr == sub_item.id || item.paid_agr == sub_item.id
+#                   end
                 end
               end
             end
@@ -498,7 +500,12 @@ end
                   when "SchoolCertificateDocument"
                     ed.SchoolCertificateDocument do |scd|
                       scd.UID ["ed", campaign.year_start, edu_document.id].join('-')
-                      scd.OriginalReceivedDate edu_document.original_received_date if edu_document.original_received_date
+                      case true
+                      when edu_document.original_received_date
+                        scd.OriginalReceivedDate edu_document.original_received_date
+                      when item.budget_agr || item.paid_agr
+                        scd.OriginalReceivedDate agreed_date if agreed_date
+                      end
                       if edu_document.education_document_date.year > 2013
                         scd.DocumentNumber edu_document.education_document_number
                       else
@@ -506,12 +513,17 @@ end
                         scd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 4)
                       end
                       scd.DocumentDate edu_document.education_document_date
-                      scd.DocumentOrganization 'школа'
+                      scd.DocumentOrganization education_document.education_document_issuer ? education_document.education_document_issuer : 'школа'
                     end
                   when "MiddleEduDiplomaDocument"
                     ed.MiddleEduDiplomaDocument do |medd|
                       medd.UID ["ed", campaign.year_start, edu_document.id].join('-')
-                      medd.OriginalReceivedDate edu_document.original_received_date if edu_document.original_received_date
+                      case true
+                      when edu_document.original_received_date
+                        medd.OriginalReceivedDate edu_document.original_received_date
+                      when item.budget_agr || item.paid_agr
+                        medd.OriginalReceivedDate agreed_date if agreed_date
+                      end
                       if edu_document.education_document_date.year > 2013
                         medd.DocumentSeries edu_document.education_document_number.first(6)
                         medd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 6)
@@ -520,16 +532,21 @@ end
                         medd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 5)
                       end
                       medd.DocumentDate edu_document.education_document_date
-                      medd.DocumentOrganization 'колледж'
+                      medd.DocumentOrganization  education_document.education_document_issuer ? education_document.education_document_issuer : 'колледж'
                     end
                   when "HighEduDiplomaDocument"
                     ed.HighEduDiplomaDocument do |hedd|
                       hedd.UID ["ed", campaign.year_start, edu_document.id].join('-')
-                      hedd.OriginalReceivedDate edu_document.original_received_date if edu_document.original_received_date
+                      case true
+                      when edu_document.original_received_date
+                        hedd.OriginalReceivedDate edu_document.original_received_date
+                      when item.budget_agr || item.paid_agr
+                        hedd.OriginalReceivedDate agreed_date if agreed_date
+                      end
                       hedd.DocumentSeries edu_document.education_document_number.first(3)
                       hedd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 3)
                       hedd.DocumentDate edu_document.education_document_date
-                      hedd.DocumentOrganization 'вуз'
+                      hedd.DocumentOrganization  education_document.education_document_issuer ? education_document.education_document_issuer : 'вуз'
                     end
                   end
                 end
@@ -546,28 +563,28 @@ end
                         when 8
                           cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'gto'].join('-')
                           cd.DocumentName "Удоствоверение о награждении золотым значком ГТО"
-                          cd.DocumentDate '2019-04-20'
+                          cd.DocumentDate '2020-04-20'
                           cd.DocumentOrganization 'Министерство спорта Российской Федерации'
                         when 9
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                           cd.DocumentName "Аттестат о среднем общем образовании с отличием"
                           cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization "Организация СО"
+                          cd.DocumentOrganization education_document.education_document_issuer ? education_document.education_document_issuer : "Организация СО"
                         when 15
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                           cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
                           cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization "Организация СО"
+                          cd.DocumentOrganization education_document.education_document_issuer ? education_document.education_document_issuer : "Организация СО"
                         when 16
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                           cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
                           cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization "Организация СО"
+                          cd.DocumentOrganization education_document.education_document_issuer ? education_document.education_document_issuer : "Организация СО"
                         when 17
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                           cd.DocumentName "Диплом о среднем профессиональном образовании с отличием"
                           cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization "Организация СПО"
+                          cd.DocumentOrganization education_document.education_document_issuer ? education_document.education_document_issuer : "Организация СПО"
                         else
                           cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'other', n].join('-')
                           cd.DocumentName "Иной документ, подтверждающий индивидуальное достижение"
