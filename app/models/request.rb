@@ -690,18 +690,18 @@ end
                 unless competitive_group.education_source_id == 15
                   if campaign.education_levels.include?(5)
                     case d.to_date.to_s
-                    when "2019-08-03"
+                    when "2020-08-24"
                       ooa.Stage 1
-                    when "2019-08-08"
+                    when "2020-08-26"
                       ooa.Stage 2
                     else
                       ooa.Stage 0
                     end
                   else
                     case d.to_date.to_s
-                    when "2019-08-15"
+                    when "2020-08-14"
                       ooa.Stage 1
-                    when "2019-08-17"
+                    when "2020-08-17"
                       ooa.Stage 2
                     else
                       ooa.Stage 0
@@ -729,9 +729,9 @@ end
                   ooa.EducationLevelID competitive_group.education_level_id
                   unless competitive_group.education_source_id == 15
                     case d.to_date.to_s
-                    when "2019-08-03"
+                    when "2020-08-24"
                       ooa.Stage 1
-                    when "2019-08-08"
+                    when "2020-08-26"
                       ooa.Stage 2
                     else
                       ooa.Stage 0
