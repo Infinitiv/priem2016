@@ -569,22 +569,22 @@ end
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                           cd.DocumentName "Аттестат о среднем общем образовании с отличием"
                           cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization education_document.education_document_issuer ? education_document.education_document_issuer : "Организация СО"
+                          cd.DocumentOrganization item.education_document.education_document_issuer ? item.education_document.education_document_issuer : "Организация СО"
                         when 15
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                           cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
                           cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization education_document.education_document_issuer ? education_document.education_document_issuer : "Организация СО"
+                          cd.DocumentOrganization item.education_document.education_document_issuer ? item.education_document.education_document_issuer : "Организация СО"
                         when 16
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                           cd.DocumentName "Аттестат о среднем (полном) общем образовании для награжденных золотой медалью"
                           cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization education_document.education_document_issuer ? education_document.education_document_issuer : "Организация СО"
+                          cd.DocumentOrganization item.education_document.education_document_issuer ? item.education_document.education_document_issuer : "Организация СО"
                         when 17
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
                           cd.DocumentName "Диплом о среднем профессиональном образовании с отличием"
                           cd.DocumentDate item.education_document.education_document_date
-                          cd.DocumentOrganization education_document.education_document_issuer ? education_document.education_document_issuer : "Организация СПО"
+                          cd.DocumentOrganization item.education_document.education_document_issuer ? item.education_document.education_document_issuer : "Организация СПО"
                         else
                           cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'other', n].join('-')
                           cd.DocumentName "Иной документ, подтверждающий индивидуальное достижение"
