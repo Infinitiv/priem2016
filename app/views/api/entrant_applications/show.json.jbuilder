@@ -1,4 +1,4 @@
-json.entrant_application @entrant_application, :id, :application_number, :campaign_id, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :benefit, :olympionic, :budget_agr, :paid_agr, :status_id, :comment, :status, :request
+json.entrant_application @entrant_application, :id, :application_number, :campaign_id, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :benefit, :olympionic, :budget_agr, :paid_agr, :status_id, :comment, :status, :request, :enrolled, :enrolled_date
 
 json.marks @entrant_application.marks.includes(:subject) do |mark|
   json.id mark.id
