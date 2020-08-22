@@ -333,6 +333,7 @@ end
     
     pd.Applications do |as|
       applications.each do |item|
+        agreed_date = nil
         if item.competitive_groups.count > 0
           as.Application do |a|
             postfix = case true
