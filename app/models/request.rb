@@ -333,7 +333,7 @@ end
     
     pd.Applications do |as|
       applications.each do |item|
-        agreed_date = nil
+        original_received_date = item.education_document.original_received_date
         if item.competitive_groups.count > 0
           as.Application do |a|
             postfix = case true
@@ -369,10 +369,12 @@ end
             end
             a.FinSourceAndEduForms do |fsaefs|
               item.competitive_groups.each do |sub_item|
+                agreed_date = nil
                 fsaefs.FinSourceEduForm do |fsef|
                   if sub_item.id == item.budget_agr || sub_item.id == item.paid_agr
                     unless item.attachments.where(document_type: 'consent_application', template: false).order(:created_at).empty?
                       agreed_date = item.attachments.where(document_type: 'consent_application', template: false).order(:created_at).last.created_at.to_datetime.to_s
+                      original_received_date ||= agreed_date
                     end
                   end
                   fsef.CompetitiveGroupUID sub_item.id
@@ -501,11 +503,8 @@ end
                   when "SchoolCertificateDocument"
                     ed.SchoolCertificateDocument do |scd|
                       scd.UID ["ed", campaign.year_start, edu_document.id].join('-')
-                      case true
-                      when edu_document.original_received_date
-                        scd.OriginalReceivedDate edu_document.original_received_date
-                      when item.budget_agr || item.paid_agr
-                        scd.OriginalReceivedDate agreed_date if agreed_date
+                      if original_received_date
+                        scd.OriginalReceivedDate original_received_date.to_date
                       end
                       if edu_document.education_document_date.year > 2013
                         scd.DocumentNumber edu_document.education_document_number
@@ -519,11 +518,8 @@ end
                   when "MiddleEduDiplomaDocument"
                     ed.MiddleEduDiplomaDocument do |medd|
                       medd.UID ["ed", campaign.year_start, edu_document.id].join('-')
-                      case true
-                      when edu_document.original_received_date
-                        medd.OriginalReceivedDate edu_document.original_received_date
-                      when item.budget_agr || item.paid_agr
-                        medd.OriginalReceivedDate agreed_date if agreed_date
+                      if original_received_date
+                        medd.OriginalReceivedDate original_received_date.to_date
                       end
                       if edu_document.education_document_date.year > 2013
                         medd.DocumentSeries edu_document.education_document_number.first(6)
@@ -538,11 +534,8 @@ end
                   when "HighEduDiplomaDocument"
                     ed.HighEduDiplomaDocument do |hedd|
                       hedd.UID ["ed", campaign.year_start, edu_document.id].join('-')
-                      case true
-                      when edu_document.original_received_date
-                        hedd.OriginalReceivedDate edu_document.original_received_date
-                      when item.budget_agr || item.paid_agr
-                        hedd.OriginalReceivedDate agreed_date if agreed_date
+                      if original_received_date
+                        hedd.OriginalReceivedDate original_received_date.to_date
                       end
                       hedd.DocumentSeries edu_document.education_document_number.first(3)
                       hedd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 3)
