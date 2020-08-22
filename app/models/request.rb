@@ -513,7 +513,7 @@ end
                         scd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 4)
                       end
                       scd.DocumentDate edu_document.education_document_date
-                      scd.DocumentOrganization education_document.education_document_issuer ? education_document.education_document_issuer : 'школа'
+                      scd.DocumentOrganization edu_document.education_document_issuer ? education_document.education_document_issuer : 'школа'
                     end
                   when "MiddleEduDiplomaDocument"
                     ed.MiddleEduDiplomaDocument do |medd|
@@ -532,7 +532,7 @@ end
                         medd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 5)
                       end
                       medd.DocumentDate edu_document.education_document_date
-                      medd.DocumentOrganization  education_document.education_document_issuer ? education_document.education_document_issuer : 'колледж'
+                      medd.DocumentOrganization  edu_document.education_document_issuer ? education_document.education_document_issuer : 'колледж'
                     end
                   when "HighEduDiplomaDocument"
                     ed.HighEduDiplomaDocument do |hedd|
@@ -546,7 +546,7 @@ end
                       hedd.DocumentSeries edu_document.education_document_number.first(3)
                       hedd.DocumentNumber edu_document.education_document_number.last(edu_document.education_document_number.size - 3)
                       hedd.DocumentDate edu_document.education_document_date
-                      hedd.DocumentOrganization  education_document.education_document_issuer ? education_document.education_document_issuer : 'вуз'
+                      hedd.DocumentOrganization  edu_document.education_document_issuer ? education_document.education_document_issuer : 'вуз'
                     end
                   end
                 end
