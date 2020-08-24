@@ -383,7 +383,7 @@ end
                     fsef.IsAgreedDate agreed_date
                   end
                   if disagreed_date
-                    fsef.IsDesagreedDate disagreed_date
+                    fsef.IsDisagreedDate disagreed_date
                   end
                   if sub_item.education_source_id == 16
                     fsef.TargetOrganizationUID item.target_contracts.where(competitive_group_id: sub_item.id).first.target_organization_id
