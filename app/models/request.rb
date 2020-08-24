@@ -370,6 +370,7 @@ end
             a.FinSourceAndEduForms do |fsaefs|
               item.competitive_groups.each do |sub_item|
                 agreed_date = nil
+                disagreed_date = item.exeptioned_date
                 fsaefs.FinSourceEduForm do |fsef|
                   if sub_item.id == item.budget_agr || sub_item.id == item.paid_agr
                     unless item.attachments.where(document_type: 'consent_application', template: false).order(:created_at).empty?
@@ -379,7 +380,10 @@ end
                   end
                   fsef.CompetitiveGroupUID sub_item.id
                   if agreed_date
-                    fsef.IsAgreedDate  agreed_date
+                    fsef.IsAgreedDate agreed_date
+                  end
+                  if disagreed_date
+                    fsef.IsDesagreedDate disagreed_date
                   end
                   if sub_item.education_source_id == 16
                     fsef.TargetOrganizationUID item.target_contracts.where(competitive_group_id: sub_item.id).first.target_organization_id
