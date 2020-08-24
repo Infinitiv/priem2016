@@ -786,9 +786,10 @@ end
                 as.Application do |a|
                   a.ApplicationUID application_number
                   a.OrderUID "oe #{campaign.year_start}-#{competitive_group.id}-#{d.to_date}"
-                  a.OrderTypeID 1
+                  a.OrderTypeID 2
                   a.CompetitiveGroupUID competitive_group.id
                   a.OrderIdLevelBudget 1
+                  a.IsDisagreedDate d.to_datetime
                 end
               end
             end
