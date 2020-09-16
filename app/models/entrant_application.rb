@@ -468,7 +468,7 @@ class EntrantApplication < ActiveRecord::Base
           achievements = achievements_array.join(',')
           test_result = values[:mark_values].sum.round() == 0 ? application.marks.sum(:value).round() : values[:mark_values].sum.round()
           achievements_sum = values[:achievements] ? values[:achievements].sum : 0
-          full_summa = values[:full_summa].round() == 0 ? [test_result, achievements_sum].sum : values[:full_summa].round()
+          full_summa = values[:full_summa].round() == 0 ? [test_result, achievements_sum].sum.round() : values[:full_summa].round()
           row = [
             application.snils,
             oid,
