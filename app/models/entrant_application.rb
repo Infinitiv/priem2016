@@ -414,10 +414,9 @@ class EntrantApplication < ActiveRecord::Base
       'diplomaIssueDate',
       'diplomaSpecialty'
     ]
-
     CSV.generate(headers: true, col_sep: ';') do |csv|
       csv << headers
-      applications.select{|application, values| application.nationality_type_id == 1}.each do |application, values|
+      applications.select{|application, values| application.nationality_type_id == 1 && (application.status_id == 4 || application.status_id == 6)}.each do |application, values|
         application.competitive_groups.each do |competitive_group|
           status = case application.status_id
                     when 6
@@ -426,30 +425,54 @@ class EntrantApplication < ActiveRecord::Base
                       application.enrolled && application.enrolled == competitive_group.id ? 1 : 2
                     end
           order_number = case application.enrolled_date
-                          when Date.new(2019, 8, 12)
+                          when Date.new(2020, 8, 12)
+                            '97-ипо'
+                          when Date.new(2020, 8, 14)
                             '98-ипо'
-                          when Date.new(2019, 8, 14)
+                          when Date.new(2020, 8, 17)
                             '99-ипо'
-                          when Date.new(2019, 8, 16)
-                            '100-ипо'
                           end
-          zero_array = ('а'..'г').zip([0, 0, 0, 0]).map{|i| i.join('-')}
-          values[:achievements] = values[:achievements].map{|a| a.round()}
-          achievements_array = ('а'..'г').zip(values[:achievements].map{|a| a.round()}).map{|i| i.join('-')}
-          test_result = values[:mark_values].sum.round() == 0 ? application.marks.sum(:value).round() : values[:mark_values].sum.round()
-          full_summa = values[:full_summa].round() == 0 ? [test_result, values[:achievements].sum].sum : values[:full_summa].round()
-          if (values[:achievements][2] - 10) % 5 == 0
-            achievements_array[2] = achievements_array[2].sub('в-', 'в1-')
-            zero_array[2] = zero_array[2].sub('в-', 'в1-')
-          else
-            achievements_array[2] = achievements_array[2].sub('в-', 'в2-')
-            zero_array[2] = zero_array[2].sub('в-', 'в2-')
+                          
+          achievements_array = []
+          application.achievements.each do |achievement|
+            case achievement.institution_achievement_id
+            when 38
+              achievements_array << 'a'
+            when 39
+              achievements_array << 'б'
+            when 40
+              achievements_array << 'в'
+            when 41
+              case achievement.value
+              when 15
+                achievements_array << 'г1'
+              when 100
+                achievements_array << 'г2'
+              when 150
+                achievements_array << 'г3'
+              end
+            when 42
+              achievements_array << 'д'
+            when 43
+              achievements_array << 'е'
+            when 44
+              achievements_array << 'ж'
+            when 45
+              achievements_array << '21a'
+            when 46
+              achievements_array << '21б'
+            when 47
+              achievements_array << 'з'
+            end
           end
-          achievements = (achievements_array - zero_array).compact.size == 0 ? nil : (achievements_array - zero_array).compact.join(',')
+          achievements = achievements_array.join(',')
+          test_result = values[:mark_values].sum.round() == 0 ? application.marks.sum(:value).round() : values[:mark_values].sum.round()
+          achievements_sum = values[:achievements] ? values[:achievements].sum : 0
+          full_summa = values[:full_summa].round() == 0 ? [test_result, achievements_sum].sum : values[:full_summa].round()
           row = [
             application.snils,
             oid,
-            2,
+            3,
             application.birth_date.strftime("%d.%m.%Y"),
             competitive_group.edu_programs.last.code,
             (competitive_group.education_source_id == 15 ? 'договор' : 'бюджет'),
@@ -457,7 +480,7 @@ class EntrantApplication < ActiveRecord::Base
             application.registration_date.strftime("%d.%m.%Y"),
             full_summa,
             (test_result if test_result > 0),
-            achievements,
+            (achievements if achievements_sum > 0),
             status,
             (order_number if status == 1),
             (application.enrolled_date.strftime("%d.%m.%Y") if status == 1),
