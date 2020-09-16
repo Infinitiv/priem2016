@@ -437,7 +437,7 @@ class EntrantApplication < ActiveRecord::Base
           application.achievements.sort_by(&:institution_achievement_id).each do |achievement|
             case achievement.institution_achievement_id
             when 38
-              achievements_array << 'a'
+              achievements_array << 'а'
             when 39
               achievements_array << 'б'
             when 40
