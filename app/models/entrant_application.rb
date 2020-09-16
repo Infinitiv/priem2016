@@ -435,34 +435,36 @@ class EntrantApplication < ActiveRecord::Base
                           
           achievements_array = []
           application.achievements.sort_by(&:institution_achievement_id).each do |achievement|
-            case achievement.institution_achievement_id
-            when 38 && achievement.value > 0
-              achievements_array << 'а'
-            when 39 && achievement.value > 0
-              achievements_array << 'б'
-            when 40 && achievement.value > 0
-              achievements_array << 'в'
-            when 41 && achievement.value > 0
-              case achievement.value
-              when 15 && achievement.value > 0
-                achievements_array << 'г1'
-              when 100 && achievement.value > 0
-                achievements_array << 'г2'
-              when 150 && achievement.value > 0
-                achievements_array << 'г3'
+            if achievement.value > 0
+              case achievement.institution_achievement_id
+              when 38
+                achievements_array << 'а'
+              when 39
+                achievements_array << 'б'
+              when 40
+                achievements_array << 'в'
+              when 41
+                case achievement.value
+                when 15
+                  achievements_array << 'г1'
+                when 100
+                  achievements_array << 'г2'
+                when 150
+                  achievements_array << 'г3'
+                end
+              when 42
+                achievements_array << 'д'
+              when 43
+                achievements_array << 'е'
+              when 44
+                achievements_array << 'ж'
+              when 45
+                achievements_array << '21а'
+              when 46
+                achievements_array << '21б'
+              when 47
+                achievements_array << "з-#{achievement.value.round()}"
               end
-            when 42 && achievement.value > 0
-              achievements_array << 'д'
-            when 43 && achievement.value > 0
-              achievements_array << 'е'
-            when 44 && achievement.value > 0
-              achievements_array << 'ж'
-            when 45 && achievement.value > 0
-              achievements_array << '21а'
-            when 46 && achievement.value > 0
-              achievements_array << '21б'
-            when 47 && achievement.value > 0
-              achievements_array << "з-#{achievement.value.round()}"
             end
           end
           achievements = achievements_array.join(',')
