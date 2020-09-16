@@ -458,7 +458,7 @@ class EntrantApplication < ActiveRecord::Base
             when 44
               achievements_array << 'ж'
             when 45
-              achievements_array << '21a'
+              achievements_array << '21а'
             when 46
               achievements_array << '21б'
             when 47
