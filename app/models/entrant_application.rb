@@ -462,7 +462,7 @@ class EntrantApplication < ActiveRecord::Base
             when 46
               achievements_array << '21б'
             when 47
-              achievements_array << 'з'
+              achievements_array << "з-#{achievement.value.round()}"
             end
           end
           achievements = achievements_array.join(',')
