@@ -18,6 +18,7 @@ table.table.datatable
     th Запрошены изменения
     th Дата заполнения анкеты
     th Форма вступительного испытания
+    th СНИЛС
     - if can? :destroy, EntrantApplication
       th Удалить заявление
   tbody
@@ -53,6 +54,7 @@ table.table.datatable
             td= entrant_application.marks.map(&:form).include?('Экзамен') ? 'Экзамен' : 'ЕГЭ'
           - when 4
             td= entrant_application.marks.map(&:form).include?('Экзамен') ? 'Экзамен' : 'Аккредитация'
+        td= entrant_application.snils
         - if can? :destroy, entrant_application
           - if entrant_application.status_id == 4
               td= link_to 'Отозвать', entrant_application_recall_entrant_application_path(entrant_application), method: :put, class: 'label label-warning', title: 'Отозвать документы'
