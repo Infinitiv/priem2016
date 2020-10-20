@@ -192,9 +192,17 @@ namespace :priem do
       %x(mkdir -p "#{entrant_application_path}")
       marks_ege = entrant_application.marks.where(form: 'ЕГЭ')
       marks_exam = entrant_application.marks.where.not(form: 'ЕГЭ')
-      mean_ege = marks_ege.empty? ? 0 : round(marks_ege.sum(&:value)/marks_ege.count, 2)
-      mean_exam = marks_exam.empty? ? 0 : round(marks_exam.sum(&:value)/marks_exam.count, 2)
-      %x(touch "#{entrant_application_path}/#{entrant_application.fio} - #{mean_ege}" - #{mean_exam}.txt)
+      mean_ege = unless marks_ege.empty?
+                   marks_ege.pluck(:value).any? ? (marks_ege.pluck(:value).sum.to_f/marks_ege.count).round(2) : 0
+                 else
+                   0
+                 end
+      mean_exam = unless marks_exam.empty?
+                    marks_exam.pluck(:value).any? ? (marks_exam.pluck(:value).sum.to_f/marks_exam.count).round(2) : 0
+                  else
+                    0
+                  end
+      %x(touch "#{entrant_application_path}/#{entrant_application.fio} - #{mean_ege} - #{mean_exam}.txt")
       target_contracts_ids = entrant_application.target_contracts.where(competitive_group_id: entrant_application.enrolled).map(&:id)
       target_attachments = entrant_application.attachments.where(document_type: 'target_contract', document_id: target_contracts_ids)
       target_attachments.each do |target_attachment|
