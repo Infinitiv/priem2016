@@ -180,14 +180,14 @@ namespace :priem do
   
   desc 'Target export'
   task target_export: :environment do
-    %x(mkdir -p public/target)
+    %x(mkdir -p storage/target)
     target_competitive_groups = CompetitiveGroup.where(campaign_id: 7, education_source_id: 16).map(&:id)
     target_competitive_groups.each do |target_competitive_group|
-      %x(mkdir -p "public/target/#{target_competitive_group}")
+      %x(mkdir -p "storage/target/#{target_competitive_group}")
     end
     entrant_applications = EntrantApplication.where(enrolled: target_competitive_groups)
     entrant_applications.each do |entrant_application|
-      entrant_application_path = "public/target/#{entrant_application.enrolled}/#{entrant_application.application_number}"
+      entrant_application_path = "storage/target/#{entrant_application.enrolled}/#{entrant_application.application_number}"
       %x(mkdir -p "#{entrant_application_path}")
       marks = entrant_application.marks.order(:subject_id).includes(:subject)
       sum = marks.pluck(:value).any? ? marks.pluck(:value).sum : 0
@@ -203,7 +203,7 @@ namespace :priem do
       target_attachments = entrant_application.attachments.where(document_type: 'target_contracts', document_id: target_contracts_ids)
       target_attachments.each do |target_attachment|
         path = target_attachment.data_hash[0..2].split('').join('/')
-        %x(cp "#{Rails.root.join('storage', path, target_attachment.data_hash)}" "public/target/#{entrant_application.enrolled}/#{entrant_application.application_number}/#{target_attachment.filename}")
+        %x(cp "#{Rails.root.join('storage', path, target_attachment.data_hash)}" "#{entrant_application_path}/#{target_attachment.filename}")
       end
     end
   end
