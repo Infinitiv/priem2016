@@ -185,6 +185,7 @@ namespace :priem do
     target_competitive_groups.each do |target_competitive_group|
       %x(mkdir -p "storage/target/#{target_competitive_group}")
     end
+    
     entrant_applications = EntrantApplication.where(enrolled: target_competitive_groups)
     entrant_applications.each do |entrant_application|
       entrant_application_path = "storage/target/#{entrant_application.enrolled}/#{entrant_application.application_number}"
