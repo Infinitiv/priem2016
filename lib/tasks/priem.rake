@@ -178,6 +178,36 @@ namespace :priem do
     File.open('public/target.xml', "w"){|f| f.write xml}
   end
   
+  desc 'Target export'
+  task target_export: :environment do
+    %x(mkdir -p public/target)
+    target_competitive_groups = CompetitiveGroup.where(campaign_id: 7, education_source_id: 16).map(&:id)
+    target_competitive_groups.each do |target_competitive_group|
+      %x(mkdir -p "public/target/#{target_competitive_group}")
+    end
+    entrant_applications = EntrantApplication.where(enrolled: target_competitive_groups)
+    entrant_applications.each do |entrant_application|
+      entrant_application_path = "public/target/#{entrant_application.enrolled}/#{entrant_application.application_number}"
+      %x(mkdir -p entrant_application_path)
+      marks = entrant_application.marks.order(:subject_id).includes(:subject)
+      sum = marks.pluck(:value).any? ? marks.pluck(:value).sum : 0
+      achievements = entrant_application.achievements.includes(:institution_achievement)
+      achievements_sum = achievements.pluck(:value).sum
+      achievements_limit = 10 if entrant_application.campaign.campaign_type_id == 1
+      if achievements_limit
+        achievements_sum = achievements_sum > achievements_limit ? 10 : achievements_sum
+      end
+      full_sum = sum + achievements_sum
+      %x(touch "#{entrant_application_path}/#{entrant_application.fio} - #{full_sum}")
+      target_contracts_ids = entrant_application.target_contracts.where(competitive_group_id: entrant_application.enrolled).map(&:id)
+      target_attachments = entrant_application.attachments.where(document_type: 'target_contracts', document_id: target_contracts_ids)
+      target_attachments.each do |target_attachment|
+        path = target_attachment.data_hash[0..2].split('').join('/')
+        %x(cp "#{Rails.root.join('storage', path, target_attachment.data_hash)}" "public/target/#{entrant_application.enrolled}/#{entrant_application.application_number}/#{target_attachment.filename}")
+      end
+    end
+  end
+  
   desc "Fill dictionaries"
   task fill_dictionaries: :environment do
     log_path = [Rails.root, 'log', 'rake.log'].join('/')
