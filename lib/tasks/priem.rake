@@ -189,16 +189,11 @@ namespace :priem do
     entrant_applications.each do |entrant_application|
       entrant_application_path = "storage/target/#{entrant_application.enrolled}/#{entrant_application.application_number}"
       %x(mkdir -p "#{entrant_application_path}")
-      marks = entrant_application.marks.order(:subject_id).includes(:subject)
-      sum = marks.pluck(:value).any? ? marks.pluck(:value).sum : 0
-      achievements = entrant_application.achievements.includes(:institution_achievement)
-      achievements_sum = achievements.pluck(:value).sum
-      achievements_limit = 10 if entrant_application.campaign.campaign_type_id == 1
-      if achievements_limit
-        achievements_sum = achievements_sum > achievements_limit ? 10 : achievements_sum
-      end
-      full_sum = sum + achievements_sum
-      %x(touch "#{entrant_application_path}/#{entrant_application.fio} - #{full_sum.to_i}")
+      marks_ege = entrant_application.marks.where(form: 'ЕГЭ')
+      marks_exam = entrant_application.marks.where.not(form: 'ЕГЭ')
+      mean_ege = marks_ege.empty? : 0 : round(marks_ege.sum(&:value)/marks_ege.count, 2)
+      mean_exam = marks_exam.empty? : 0 : round(marks_exam.sum(&:value)/marks_exam.count, 2)
+      %x(touch "#{entrant_application_path}/#{entrant_application.fio} - #{mean_ege}" - #{mean_exam}.txt)
       target_contracts_ids = entrant_application.target_contracts.where(competitive_group_id: entrant_application.enrolled).map(&:id)
       target_attachments = entrant_application.attachments.where(document_type: 'target_contract', document_id: target_contracts_ids)
       target_attachments.each do |target_attachment|
