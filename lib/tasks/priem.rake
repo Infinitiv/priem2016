@@ -200,7 +200,7 @@ namespace :priem do
       full_sum = sum + achievements_sum
       %x(touch "#{entrant_application_path}/#{entrant_application.fio} - #{full_sum.to_i}")
       target_contracts_ids = entrant_application.target_contracts.where(competitive_group_id: entrant_application.enrolled).map(&:id)
-      target_attachments = entrant_application.attachments.where(document_type: 'target_contracts', document_id: target_contracts_ids)
+      target_attachments = entrant_application.attachments.where(document_type: 'target_contract', document_id: target_contracts_ids)
       target_attachments.each do |target_attachment|
         path = target_attachment.data_hash[0..2].split('').join('/')
         %x(cp "#{Rails.root.join('storage', path, target_attachment.data_hash)}" "#{entrant_application_path}/#{target_attachment.filename}")
