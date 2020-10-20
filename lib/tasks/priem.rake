@@ -188,7 +188,7 @@ namespace :priem do
     entrant_applications = EntrantApplication.where(enrolled: target_competitive_groups)
     entrant_applications.each do |entrant_application|
       entrant_application_path = "public/target/#{entrant_application.enrolled}/#{entrant_application.application_number}"
-      %x(mkdir -p entrant_application_path)
+      %x(mkdir -p "#{entrant_application_path}")
       marks = entrant_application.marks.order(:subject_id).includes(:subject)
       sum = marks.pluck(:value).any? ? marks.pluck(:value).sum : 0
       achievements = entrant_application.achievements.includes(:institution_achievement)
@@ -198,7 +198,7 @@ namespace :priem do
         achievements_sum = achievements_sum > achievements_limit ? 10 : achievements_sum
       end
       full_sum = sum + achievements_sum
-      %x(touch "#{entrant_application_path}/#{entrant_application.fio} - #{full_sum}")
+      %x(touch "#{entrant_application_path}/#{entrant_application.fio} - #{full_sum.to_i}")
       target_contracts_ids = entrant_application.target_contracts.where(competitive_group_id: entrant_application.enrolled).map(&:id)
       target_attachments = entrant_application.attachments.where(document_type: 'target_contracts', document_id: target_contracts_ids)
       target_attachments.each do |target_attachment|
