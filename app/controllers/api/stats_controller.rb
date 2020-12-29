@@ -33,7 +33,7 @@ class Api::StatsController < ApplicationController
   end
 
   def campaigns
-    @campaigns = Campaign.where("5 = any(education_levels)").select(:id, :name, :year_start)
+    @campaigns = Campaign.select(:id, :name, :year_start)
   end
   
   private
@@ -54,7 +54,7 @@ class Api::StatsController < ApplicationController
   
   
   def set_campaign
-    @campaign = Campaign.where("5 = any(education_levels)").find_by_year_start(params[:id])
+    @campaign = Campaign.find(params[:id])
   end
   
   def set_entrant_applications
