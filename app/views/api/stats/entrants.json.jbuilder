@@ -43,7 +43,11 @@ json.array! @entrants do |entrant|
   json.mean_ege marks.where(form: 'ЕГЭ').count > 0 ? marks.where(form: 'ЕГЭ').sum(:value).to_f / marks.where(form: 'ЕГЭ').count : nil
   json.mean_exam marks.where(form: 'Экзамен').count > 0 ? marks.where(form: 'Экзамен').sum(:value).to_f / marks.where(form: 'Экзамен').count : nil
   achievements = entrant.achievements
-  json.achievements achievements.sum(:value) > 10 ? 10.to_f : achievements.sum(:value)
+  if entrant.campaign.campaign_type_id == 1
+    json.achievements achievements.sum(:value) > 10 ? 10.to_f : achievements.sum(:value)
+  else
+    json.achievements achievements.sum(:value)
+  end
   benefits = entrant.benefit_documents
   unless benefits.empty?
     if benefits.map(&:benefit_type_id).include?(4)
