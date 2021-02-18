@@ -1,5 +1,48 @@
 namespace :priem do
   require 'builder'
+  require 'json'
+  require 'net/http'
+  
+  task check_addresses: :environment do
+    entrant_applications = EntrantApplication.includes(:campaign).where.not(address: nil).where(address_suggestions: nil, status_id: [4, 6])
+    nn = entrant_applications.count
+    puts "Найдено записей для обработки: #{nn}"
+    url = 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address'
+    token = ENV['DADATA_TOKEN']
+    headers = {'Content-Type' => 'application/json', 'Accept' => 'application/json', 'Authorization' => "Token #{token}"}
+
+    uri = URI.parse(url)
+    n = 1
+    Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+      entrant_applications.each do |entrant_application|
+        puts "Обрабатываем запись #{n} из #{nn}"
+        data = {}
+        request = { "query": "#{[entrant_application.zip_code, entrant_application.address].compact.join(', ')}" }.to_json
+        response = http.post(uri.path, request, headers)
+        data = JSON.parse(response.body)
+        unless data['suggestions'].empty?
+          entrant_application.address_suggestions = data['suggestions']
+          if data['suggestions'].size == 1
+            entrant_application.verified_address = data['suggestions'].first['unrestricted_value']
+            entrant_application.region_iso_code = data['suggestions'].first['data']['region_iso_code']
+            entrant_application.region_with_type = data['suggestions'].first['data']['region_with_type']
+            entrant_application.geo_lat = data['suggestions'].first['data']['geo_lat']
+            entrant_application.geo_lon = data['suggestions'].first['data']['geo_lon']
+          else
+            puts "Найдено более одного возможного адреса ((("
+          end
+          if entrant_application.save!
+            puts 'Запись успешно обновлена'
+          else
+            puts 'Что-то пошло не так!'
+          end
+        else
+          puts "Не найдено подходящих вариантов для адреса #{entrant_application.address}. Поступающий # #{[entrant_application.campaign.year_start, entrant_application.application_number].join('-')}"
+        end
+        n += 1
+      end
+    end
+  end
   
   task check_application: :environment do 
     campaign = Campaign.where(campaign_type_id: 1).last

@@ -14,6 +14,7 @@ class Api::StatsController < ApplicationController
       :registration_date,
       :status_id,
       :nationality_type_id,
+      :region_with_type,
       :enrolled,
       :enrolled_date,
       :exeptioned,

@@ -6,6 +6,7 @@ json.array! @entrants do |entrant|
   json.region_id entrant.region_id
   json.registration_date entrant.registration_date
   json.nationality_type_id entrant.nationality_type_id
+  json.region_with_type entrant.region_with_type
   json.status_id entrant.status_id
   json.competitive_groups entrant.competitive_groups.map(&:name).join(',')
   json.education_document_type entrant.education_document.education_document_type
