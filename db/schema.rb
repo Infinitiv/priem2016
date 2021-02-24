@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200703061512) do
+ActiveRecord::Schema.define(version: 20210218140051) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -262,6 +262,12 @@ ActiveRecord::Schema.define(version: 20200703061512) do
     t.integer  "locked_by"
     t.string   "status"
     t.text     "request"
+    t.json     "address_suggestions"
+    t.string   "region_iso_code"
+    t.string   "region_with_type"
+    t.string   "geo_lat"
+    t.string   "geo_lon"
+    t.string   "verified_address"
   end
 
   add_index "entrant_applications", ["attachment_id"], name: "index_entrant_applications_on_attachment_id", using: :btree
