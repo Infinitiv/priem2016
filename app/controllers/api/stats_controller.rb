@@ -31,6 +31,8 @@ class Api::StatsController < ApplicationController
       :target_contracts,
       :target_organizations
     ).where(status_id: [4, 6])
+    @specialities = Dictionary.find_by_code(10).items
+    @countries = Dictionary.find_by_code(7).items
   end
 
   def campaigns

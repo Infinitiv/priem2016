@@ -5,7 +5,7 @@ json.array! @entrants do |entrant|
   json.birth_date entrant.birth_date
   json.region_id entrant.region_id
   json.registration_date entrant.registration_date
-  json.nationality_type_id entrant.nationality_type_id
+  json.nationality @countries.select{|country| country.key(entrant.nationality_type_id)}.first['name']
   json.region_with_type entrant.region_with_type
   json.status_id entrant.status_id
   json.competitive_groups entrant.competitive_groups.map(&:name).join(',')
@@ -13,7 +13,7 @@ json.array! @entrants do |entrant|
   json.education_document_issuer entrant.education_document.education_document_issuer
   json.education_document_date entrant.education_document.education_document_date
   json.return_documents_date entrant.return_documents_date
-  json.direction_id entrant.enrolled ? entrant.competitive_groups.find(entrant.enrolled).direction_id : nil
+  json.direction entrant.enrolled ? @specialities.select{|speciality| speciality.key(entrant.competitive_groups.find(entrant.enrolled).direction_id)}.first['name'] : nil
   json.enrolled_name entrant.enrolled ? entrant.competitive_groups.find(entrant.enrolled).name : nil
   json.education_source_id entrant.enrolled ? entrant.competitive_groups.find(entrant.enrolled).education_source_id : nil
   json.enrolled_date entrant.enrolled_date
