@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210218140051) do
+ActiveRecord::Schema.define(version: 20210525143805) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -121,16 +121,20 @@ ActiveRecord::Schema.define(version: 20210218140051) do
 
   create_table "competitive_groups", force: :cascade do |t|
     t.integer  "campaign_id"
-    t.string   "name",                default: ""
+    t.string   "name",                      default: ""
     t.integer  "education_level_id"
     t.integer  "education_source_id"
     t.integer  "education_form_id"
     t.integer  "direction_id"
-    t.boolean  "is_for_krym",         default: false
-    t.boolean  "is_additional",       default: false
+    t.boolean  "is_for_krym",               default: false
+    t.boolean  "is_additional",             default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.date     "last_admission_date"
+    t.date     "application_start_date"
+    t.date     "application_end_exam_date"
+    t.date     "application_end_ege_date"
+    t.date     "order_end_date"
   end
 
   add_index "competitive_groups", ["campaign_id"], name: "index_competitive_groups_on_campaign_id", using: :btree
