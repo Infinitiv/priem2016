@@ -47,12 +47,11 @@ end
 
 gem 'thin'
 gem 'slim'
-gem 'bootstrap-sass'
+gem 'bootstrap-sass', '~> 3.4'
 gem 'will_paginate'
 gem 'roo'
 gem 'jquery-datatables-rails'
 gem 'prawn'
-gem 'google_drive'
 gem 'devise'
 gem 'cancancan'
 gem 'rmagick'
