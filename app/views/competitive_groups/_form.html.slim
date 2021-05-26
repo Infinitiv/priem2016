@@ -18,16 +18,11 @@
   .form-group
     = f.label :education_source_id, 'Источник финансирования', class: 'label-control col-sm-2'
     .col-sm-4
-          = f.select :education_source_id, options_for_select(@education_sources), {include_blank: true}, class: 'form-control'
+      = f.select :education_source_id, options_for_select(@education_sources), {include_blank: true}, class: 'form-control'
   .form-group
     = f.label :direction_id, 'Направление подготовки', class: 'label-control col-sm-2'
     .col-sm-4
-          = f.select :direction_id, options_for_select(@directions), {include_blank: true}, class: 'form-control'
-  .form-group
-    .col-sm-2
-      = f.label :is_for_krym, '', class: 'checkbox-inline'
-        = f.check_box :is_for_krym
-        = f.label 'Места для Крыма'
+      = f.select :direction_id, options_for_select(@directions), {include_blank: true}, class: 'form-control'
   .form-group
     .col-sm-2
       = f.label :is_additional, '', class: 'checkbox-inline'

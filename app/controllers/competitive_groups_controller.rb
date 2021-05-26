@@ -80,7 +80,7 @@ class CompetitiveGroupsController < ApplicationController
   end
   
   def competitive_group_params
-    params.require(:competitive_group).permit(:campaign_id, :name, :education_level_id, :education_source_id, :education_form_id, :direction_id, :is_for_krym, :is_additional)
+    params.require(:competitive_group).permit(:campaign_id, :name, :education_level_id, :education_source_id, :education_form_id, :direction_id, :is_for_krym, :is_additional, :application_start_date, :application_end_exam_date, :application_end_ege_date, :order_end_date)
   end
   
   def set_selects

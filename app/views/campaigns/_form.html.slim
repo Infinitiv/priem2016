@@ -6,11 +6,11 @@
   .form-group
     = f.label :year_start, 'Год начала', class: 'label-control col-sm-2'
     .col-sm-4
-      = f.number_field :year_start, value: Time.now.strftime("%Y"), in: 2016..2020, class: 'form-control'
+      = f.number_field :year_start, value: Time.now.strftime("%Y"), in: 2016..2025, class: 'form-control'
   .form-group
     = f.label :year_end, 'Год окончания', class: 'label-control col-sm-2'
     .col-sm-4
-      = f.number_field :year_end, value: Time.now.strftime("%Y"), in: 2016..2020, class: 'form-control'
+      = f.number_field :year_end, value: Time.now.strftime("%Y"), in: 2016..2025, class: 'form-control'
   = f.label :education_forms, 'Формы обучения'
   - @education_forms.each do |k, v|
     .form-group

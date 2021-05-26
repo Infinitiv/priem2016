@@ -8,6 +8,6 @@ class CompetitiveGroup < ActiveRecord::Base
   has_and_belongs_to_many :entrant_applications
   has_many :marks, through: :entrant_applications
   
-  validates :campaign_id, :name, :education_level_id, :education_source_id, :education_form_id, :direction_id, presence: true
+  validates :campaign_id, :name, :education_level_id, :education_source_id, :education_form_id, :direction_id, :application_start_date, :application_end_exam_date, :application_end_ege_date, :order_end_date, presence: true
   validates :campaign_id, :education_level_id, :education_source_id, :education_form_id, :direction_id, numericality: {only_integer: true}
 end
