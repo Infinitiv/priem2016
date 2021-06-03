@@ -8,6 +8,10 @@ json.campaigns @campaigns do |campaign|
     json.id competitive_group.id
     json.name competitive_group.name
     json.direction_id competitive_group.direction_id
+    json.application_start_date competitive_group.application_start_date
+    json.application_end_exam_date competitive_group.application_end_exam_date
+    json.application_end_ege_date competitive_group.application_end_ege_date
+    json.order_end_date competitive_group.order_end_date
     json.target_organizations competitive_group.target_organizations, :id, :target_organization_name
   end
   json.institution_achievements campaign.institution_achievements, :id, :name, :max_value
