@@ -32,25 +32,42 @@ class Campaign < ActiveRecord::Base
     xml = Nokogiri::XML(response.body)
     header = file.row(1)
     competitive_groups = {}
+    admission_volumes = {}
     (2..file.last_row).to_a.each do |i|
       row = Hash[[header, file.row(i)].transpose]
       code = row["Код направления подготовки"]
       if xml.at("NewCode:contains('#{code}')")
         direction_id = xml.at("NewCode:contains('#{code}')").parent.at_css("ID").text
+        admission_volumes[direction_id] ||= {}
+        education_level_id = campaign.education_levels.include?(5) ? 5 : 18
+        admission_volumes[direction_id][:education_level_id] = education_level_id
         name = xml.at("NewCode:contains('#{code}')").parent.at_css("Name").text
         case row['Источник финасирования']
         when 'бюджетный прием'
           competitive_group_name = "#{name}. Бюджет." if row['Количество мест'].to_i > 0
           education_source_id = 14
+          admission_volumes[direction_id][number_budget_o] ||= 0
+          admission_volumes[direction_id][number_budget_o] += row['Количество мест']
+          admission_volumes[direction_id][education_source_id] = education_source_id
         when 'внебюджетный прием'
           competitive_group_name = "#{name}. Внебюджет." if row['Количество мест'].to_i > 0
           education_source_id = 15
+          admission_volumes[direction_id][number_paid_o] ||= 0
+          admission_volumes[direction_id][number_paid_o] += row['Количество мест']
+          admission_volumes[direction_id][education_source_id] = education_source_id
         when 'целевой прием'
-          competitive_group_name = "#{name}. Целевые места." if row['Количество мест'].to_i > 0
+          target_organization_name = TargetOrganization.find(row['Заказчик']).target_organization_name
+          competitive_group_name = "#{name}. Целевые места. #{target_organization_name}." if row['Количество мест'].to_i > 0
           education_source_id = 16
+          admission_volumes[direction_id][number_target_o] ||= 0
+          admission_volumes[direction_id][number_target_o] += row['Количество мест']
+          admission_volumes[direction_id][education_source_id] = education_source_id
         when 'особая квота'
           competitive_group_name = "#{name}. Квота особого права." if row['Количество мест'].to_i > 0
           education_source_id = 20
+          admission_volumes[direction_id][number_quota_o] ||= 0
+          admission_volumes[direction_id][number_quota_o] += row['Количество мест']
+          admission_volumes[direction_id][education_source_id] = education_source_id
         end
         competitive_groups[competitive_group_name] = {}
         competitive_groups[competitive_group_name]['code'] = code
@@ -70,54 +87,55 @@ class Campaign < ActiveRecord::Base
       EduProgram.create(name: competitive_group_name, code: values['code']) unless EduProgram.find_by_code(values['code'])
     end
 
-    competitive_groups.each do |competitive_group_name, values|
+    admission_volumes.each do |direction_id, values|
       # добавляем объемы приема
       education_level_id = campaign.education_levels.include?(5) ? 5 : 18
-      attrib = {education_level_id: education_level_id, direction_id: values['direction_id']}
-      case values['education_source_id']
-      when 14
-        number = {number_budget_o: values['number']}
-      when 15
-        number = {number_paid_o: values['number']}
-      when 16
-        number = {number_target_o: values['number']}
-      when 20
-        number = {number_quota_o: values['number']}
-      end
-      attrib.merge!(number)
-      admission_volume = campaign.admission_volumes.find_by_direction_id(values['direction_id']) || campaign.admission_volumes.new
+      attrib = {direction_id: direction_id}.merge!(values)
+      admission_volume = campaign.admission_volumes.find_by_direction_id(direction_id) || campaign.admission_volumes.new
       admission_volume.attributes = attrib
       if admission_volume.save!
         # распределяем места по источникам финансирования
         attrib = {level_budget_id: 1}
-        attrib.merge!(number) unless values['education_source_id'] == 15
+        attrib.merge!(values) unless values['education_source_id'] == 15
         distributed_admission_volume = admission_volume.distributed_admission_volumes.find_by_level_budget_id(1) || admission_volume.distributed_admission_volumes.new
         distributed_admission_volume.attributes = attrib
         distributed_admission_volume.save!
-        if competitive_group_name
-          # добавляем конкурсные группы
-          competitive_group = campaign.competitive_groups.find_by_name(competitive_group_name) || campaign.competitive_groups.create(
-            name: competitive_group_name, 
-            education_level_id: campaign.education_levels.first, 
-            education_source_id: values['education_source_id'], 
-            education_form_id: campaign.education_forms.first, 
-            direction_id: values['direction_id'],
-            application_start_date: values['application_start_date'],
-            application_end_exam_date: values['application_end_exam_date'],
-            application_end_ege_date: values['application_end_ege_date'],
-            order_end_date: values['order_end_date']
-          )
-          # добавляем элементы конкурсных групп
-          attrib = {}
-          attrib.merge!(number)
-          competitive_group_item = competitive_group.competitive_group_item || CompetitiveGroupItem.new
-          competitive_group_item.competitive_group_id = competitive_group.id
-          competitive_group_item.attributes = attrib
-          competitive_group_item.save!
-          # прикрепляем образовательные программы
-          competitive_group.edu_programs = []
-          competitive_group.edu_programs << EduProgram.find_by_code(values['code'])
+      end
+    end
+    competitive_groups.each do |competitive_group_name, values|
+      if competitive_group_name
+        # добавляем конкурсные группы
+        competitive_group = campaign.competitive_groups.find_by_name(competitive_group_name) || campaign.competitive_groups.create(
+          name: competitive_group_name,
+          education_level_id: campaign.education_levels.first,
+          education_source_id: values['education_source_id'],
+          education_form_id: campaign.education_forms.first,
+          direction_id: values['direction_id'],
+          application_start_date: values['application_start_date'],
+          application_end_exam_date: values['application_end_exam_date'],
+          application_end_ege_date: values['application_end_ege_date'],
+          order_end_date: values['order_end_date']
+        )
+        # добавляем элементы конкурсных групп
+        attrib = {}
+        case values['education_source_id']
+        when 14
+          number = {number_budget_o: values['number']}
+        when 15
+          number = {number_paid_o: values['number']}
+        when 16
+          number = {number_target_o: values['number']}
+        when 20
+          number = {number_quota_o: values['number']}
         end
+        attrib.merge!(number)
+        competitive_group_item = competitive_group.competitive_group_item || CompetitiveGroupItem.new
+        competitive_group_item.competitive_group_id = competitive_group.id
+        competitive_group_item.attributes = attrib
+        competitive_group_item.save!
+        # прикрепляем образовательные программы
+        competitive_group.edu_programs = []
+        competitive_group.edu_programs << EduProgram.find_by_code(values['code'])
       end
     end
 

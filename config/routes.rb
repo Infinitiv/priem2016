@@ -9,7 +9,12 @@ Rails.application.routes.draw do
   root 'campaigns#index'
   
   namespace :api, defaults: {format: 'json'}, path: '/api' do
-    resources :entrant_applications, only: [:show, :create, :update]
+    resources :entrant_applications, only: [:show, :create, :update] do
+      member do
+        put 'check_pin'
+        put 'remove_pin'
+      end
+    end
     resources :attachments, only: [:show, :create, :destroy]
     resources 'stats', only: [:show] do
       member do

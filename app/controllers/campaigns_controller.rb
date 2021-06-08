@@ -15,6 +15,7 @@ class CampaignsController < ApplicationController
   
   def create
     @campaign = Campaign.new(campaign_params)
+    @campaign.salt = Random::srand
     if @campaign.save
       redirect_to @campaign, notice: 'Кампания успешно добавлена'
     else

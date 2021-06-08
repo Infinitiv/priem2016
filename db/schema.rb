@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210525143805) do
+ActiveRecord::Schema.define(version: 20210603111714) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -97,6 +97,7 @@ ActiveRecord::Schema.define(version: 20210525143805) do
     t.datetime "updated_at"
     t.string   "google_key_development"
     t.string   "google_key_production"
+    t.string   "salt"
   end
 
   create_table "competitive_group_items", force: :cascade do |t|
@@ -272,6 +273,7 @@ ActiveRecord::Schema.define(version: 20210525143805) do
     t.string   "geo_lat"
     t.string   "geo_lon"
     t.string   "verified_address"
+    t.integer  "pin"
   end
 
   add_index "entrant_applications", ["attachment_id"], name: "index_entrant_applications_on_attachment_id", using: :btree
