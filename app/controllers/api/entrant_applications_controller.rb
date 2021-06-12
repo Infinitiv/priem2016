@@ -25,6 +25,9 @@ class Api::EntrantApplicationsController < ApplicationController
       entrant_application.status = 'новое'
       entrant_application.pin = (1..9).to_a.sample(4).join().to_i
       if entrant_application.save
+        entrant_application.campaign.entrance_test_items.uniq.each do |entrance_test_item|
+          entrant_application.marks.create(subject_id: entrance_test_item.subject_id)
+        end
         Events.welcome_mail(entrant_application).deliver_later if Rails.env == 'production'
         send_data({status: 'success', message: 'entrant application created', hash: entrant_application.data_hash}.to_json)
       end
@@ -152,6 +155,7 @@ class Api::EntrantApplicationsController < ApplicationController
                   :special_entrant, 
                   :special_conditions,
                   :snils,
+                  :snils_absent,
                   :pin,
                   identity_documents: [
                                        :identity_document_type,
