@@ -8,6 +8,7 @@ class Api::AttachmentsController < ApplicationController
   end
   
   def create
+    attachments = []
     unless attachment_params[:entrant_application_id].blank? || attachment_params[:files].nil?
       attachment_params[:files].each do |file|
         @attachment = Attachment.new
@@ -18,6 +19,7 @@ class Api::AttachmentsController < ApplicationController
         @attachment.template = false
         @attachment.uploaded_file(file)
         @attachment.save
+        attachments.push(@attachment.slice(:id, :document_type, :mime_type, :data_hash, :status, :merged, :template, :document_id, :filename))
       end
     end
     if @attachment.document_type == 'entrant_application' && @attachment.template == false
@@ -32,6 +34,7 @@ class Api::AttachmentsController < ApplicationController
     if @attachment.document_type == 'recall_application' && @attachment.template == false
       @attachment.entrant_application.update_attributes(status: 'подано заявление об отзыве документов')
     end
+    send_data({status: 'success', attachments: attachments}.to_json)
     render text: 'ok'
   end
   

@@ -15,11 +15,11 @@ class Api::EntrantApplicationsController < ApplicationController
   end
 
   def create
-    campaign = Campaign.find(entrant_application_params[:campaign_id])
-    if campaign.entrant_applications.where(email: entrant_application_params[:email]).empty?
+    campaign = Campaign.find(params[:campaignId])
+    if campaign.entrant_applications.where(email: params[:email]).empty?
       entrant_application = EntrantApplication.new
-      entrant_application.campaign_id = entrant_application_params[:campaign_id]
-      entrant_application.email = entrant_application_params[:email]
+      entrant_application.campaign_id = params[:campaignId]
+      entrant_application.email = params[:email]
       entrant_application.registration_date = Time.now.to_date
       entrant_application.data_hash = Digest::MD5.hexdigest [entrant_application.email, campaign.salt].compact.join()
       entrant_application.status = 'новое'
@@ -29,7 +29,7 @@ class Api::EntrantApplicationsController < ApplicationController
           entrant_application.marks.create(subject_id: entrance_test_item.subject_id)
         end
         Events.welcome_mail(entrant_application).deliver_later if Rails.env == 'production'
-        send_data({status: 'success', message: 'entrant application created', hash: entrant_application.data_hash}.to_json)
+        send_data({status: 'success', message: 'entrant application created', hash: entrant_application.data_hash, id: entrant_application.id}.to_json)
       end
     else
       send_data({status: 'faild', message: 'email is not uniq'}.to_json)
@@ -107,16 +107,16 @@ class Api::EntrantApplicationsController < ApplicationController
   end
 
   def update
-    if params[:request]
-      @entrant_application.update_attributes(request: params[:request]) unless params[:request].empty?
-    else
-      @entrant_application.update_attributes(status: 'прошу проверить')
+    if params[:entrantApplication]
+      if @entrant_application.update_Iattributes(request: params[:request])
+
+      end
     end
     send_data({status: 'success', hash: @entrant_application.data_hash}.to_json)
   end
 
   def check_pin
-    pin = entrant_application_params[:pin].to_i
+    pin = params[:pin].to_i
     if pin == @entrant_application.pin
       @entrant_application.update_attributes(pin: nil)
       send_data({status: 'success', message: 'pins are equal', hash: @entrant_application.data_hash}.to_json)
@@ -139,74 +139,177 @@ class Api::EntrantApplicationsController < ApplicationController
     @entrant_application = EntrantApplication.includes(:identity_documents, :education_document, :marks, :achievements, :olympic_documents, :benefit_documents, :other_documents, :competitive_groups, :target_contracts, :contracts, :attachments).find_by_data_hash(params[:id])
   end
   
-  def entrant_application_params
-    params.permit(:citizenship, 
-                  :campaign_id, 
-                  :entrant_last_name, 
-                  :entrant_first_name, 
-                  :entrant_middle_name, 
-                  :gender_id, 
-                  :birth_date, 
-                  :address,
-                  :zip_code,
-                  :email,
-                  :phone,
-                  :need_hostel, 
-                  :special_entrant, 
-                  :special_conditions,
-                  :snils,
-                  :snils_absent,
-                  :pin,
-                  identity_documents: [
-                                       :identity_document_type,
-                                       :identity_document_series,
-                                       :identity_document_number,
-                                       :identity_document_date,
-                                       :identity_document_issuer,
-                                       :alt_entrant_last_name,
-                                       :alt_entrant_first_name,
-                                       :alt_entrant_middle_name
-                                       ],
-                  education_document: [
-                                       :education_document_type,
-                                       :education_document_number,
-                                       :education_document_issuer,
-                                       :education_document_date,
-                                       :education_speciality_code
-                                       ],
-                  institution_achievement_ids: [],
-                  marks: [
-                          :subject_id,
-                          :form,
-                          :year,
-                          :value,
-                          :organization_uid
-                          ],
-                  competitive_groups: [
-                                       :id,
-                                       :target_organization_id
-                                       ],
-                  benefit_documents: [
-                                      :benefit_document_type_id,
-                                      :benefit_document_series,
-                                      :benefit_document_number,
-                                      :benefit_document_organization,
-                                      :benefit_document_date
-                                      ],
-                  olympic_documents: [
-                                         :olympic_document_type_id,
-                                         :diploma_type_id,
-                                         :olympic_document_series,
-                                         :olympic_document_number,
-                                         :olympic_document_date,
-                                         :class_number
-                                         ],
-                  other_documents: [
-                                    :name,
-                                    :other_document_number,
-                                    :other_document_series,
-                                    :other_document_date,
-                                    :other_document_issuer
-                                    ])
-  end
+  #def entrant_application_params
+    #params.permit(entrantApplication: {
+                                       #:applicationNumber,
+                                       #:campaignId,
+                                       #:nationalityTypeId,
+                                       #personal: {
+                                                  #:entrantLastName,
+                                                  #:entrantFirstName,
+                                                  #:entrantMiddleName,
+                                                  #:genderId,
+                                                  #:birthDate
+                                                 #},
+                                       #contactInformation: {
+                                                            #:address,
+                                                            #:zipCode,
+                                                            #:email,
+                                                            #:phone
+                                                           #},
+                                       #:benefit,
+                                       #:olympionic,
+                                       #:budgetAgr,
+                                       #:paidAgr,
+                                       #:statusId,
+                                       #:comment,
+                                       #:status,
+                                       #:request,
+                                       #:enrolled,
+                                       #:enrolledDate,
+                                       #:needHostel,
+                                       #:specialEntrant,
+                                       #:specialConditions,
+                                       #:hash,
+                                       #:snils,
+                                       #:snilsAbsent,
+                                       #identityDocuments:
+                                      #[
+                                       #{
+                                        #:id,
+                                        #:identityDocumentType,
+                                        #:identityDocumentSeries,
+                                        #:identityDocumentNumber,
+                                        #:identityDocumentDate,
+                                        #:identityDocumentIssuer,
+                                        #:status,
+                                        #:identityDocumentData,
+                                        #:altEntrantLastName,
+                                        #:altEntrantFirstName,
+                                        #:altEntrantMiddleName
+                                       #}
+                                      #],
+                                       #educationDocument:
+                                      #{
+                                       #:id,
+                                       #:educationDocumentType,
+                                       #:educationDocumentNumber,
+                                       #:educationDocumentDate,
+                                       #:educationDocumentIssuer,
+                                       #:originalReceivedDate,
+                                       #:educationSpecialityCode,
+                                       #:status,
+                                       #:isOriginal
+                                      #},
+                                       #marks:
+                                      #[
+                                       #{
+                                        #:id,
+                                        #:value,:
+                                        #:subjectId,
+                                        #:subject,
+                                        #:form,
+                                        #:checked,
+                                        #:organizationUid
+                                       #}
+                                      #],
+                                       #:sum,
+                                       #:achievementsSum,
+                                       #:fullSum,
+                                       #achievements:
+                                      #[
+                                       #{
+                                        #:id,
+                                        #:name,
+                                        #:value,
+                                        #:status
+                                       #}
+                                      #],
+                                       #olympicDocuments:
+                                      #[
+                                       #{
+                                        #:id,
+                                        #:benefitDocumentTypeId,
+                                        #:olympicId,
+                                        #:diplomaTypeId,
+                                        #:olympicProfileId,
+                                        #:classNumber,
+                                        #:olympicDocumentSeries,
+                                        #:olympicDocumentNumber,
+                                        #:olympicDocumentDate,
+                                        #:olympicSubjectId,
+                                        #:ege_subjectId,
+                                        #:status,
+                                        #:olympicDocumentTypeId
+                                       #}
+                                      #],
+                                       #benefitDocuments:
+                                      #[
+                                       #{
+                                        #:id,
+                                        #:benefitDocumentTypeId,
+                                        #:benefitDocumentSeries,
+                                        #:benefitDocumentNumber,
+                                        #:benefitDocumentDate,
+                                        #:benefitDocumentOrganization,
+                                        #:benefitTypeId,
+                                        #:status
+                                       #}
+                                      #],
+                                       #otherDocuments:
+                                      #[
+                                       #{
+                                        #:id,
+                                        #:otherDocumentSeries,
+                                        #:otherDocumentNumber,
+                                        #:otherDocumentIssuer,
+                                        #:name
+                                       #}
+                                      #],
+                                       #competitiveGroups:
+                                      #[
+                                       #{
+                                        #:id,
+                                        #:name,
+                                        #:educationLevelId,
+                                        #:educationSourceId,
+                                        #:educationFormId,
+                                        #:directionId
+                                       #}
+                                      #],
+                                       #targetContracts:
+                                      #[
+                                       #{
+                                        #:id,
+                                        #:competitiveGroupId,
+                                        #:competitiveGroupName,
+                                        #:targetOrganizationId,
+                                        #:targetOrganizationName,
+                                        #:status
+                                       #}
+                                      #],
+                                       #contracts:
+                                      #[
+                                       #{
+                                        #:competitiveGroupId,
+                                        #:competitiveGroupName,
+                                        #:status
+                                       #}
+                                      #],
+                                       #attachments:
+                                      #[
+                                       #{
+                                        #:id,
+                                        #:documentType,
+                                        #:mimeType,
+                                        #:dataHash,
+                                        #:status,
+                                        #:merged,
+                                        #:template,
+                                        #:documentId,
+                                        #:filename
+                                       #}
+                                      #]
+                                      #}
+  #end
 end
