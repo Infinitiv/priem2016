@@ -1,5 +1,5 @@
 # config valid only for current version of Capistrano
-lock '3.14.1'
+lock '3.16.0'
 
 set :application, 'priem2016_production'
 set :repo_url, 'git@github.com:Infinitiv/priem2016.git'
