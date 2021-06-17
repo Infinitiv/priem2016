@@ -28,7 +28,7 @@ class Api::EntrantApplicationsController < ApplicationController
         entrant_application.campaign.entrance_test_items.uniq.each do |entrance_test_item|
           entrant_application.marks.create(subject_id: entrance_test_item.subject_id)
         end
-        Events.welcome_mail(entrant_application).deliver_later if Rails.env == 'production'
+        Events.check_pin(entrant_application).deliver_later if Rails.env == 'production'
         send_data({status: 'success', message: 'entrant application created', hash: entrant_application.data_hash, id: entrant_application.id}.to_json)
       end
     else

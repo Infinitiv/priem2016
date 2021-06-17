@@ -12,6 +12,11 @@ class Events < ActionMailer::Base
     mail(to: @entrant_application.email, subject: 'Приемная комиссия ИвГМА сообщает')
   end
   
+  def check_pin(entrant_application)
+    @entrant_application = entrant_application
+    mail(to: @entrant_application.email, subject: 'Приемная комиссия ИвГМА сообщает')
+  end
+  
   def add_comment(entrant_application)
     @entrant_application = entrant_application
     mail(to: @entrant_application.email, subject: 'Приемная комиссия ИвГМА сообщает')
