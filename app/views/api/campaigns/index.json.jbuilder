@@ -11,11 +11,11 @@ json.campaigns @campaigns do |campaign|
     json.id competitive_group.id
     json.name competitive_group.name
     json.directionId competitive_group.direction_id
+    json.educationSourceId competitive_group.education_source_id
     json.applicationStartDate competitive_group.application_start_date
     json.applicationEndExamDate competitive_group.application_end_exam_date
     json.applicationEndEgeDate competitive_group.application_end_ege_date
     json.orderEndDate competitive_group.order_end_date
-    json.targetOrganizations competitive_group.target_organizations, :id, :target_organization_name
     json.number competitive_group.competitive_group_item.attributes.select{|k, v| k =~ /number/}.values.sum
   end
   json.institutionAchievements campaign.institution_achievements do |institution_achievement|

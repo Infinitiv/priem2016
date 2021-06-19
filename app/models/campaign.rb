@@ -9,6 +9,7 @@ class Campaign < ActiveRecord::Base
   has_many :marks, through: :entrant_applications
   has_many :achievements, through: :entrant_applications
   has_many :entrance_test_items, through: :competitive_groups
+  has_many :target_organizations, through: :competitive_groups
   has_many :subjects, through: :entrance_test_items
   has_many :identity_documents, through: :entrant_applications
   

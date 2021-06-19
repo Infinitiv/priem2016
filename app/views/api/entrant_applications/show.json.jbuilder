@@ -1,5 +1,7 @@
 json.entrantApplication do
+  json.id @entrant_application.id
   json.applicationNumber @entrant_application.application_number
+  json.registrationNumber @entrant_application.registration_number
   json.campaignId @entrant_application.campaign_id
   json.nationalityTypeId @entrant_application.nationality_type_id
   json.personal do
@@ -31,7 +33,8 @@ json.entrantApplication do
   json.hash @entrant_application.data_hash
   json.snils @entrant_application.snils
   json.snilsAbsent @entrant_application.snils_absent
-  json.identityDocuments @entrant_application.identity_documents.order(:identity_document_date) do |identity_document|
+  json.language @entrant_application.language
+  json.identityDocuments @entrant_application.identity_documents.order(identity_document_date: :desc) do |identity_document|
     json.id identity_document.id
     json.identityDocumentType identity_document.identity_document_type
     json.identityDocumentSeries identity_document.identity_document_series
@@ -65,6 +68,7 @@ json.entrantApplication do
     json.subjectId mark.subject_id
     json.subject mark.subject.subject_name
     json.form mark.form
+    json.year mark.year
     json.checked mark.checked
     json.organizationUid mark.organization_uid
   end
@@ -77,6 +81,7 @@ json.entrantApplication do
     json.value achievement.value
     json.status achievement.status
   end
+  json.achievementIds @entrant_application.achievements.map(&:institution_achievement_id)
   json.olympicDocuments @entrant_application.olympic_documents do |olympic_document|
     json.id olympic_document.id
     json.benefitDocumentTypeId olympic_document.benefit_type_id
@@ -118,6 +123,7 @@ json.entrantApplication do
     json.educationFormId competitive_group.education_form_id
     json.directionId competitive_group.direction_id
   end
+  json.competitiveGroupIds @entrant_application.competitive_groups.map(&:id)
   json.targetContracts @entrant_application.target_contracts do |target_contract|
     json.id target_contract.id
     json.competitiveGroupId target_contract.competitive_group.id
