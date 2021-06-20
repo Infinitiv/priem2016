@@ -954,8 +954,10 @@ class EntrantApplication < ActiveRecord::Base
     pdf.move_down 4
     pdf.text "Подпись ___________________", size: 10, align: :right
     pdf.move_down 4
-    pdf.text "Согласен на обработку персональных данных", size: 10
-    pdf.move_down 4
+    if marks.map(&:form).include?('ВИ')
+      pdf.text "Ознакомлен с регламентом проведения вступительных испытаний, проводимых академией самостоятельно", size: 10
+      pdf.move_down 4
+    end
     pdf.text "Подпись ___________________", size: 10, align: :right
     pdf.move_down 4
     pdf.text "Ознакомлен с информацией о необходимости указания в заявлении о приеме достоверных сведений и представления подлинных документов", size: 10

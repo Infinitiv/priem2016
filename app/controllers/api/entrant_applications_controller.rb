@@ -116,14 +116,14 @@ class Api::EntrantApplicationsController < ApplicationController
       end
       if params[:consent]
         @entrant_application.budget_agr = params[:consent][:budget_agr]
-        @entrant_application.paid_agr = params[:consent][:paid_agr]
         response_data[:consent] = 'success'
       end
       if params[:status_id]
         @entrant_application.status_id = 2
         @entrant_application.status = 'на расмотрении'
         Events.welcome_mail(@entrant_application).deliver_later if Rails.env == 'production'
-        response_data[:status_id] = 'success'
+        response_data[:status_id] = 2
+        response_data[:status] = 'на расмотрении'
       end
       if @entrant_application.save
         if params[:education_document]
@@ -246,7 +246,7 @@ class Api::EntrantApplicationsController < ApplicationController
           end
           response_data[:achievements]  = @entrant_application.achievements
         end
-      response_data[:status] = 'success'
+      response_data[:result] = 'success'
       response_data[:hash] = @entrant_application.data_hash
       send_data(response_data.to_json)
       end
