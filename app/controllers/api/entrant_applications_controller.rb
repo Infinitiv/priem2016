@@ -122,6 +122,7 @@ class Api::EntrantApplicationsController < ApplicationController
       if params[:status_id]
         @entrant_application.status_id = 2
         @entrant_application.status = 'на расмотрении'
+        Events.welcome_mail(@entrant_application).deliver_later if Rails.env == 'production'
         response_data[:status_id] = 'success'
       end
       if @entrant_application.save
