@@ -1,6 +1,6 @@
 class Api::EntrantApplicationsController < ApplicationController
   skip_before_action :verify_authenticity_token
-  before_filter :set_entrant_application, only: [:show, :update, :check_pin, :remove_pin]
+  before_filter :set_entrant_application, only: [:show, :update, :check_pin, :remove_pin, :send_welcome_email]
   
   def show
     @marks = @entrant_application.marks.order(:subject_id).includes(:subject)
@@ -121,7 +121,6 @@ class Api::EntrantApplicationsController < ApplicationController
       if params[:status_id]
         @entrant_application.status_id = 2
         @entrant_application.status = 'на расмотрении'
-        Events.welcome_mail(@entrant_application).deliver_later if Rails.env == 'production'
         response_data[:status_id] = 2
         response_data[:status] = 'на расмотрении'
       end
@@ -271,6 +270,11 @@ class Api::EntrantApplicationsController < ApplicationController
     else
       send_data({status: 'faild', message: 'pins was not removed', hash: @entrant_application.data_hash}.to_json)
     end
+  end
+  
+  def send_welcome_email
+    Events.welcome_mail(@entrant_application).deliver_later if Rails.env == 'production'
+    send_data({status: 'success', message: 'Сообщение отправлено', hash: @entrant_application.data_hash}.to_json)
   end
   
   def generate_entrant_application
