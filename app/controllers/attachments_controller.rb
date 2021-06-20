@@ -3,8 +3,9 @@ class AttachmentsController < ApplicationController
   before_action :set_attachment, only: [:show, :destroy]
   
   def show
-    path = @attachment.data_hash[0..2].split('').join('/')
-    send_file Rails.root.join('storage', path, @attachment.data_hash), :filename => @attachment.filename, :type => @attachment.mime_type
+    path = Rails.root.join('storage', @attachment.data_hash[0..2].split('').join('/'), @attachment.data_hash)
+    %x(touch "#{path}")
+    send_file path, :filename => @attachment.filename, :type => @attachment.mime_type
   end
     
   def destroy
