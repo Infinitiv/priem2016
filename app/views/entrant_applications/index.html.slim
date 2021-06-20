@@ -50,7 +50,7 @@ table.table.datatable
         td
           - if entrant_application.request
             .label.label-success зеленая точка
-        td= entrant_application.registration_date
+        td= entrant_application.created_at.strftime("%F %R")
         - case @campaign.campaign_type_id
           - when 1
             td= entrant_application.marks.map(&:form).include?('Экзамен') ? 'Экзамен' : 'ЕГЭ'
