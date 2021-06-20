@@ -1291,15 +1291,15 @@ class EntrantApplication < ActiveRecord::Base
     pdf.grid([4, 0], [4, 7]).bounding_box do
       pdf.text "#{fio}", :size => 32, align: :center
     end
-    pdf.grid([5, 0], [5, 2]).bounding_box do
-      pdf.text "Язык: #{language}", :size => 14, align: :center
-    end
     pdf.grid([6, 0], [6, 7]).bounding_box do
       pdf.text "Адрес: #{address}", :size => 12
       pdf.move_down 4
       pdf.text "Телефон: #{phone}", :size => 12
       pdf.move_down 4
       pdf.text "Email: #{email}", :size => 12
+    end
+    pdf.grid([7, 0], [7, 7]).bounding_box do
+      pdf.text "Язык: #{language}", :size => 14
     end
     
     pdf.render_file tempfile
