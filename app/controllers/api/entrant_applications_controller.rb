@@ -15,16 +15,18 @@ class Api::EntrantApplicationsController < ApplicationController
   end
 
   def create
-    campaign = Campaign.find(params[:campaignId])
+    campaign = Campaign.find(params[:campaign_id])
     if campaign.entrant_applications.where(email: params[:email]).empty?
       entrant_application = EntrantApplication.new
-      current_registration_number = campaign.entrant_applications.select(:registration_number).map(&:registration_number).max
+      current_registration_number = campaign.entrant_applications.select(:registration_number).map(&:registration_number).compact.max
       entrant_application.registration_number = current_registration_number ? current_registration_number + 1 : 1
-      entrant_application.campaign_id = params[:campaignId]
+      entrant_application.campaign_id = params[:campaign_id]
       entrant_application.email = params[:email]
+      entrant_application.nationality_type_id = 1
       entrant_application.registration_date = Time.now.to_date
       entrant_application.data_hash = Digest::MD5.hexdigest [entrant_application.email, campaign.salt].compact.join()
       entrant_application.status = 'новое'
+      entrant_application.status_id = 0
       entrant_application.pin = (1..9).to_a.sample(4).join().to_i
       if entrant_application.save
         entrant_application.campaign.entrance_test_items.uniq.each do |entrance_test_item|
@@ -41,40 +43,41 @@ class Api::EntrantApplicationsController < ApplicationController
 
   def update
     response_data = {}
-    if params[:entrant_application]
+    if params[:entrant_application] && @entrant_application.status_id == 0
       if params[:personal]
         response_data[:personal] = {}
-        if params[:personal][:entrantLastName]
-          @entrant_application.entrant_last_name = params[:personal][:entrantLastName]
-          response_data[:personal][:entrantLastName] = 'success'
+        if params[:personal][:entrant_last_name]
+          @entrant_application.entrant_last_name = params[:personal][:entrant_last_name]
+          response_data[:personal][:entrant_last_name] = 'success'
         end
-        if params[:personal][:entrantFirstName]
-          @entrant_application.entrant_first_name = params[:personal][:entrantFirstName] 
-          response_data[:personal][:entrantFirstName] = 'success'
+        if params[:personal][:entrant_first_name]
+          @entrant_application.entrant_first_name = params[:personal][:entrant_first_name] 
+          response_data[:personal][:entrant_first_name] = 'success'
         end
-        if params[:personal][:entrantMiddleName]
-          @entrant_application.entrant_middle_name = params[:personal][:entrantMiddleName] 
+        if params[:personal][:entrant_middle_name]
+          @entrant_application.entrant_middle_name = params[:personal][:entrant_middle_name] 
+          response_data[:personal][:entrant_middle_name]  = 'success'
         end
-        if params[:personal][:genderId]
-          @entrant_application.gender_id = params[:personal][:genderId] 
-          response_data[:personal][:entrantMiddleName]  = 'success'
+        if params[:personal][:gender_id]
+          @entrant_application.gender_id = params[:personal][:gender_id] 
+          response_data[:personal][:gender_id]  = 'success'
         end
-        if params[:personal][:birthDate]
-          @entrant_application.birth_date = params[:personal][:birthDate]
-          response_data[:personal][:birthDate]  = 'success'
+        if params[:personal][:birth_date]
+          @entrant_application.birth_date = params[:personal][:birth_date]
+          response_data[:personal][:birth_date]  = 'success'
         end
       end
-      if params[:needHostel]
-        @entrant_application.need_hostel = params[:needHostel]
-        response_data[:needHostel] = 'success'
+      if params[:need_hostel]
+        @entrant_application.need_hostel = params[:need_hostel]
+        response_data[:need_hostel] = 'success'
       end
-      if params[:specialEntrant]
-        @entrant_application.special_entrant = params[:specialEntrant]
-        response_data[:specialEntrant] = 'success'
+      if params[:special_entrant]
+        @entrant_application.special_entrant = params[:special_entrant]
+        response_data[:special_entrant] = 'success'
       end
-      if params[:specialConditions]
-        @entrant_application.special_conditions = params[:specialConditions]
-        response_data[:specialConditions] = 'success'
+      if params[:special_conditions]
+        @entrant_application.special_conditions = params[:special_conditions]
+        response_data[:special_conditions] = 'success'
       end
       if params[:benefit]
         @entrant_application.benefit = params[:benefit]
@@ -84,130 +87,144 @@ class Api::EntrantApplicationsController < ApplicationController
         @entrant_application.olympionic = params[:olympionic]
         response_data[:olympionic] = 'success'
       end
-      if params[:contactInformation]
-        response_data[:contactInformation] = {}
-        if params[:contactInformation][:address]
-          @entrant_application.address = params[:contactInformation][:address]
-          response_data[:contactInformation][:address] = 'success'
+      if params[:contact_information]
+        response_data[:contact_information] = {}
+        if params[:contact_information][:address]
+          @entrant_application.address = params[:contact_information][:address]
+          response_data[:contact_information][:address] = 'success'
         end
-        if params[:contactInformation][:zipCode]
-          @entrant_application.zip_code = params[:contactInformation][:zipCode]
-          response_data[:contactInformation][:zipCode] = 'success'
+        if params[:contact_information][:zip_code]
+          @entrant_application.zip_code = params[:contact_information][:zip_code]
+          response_data[:contact_information][:zip_code] = 'success'
         end
-        if params[:contactInformation][:phone]
-          @entrant_application.phone = params[:contactInformation][:phone]
-          response_data[:contactInformation][:phone] = 'success'
+        if params[:contact_information][:phone]
+          @entrant_application.phone = params[:contact_information][:phone]
+          response_data[:contact_information][:phone] = 'success'
         end
       end
       if params[:snils]
         @entrant_application.snils = params[:snils]
         response_data[:snils] = 'success'
       end
+      if params[:snils_absent]
+        @entrant_application.snils_absent = params[:snils_absent]
+        response_data[:snils_absent] = 'success'
+      end
       if params[:language]
         @entrant_application.language = params[:language]
         response_data[:language] = 'success'
       end
+      if params[:consent]
+        @entrant_application.budget_agr = params[:consent][:budget_agr]
+        @entrant_application.paid_agr = params[:consent][:paid_agr]
+        response_data[:consent] = 'success'
+      end
+      if params[:status_id]
+        @entrant_application.status_id = 2
+        @entrant_application.status = 'на расмотрении'
+        response_data[:status_id] = 'success'
+      end
       if @entrant_application.save
-        if params[:educationDocument]
+        if params[:education_document]
           tmp_hash = {}
-          response_data[:educationDocument] = {}
-          params[:educationDocument].each{|k, v| tmp_hash[k.underscore] = v}
+          params[:education_document].each{|k, v| tmp_hash[k] = v}
+          response_data[:education_document] = {}
           keys = EducationDocument.new.attributes.keys
           tmp_hash.slice! *keys
-          if tmp_hash['id']
-            education_document = EducationDocument.find(tmp_hash['id'])
+          if params[:education_document][:id]
+            education_document = EducationDocument.find(params[:education_document][:id])
             education_document.attributes = tmp_hash
           else
             education_document = EducationDocument.new(tmp_hash)
             education_document.entrant_application_id = @entrant_application.id
           end
           education_document.save!
-          response_data[:educationDocument][:id]  = education_document.id
+          response_data[:education_document][:id]  = education_document.id
         end
-        if params[:identityDocument]
+        if params[:identity_document]
           tmp_hash = {}
-          response_data[:identityDocument] = {}
-          params[:identityDocument].each{|k, v| tmp_hash[k.underscore] = v}
+          params[:identity_document].each{|k, v| tmp_hash[k] = v}
+          response_data[:identity_document] = {}
           keys = IdentityDocument.new.attributes.keys
           tmp_hash.slice! *keys
-          if tmp_hash['id']
-            identity_document = @entrant_application.identity_documents.find(tmp_hash['id'])
+          if params[:identity_document][:id]
+            identity_document = @entrant_application.identity_documents.find(params[:identity_document][:id])
             identity_document.attributes = tmp_hash
           else
             identity_document = @entrant_application.identity_documents.new(tmp_hash)
           end
           identity_document.save!
-          response_data[:identityDocument][:id]  = identity_document.id
+          response_data[:identity_document][:id]  = identity_document.id
         end
-        if params[:olympicDocument]
+        if params[:olympic_document]
           tmp_hash = {}
-          response_data[:olympicDocument] = {}
-          params[:olympicDocument].each{|k, v| tmp_hash[k.underscore] = v}
+          params[:olympic_document].each{|k, v| tmp_hash[k] = v}
+          response_data[:olympic_document] = {}
           keys = OlympicDocument.new.attributes.keys
           tmp_hash.slice! *keys
-          if tmp_hash['id']
-            olympic_document = @entrant_application.olympic_documents.find(tmp_hash['id'])
+          if params[:olympic_document][:id]
+            olympic_document = @entrant_application.olympic_documents.find(params[:olympic_document][:id])
             olympic_document.attributes = tmp_hash
           else
             olympic_document = @entrant_application.olympic_documents.new(tmp_hash)
           end
           olympic_document.save!
-          response_data[:olympicDocument][:id]  = olympic_document.id
+          response_data[:olympic_document][:id]  = olympic_document.id
         end
-        if params[:benefitDocument]
+        if params[:benefit_document]
           tmp_hash = {}
-          response_data[:benefitDocument] = {}
-          params[:benefitDocument].each{|k, v| tmp_hash[k.underscore] = v}
+          params[:benefit_document].each{|k, v| tmp_hash[k] = v}
+          response_data[:benefit_document] = {}
           keys = BenefitDocument.new.attributes.keys
           tmp_hash.slice! *keys
-          if tmp_hash['id']
-            benefit_document = @entrant_application.benefit_documents.find(tmp_hash['id'])
+          if params[:benefit_document][:id]
+            benefit_document = @entrant_application.benefit_documents.find(params[:benefit_document][:id])
             benefit_document.attributes = tmp_hash
           else
             benefit_document = @entrant_application.benefit_documents.new(tmp_hash)
           end
           benefit_document.save!
-          response_data[:benefitDocument][:id]  = benefit_document.id
+          response_data[:benefit_document][:id]  = benefit_document.id
         end
-        if params[:otherDocument]
+        if params[:other_document]
           tmp_hash = {}
-          response_data[:otherDocument] = {}
-          params[:otherDocument].each{|k, v| tmp_hash[k.underscore] = v}
+          params[:other_document].each{|k, v| tmp_hash[k] = v}
+          response_data[:other_document] = {}
           keys = OtherDocument.new.attributes.keys
           tmp_hash.slice! *keys
-          if tmp_hash['id']
-            other_document = @entrant_application.other_documents.find(tmp_hash['id'])
+          if params[:other_document][:id]
+            other_document = @entrant_application.other_documents.find(params[:other_document][:id])
             other_document.attributes = tmp_hash
           else
             other_document = @entrant_application.other_documents.new(tmp_hash)
           end
           other_document.save!
-          response_data[:otherDocument][:id]  = other_document.id
+          response_data[:other_document][:id]  = other_document.id
         end
-        if params[:targetContract]
+        if params[:target_contract]
           tmp_hash = {}
-          response_data[:targetContract] = {}
-          params[:targetContract].each{|k, v| tmp_hash[k.underscore] = v}
+          params[:target_contract][:target_organization_id] = CompetitiveGroup.find(params[:target_contract][:competitive_group_id]).target_organizations.first.id
+          params[:target_contract].each{|k, v| tmp_hash[k] = v}
+          response_data[:target_contract] = {}
           keys = TargetContract.new.attributes.keys
           tmp_hash.slice! *keys
-          tmp_hash['target_organization_id'] = CompetitiveGroup.find(tmp_hash['competitive_group_id']).target_organizations.first.id
-          if tmp_hash['id']
-            target_contract = @entrant_application.target_contracts.find(tmp_hash['id'])
+          if params[:target_contract][:id]
+            target_contract = @entrant_application.target_contracts.find(params[:target_contract][:id])
             target_contract.attributes = tmp_hash
           else
             target_contract = @entrant_application.target_contracts.new(tmp_hash)
           end
           target_contract.save!
-          response_data[:targetContract][:id]  = target_contract.id
+          response_data[:target_contract][:id]  = target_contract.id
         end
         if params[:mark]
           tmp_hash = {}
+          params[:mark].each{|k, v| tmp_hash[k] = v}
           response_data[:mark] = {}
-          params[:mark].each{|k, v| tmp_hash[k.underscore] = v}
           keys = Mark.new.attributes.keys
           tmp_hash.slice! *keys
-          if tmp_hash['id']
-            mark = @entrant_application.marks.find(tmp_hash['id'])
+          if params[:mark][:id]
+            mark = @entrant_application.marks.find(params[:mark][:id])
             mark.attributes = tmp_hash
           else
             mark = @entrant_application.marks.new(tmp_hash)
@@ -215,11 +232,11 @@ class Api::EntrantApplicationsController < ApplicationController
           mark.save!
           response_data[:mark][:id]  = mark.id
         end
-        if params[:competitiveGroup]
-          response_data[:competitiveGroup] = {}
+        if params[:competitive_group]
+          response_data[:competitive_group] = {}
           @entrant_application.competitive_groups.delete_all
-          @entrant_application.competitive_groups << CompetitiveGroup.where(id: params[:competitiveGroup])
-          response_data[:competitiveGroup][:ids]  = @entrant_application.competitive_groups.map(&:id)
+          @entrant_application.competitive_groups << CompetitiveGroup.where(id: params[:competitive_group])
+          response_data[:competitive_group][:ids]  = @entrant_application.competitive_groups.map(&:id)
         end
         if params[:achievement]
           response_data[:achievement] = {}
@@ -228,17 +245,12 @@ class Api::EntrantApplicationsController < ApplicationController
           end
           response_data[:achievement][:ids]  = @entrant_application.achievements.map(&:institution_achievement_id)
         end
-        #if params[:other_documents]
-          #params[:other_documents].each do |other_document|
-            #unless other_document[:other_document_number] == ''
-              #@entrant_application.other_documents.create(other_document)
-            #end
-          #end
-        #end
       response_data[:status] = 'success'
       response_data[:hash] = @entrant_application.data_hash
       send_data(response_data.to_json)
       end
+    else
+      send_data({status: 'faild', message: 'Редактирование невозможно'}.to_json)
     end
   end
 
@@ -256,7 +268,34 @@ class Api::EntrantApplicationsController < ApplicationController
     if  @entrant_application.update_attributes(pin: nil)
       send_data({status: 'success', message: 'pins was removed', hash: @entrant_application.data_hash}.to_json)
     else
-      send_data({status: 'faild', message: 'pins waw not removed', hash: @entrant_application.data_hash}.to_json)
+      send_data({status: 'faild', message: 'pins was not removed', hash: @entrant_application.data_hash}.to_json)
+    end
+  end
+  
+  def generate_entrant_application
+    entrant_application = EntrantApplication.find_by_data_hash(params[:id])
+    if entrant_application.generate_entrant_application
+      send_data({status: 'success', message: 'Бланк заявления создан', attachments: entrant_application.attachments}.to_json)
+    else
+      send_data({status: 'faild', message: 'Что-то пошло не так'}.to_json)
+    end
+  end
+  
+  def generate_consent_applications
+    entrant_application = EntrantApplication.find_by_data_hash(params[:id])
+    if entrant_application.generate_consent_applications
+      send_data({status: 'success', message: 'Бланки заявлений о согласии созданы', attachments: entrant_application.attachments}.to_json)
+    else
+      send_data({status: 'faild', message: 'Что-то пошло не так'}.to_json)
+    end
+  end
+  
+  def generate_withdraw_applications
+    entrant_application = EntrantApplication.find_by_data_hash(params[:id])
+    if entrant_application.generate_withdraw_applications
+      send_data({status: 'success', message: 'Бланки заявлений об отзыве согласия созданы', attachments: entrant_application.attachments}.to_json)
+    else
+      send_data({status: 'faild', message: 'Что-то пошло не так'}.to_json)
     end
   end
   

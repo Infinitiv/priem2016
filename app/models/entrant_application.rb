@@ -212,7 +212,7 @@ class EntrantApplication < ActiveRecord::Base
   
 
   def self.entrant_applications_hash(campaign)
-    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :budget_agr, :paid_agr, :enrolled, :enrolled_date, :exeptioned, :snils, :birth_date, :registration_date, :gender_id, :nationality_type_id, :contracts]).order(:application_number).includes(:achievements, :education_document, :competitive_groups, :benefit_documents, :olympic_documents, :target_contracts)
+    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :budget_agr, :paid_agr, :enrolled, :enrolled_date, :exeptioned, :snils, :birth_date, :registration_date, :gender_id, :nationality_type_id, :contracts]).order(:application_number).includes(:achievements, :education_document, :competitive_groups, :benefit_documents, :olympic_documents, :target_contracts).where(status_id: 4)
     
     entrance_test_items = campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     
@@ -806,12 +806,16 @@ class EntrantApplication < ActiveRecord::Base
     end
   end
   
-  def generate_templates
+  def generate_entrant_application
     countries = Dictionary.find_by_name('Страна').items
     identity_documents_list = Dictionary.find_by_name('Тип документа, удостоверяющего личность').items
     benefit_types = Dictionary.find_by_name('Вид льготы').items
     document_types = Dictionary.find_by_name('Тип документа').items
-    title = "Заявление о приеме в ИвГМА № #{application_number}"
+    if application_number
+      title = "Заявление о приеме в ИвГМА № #{application_number}"
+    else
+      title = "Заявление о приеме в ИвГМА зарегистрировано под № #{registration_number}"
+    end
     tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
     pdf = Prawn::Document.new(page_size: "A4", :info => {
       :Title => title,
@@ -829,7 +833,7 @@ class EntrantApplication < ActiveRecord::Base
     pdf.font "Ubuntu"
     pdf.text title, style: :bold, :size => 14, align: :center
     pdf.move_down 4
-    pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", size: 10, align: :right
+    pdf.text "И. о. ректора ФГБОУ ВО ИвГМА Минздрава России", size: 10, align: :right
     pdf.move_down 4
     pdf.text "д.м.н., проф. Е. В. Борзову", size: 10, align: :right
     pdf.move_down 4
@@ -844,7 +848,7 @@ class EntrantApplication < ActiveRecord::Base
     pdf.move_down 4
     pdf.text "Персональные данные", size: 12
     pdf.move_down 4
-    pdf.text "Дата рождения: #{birth_date.strftime("%d.%m.%Y")}", size: 10
+    pdf.text "Дата рождения: #{birth_date.strftime("%d.%m.%Y")}", size: 10 if birth_date
     pdf.move_down 4
     pdf.text "Гражданство: #{countries.select{|item| item['id'] == nationality_type_id}[0]['name']}", size: 10
     pdf.move_down 4
@@ -860,12 +864,12 @@ class EntrantApplication < ActiveRecord::Base
     pdf.text "Документ удостоверяющий личность", size: 12
     pdf.move_down 4
     identity_document = identity_documents.order(identity_document_date: :asc).last
-    pdf.text "#{identity_documents_list.select{|item| item['id'] == identity_document.identity_document_type}[0]['name']}: #{identity_document.identity_document_data}", size: 10
+    pdf.text "#{identity_documents_list.select{|item| item['id'] == identity_document.identity_document_type}[0]['name']}: #{identity_document.identity_document_data}", size: 10 if identity_document
     pdf.move_down 4
     pdf.move_down 4
     pdf.text "Документ об образовании", size: 12
     pdf.move_down 4
-    pdf.text "#{education_document.education_document_data}", size: 10
+    pdf.text "#{education_document.education_document_data}", size: 10 if education_document
     pdf.move_down 4
     pdf.move_down 4
     if campaign.campaign_type_id == 4
@@ -879,10 +883,16 @@ class EntrantApplication < ActiveRecord::Base
         pdf.move_down 4
         pdf.move_down 4
       end
-      pdf.text "Номер СНИЛС #{snils}", size: 12
-      pdf.move_down 4
-      pdf.move_down 4
     end
+    unless snils.empty?
+      pdf.text "Номер СНИЛС #{snils}", size: 12
+    else
+      pdf.text "Подтверждаю отсутствие СНИЛС", size: 12
+      pdf.move_down 4
+      pdf.text "Подпись ___________________", size: 10, align: :right
+    end
+    pdf.move_down 4
+    pdf.move_down 4
     pdf.text "Прошу рассмотреть мои документы для участия в следующих конкурсах:", size: 12
     pdf.move_down 4
     competitive_groups.each do |competitive_group|
@@ -894,15 +904,17 @@ class EntrantApplication < ActiveRecord::Base
       pdf.text "Имею особые права:", size: 12
       pdf.move_down 4
       olympic_documents.each do |olympic_document|
-        pdf.text "Имею право на #{benefit_types.select{|item| item['id'] == olympic_document.benefit_type_id}[0]['name']}", size: 10
-        pdf.move_down 4
-        pdf.text "Реквизиты документа, дающего особое право: #{document_types.select{|item| item['id'] == olympic_document.olympic_document_type_id}[0]['name']} #{olympic_document.olympic_document_data}", size: 10
+        #pdf.text "Имею право на #{benefit_types.select{|item| item['id'] == olympic_document.benefit_type_id}[0]['name']}", size: 10
+        #pdf.move_down 4
+        #pdf.text "Реквизиты документа, дающего особое право: #{document_types.select{|item| item['id'] == olympic_document.olympic_document_type_id}[0]['name']} #{olympic_document.olympic_document_data}", size: 10
+        pdf.text "Реквизиты документа, дающего особое право: #{olympic_document.olympic_document_data}", size: 10
         pdf.move_down 4
       end
       benefit_documents.each do |benefit_document|
-        pdf.text "Имею право на #{'прием' if benefit_document.benefit_type_id == 4} #{benefit_types.select{|item| item['id'] == benefit_document.benefit_type_id}[0]['name']}", size: 10
-        pdf.move_down 4
-        pdf.text "Реквизиты документа, дающего особое право: #{document_types.select{|item| item['id'] == benefit_document.benefit_document_type_id}[0]['name']} #{benefit_document.benefit_document_data}", size: 10
+        #pdf.text "Имею право на #{'прием' if benefit_document.benefit_type_id == 4} #{benefit_types.select{|item| item['id'] == benefit_document.benefit_type_id}[0]['name']}", size: 10
+        #pdf.move_down 4
+        #pdf.text "Реквизиты документа, дающего особое право: #{document_types.select{|item| item['id'] == benefit_document.benefit_document_type_id}[0]['name']} #{benefit_document.benefit_document_data}", size: 10
+        pdf.text "Реквизиты документа, дающего особое право: #{benefit_document.benefit_document_data}", size: 10
         pdf.move_down 4
       end
     end
@@ -987,7 +999,7 @@ class EntrantApplication < ActiveRecord::Base
     
     if campaign.campaign_type_id == 4 && marks.map(&:form).include?('Аккредитация')
       pdf.start_new_page
-      pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", align: :right, size: 10
+      pdf.text "И. о. ректора ФГБОУ ВО ИвГМА Минздрава России", align: :right, size: 10
       pdf.move_down 6
       pdf.text "д.м.н., проф. Е. В. Борзову", align: :right, size: 10
       pdf.move_down 6
@@ -1017,7 +1029,9 @@ class EntrantApplication < ActiveRecord::Base
       %x(mv "#{tempfile}" "#{file_path}")
       %x(touch "#{file_path}")
     end
-    
+  end
+  
+  def generate_consent_applications
     competitive_groups.each do |competitive_group|
       title = "Заявление о согласии на зачисление в ИвГМА"
       tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
@@ -1037,7 +1051,7 @@ class EntrantApplication < ActiveRecord::Base
       pdf.font "Ubuntu"
       pdf.text title, style: :bold, :size => 14, align: :center
       pdf.move_down 6
-      pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", align: :right
+      pdf.text "И. о. ректора ФГБОУ ВО ИвГМА Минздрава России", align: :right
       pdf.move_down 6
       pdf.text "д.м.н., проф. Е. В. Борзову", align: :right
       pdf.move_down 6
@@ -1096,7 +1110,11 @@ class EntrantApplication < ActiveRecord::Base
         %x(mv "#{tempfile}" "#{file_path}")
         %x(touch "#{file_path}")
       end
-      
+    end
+  end
+  
+  def generate_withdraw_applications
+    competitive_groups.each do |competitive_group|
       title = "Заявление об отказе от зачисления в ИвГМА"
       tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
       pdf = Prawn::Document.new(page_size: "A5", page_layout: :landscape, :info => {
@@ -1115,7 +1133,7 @@ class EntrantApplication < ActiveRecord::Base
       pdf.font "Ubuntu"
       pdf.text title, style: :bold, :size => 14, align: :center
       pdf.move_down 6
-      pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", align: :right
+      pdf.text "И. о. ректора ФГБОУ ВО ИвГМА Минздрава России", align: :right
       pdf.move_down 6
       pdf.text "д.м.н., проф. Е. В. Борзову", align: :right
       pdf.move_down 6
@@ -1149,150 +1167,154 @@ class EntrantApplication < ActiveRecord::Base
         %x(touch "#{file_path}")
       end
     end
-    
+  end
+  
+  def generate_recall_application
     title = "Заявление об отзыве поданных в ИвГМА документов"
-      tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
-      pdf = Prawn::Document.new(page_size: "A5", page_layout: :landscape, :info => {
-        :Title => title,
-        :Author => "Vladimir Markovnin",
-        :Subject => "Прием ИвГМА",
-        :Creator => "ИвГМА",
-        :Producer => "Prawn",
-        :CreationDate => Time.now }
-        )
-      pdf.font_families.update("Ubuntu" => {
-        :normal => "vendor/fonts/Ubuntu-R.ttf",
-        :italic => "vendor/fonts/Ubuntu-RI.ttf",
-        :bold => "vendor/fonts/Ubuntu-B.ttf"
-        })
-      pdf.font "Ubuntu"
-      pdf.text title, style: :bold, :size => 14, align: :center
-      pdf.move_down 6
-      pdf.text "Ректору ФГБОУ ВО ИвГМА Минздрава России", align: :right
-      pdf.move_down 6
-      pdf.text "д.м.н., проф. Е. В. Борзову", align: :right
-      pdf.move_down 6
-      pdf.move_down 6
-      case campaign.campaign_type_id
-      when 1
-        pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от участия в конкурсе / от зачисления на обучение по образовательным программам специалитета в ФГБОУ ВО ИвГМА Минздрава России и отзываю поданные документы. Прошу исключить меня из списков поступающих / зачисленных в  ФГБОУ ВО ИвГМА Минздрава России."
-      when 4
-        pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от участия в конкурсе / от зачисления на обучение по образовательным программам ординатуры в ФГБОУ ВО ИвГМА Минздрава России и отзываю поданные документы. Прошу исключить меня из списков поступающих / зачисленных в  ФГБОУ ВО ИвГМА Минздрава России."
-      end
-      pdf.move_down 6
-      pdf.text "Подпись ___________________", align: :right
-      
-      pdf.render_file tempfile
+    tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
+    pdf = Prawn::Document.new(page_size: "A5", page_layout: :landscape, :info => {
+      :Title => title,
+      :Author => "Vladimir Markovnin",
+      :Subject => "Прием ИвГМА",
+      :Creator => "ИвГМА",
+      :Producer => "Prawn",
+      :CreationDate => Time.now }
+      )
+    pdf.font_families.update("Ubuntu" => {
+      :normal => "vendor/fonts/Ubuntu-R.ttf",
+      :italic => "vendor/fonts/Ubuntu-RI.ttf",
+      :bold => "vendor/fonts/Ubuntu-B.ttf"
+      })
+    pdf.font "Ubuntu"
+    pdf.text title, style: :bold, :size => 14, align: :center
+    pdf.move_down 6
+    pdf.text "И. о. ректора ФГБОУ ВО ИвГМА Минздрава России", align: :right
+    pdf.move_down 6
+    pdf.text "д.м.н., проф. Е. В. Борзову", align: :right
+    pdf.move_down 6
+    pdf.move_down 6
+    case campaign.campaign_type_id
+    when 1
+      pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от участия в конкурсе / от зачисления на обучение по образовательным программам специалитета в ФГБОУ ВО ИвГМА Минздрава России и отзываю поданные документы. Прошу исключить меня из списков поступающих / зачисленных в  ФГБОУ ВО ИвГМА Минздрава России."
+    when 4
+      pdf.text "Я, #{fio} (№ личного дела #{application_number}), отказываюсь от участия в конкурсе / от зачисления на обучение по образовательным программам ординатуры в ФГБОУ ВО ИвГМА Минздрава России и отзываю поданные документы. Прошу исключить меня из списков поступающих / зачисленных в  ФГБОУ ВО ИвГМА Минздрава России."
+    end
+    pdf.move_down 6
+    pdf.text "Подпись ___________________", align: :right
     
-      attachment = attachments.where(document_type: 'recall_application', document_id: id, template: true).first || Attachment.new
-      attachment.entrant_application_id = id
-      attachment.document_type = 'recall_application'
-      attachment.document_id = id
-      attachment.filename = "#{title}.pdf"
-      attachment.mime_type = 'application/pdf'
-      attachment.merged = false
-      attachment.template = true
-      md5 = ::Digest::MD5.file(tempfile).hexdigest
-      attachment.data_hash = md5
-      path = attachment.data_hash[0..2].split('').join('/')
-      if attachment.save
-        %x(mkdir -p #{Rails.root.join('storage', path)})
-        file_path = Rails.root.join('storage', path, attachment.data_hash)
-        %x(mv "#{tempfile}" "#{file_path}")
-        %x(touch "#{file_path}")
+    pdf.render_file tempfile
+  
+    attachment = attachments.where(document_type: 'recall_application', document_id: id, template: true).first || Attachment.new
+    attachment.entrant_application_id = id
+    attachment.document_type = 'recall_application'
+    attachment.document_id = id
+    attachment.filename = "#{title}.pdf"
+    attachment.mime_type = 'application/pdf'
+    attachment.merged = false
+    attachment.template = true
+    md5 = ::Digest::MD5.file(tempfile).hexdigest
+    attachment.data_hash = md5
+    path = attachment.data_hash[0..2].split('').join('/')
+    if attachment.save
+      %x(mkdir -p #{Rails.root.join('storage', path)})
+      file_path = Rails.root.join('storage', path, attachment.data_hash)
+      %x(mv "#{tempfile}" "#{file_path}")
+      %x(touch "#{file_path}")
+    end
+  end
+  
+  def generate_title_application
+    title = "Титульный лист"
+    tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
+    pdf = Prawn::Document.new(page_size: "A4", :info => {
+      :Title => title,
+      :Author => "Vladimir Markovnin",
+      :Subject => "Прием ИвГМА",
+      :Creator => "ИвГМА",
+      :Producer => "Prawn",
+      :CreationDate => Time.now }
+      )
+    pdf.font_families.update("Ubuntu" => {
+      :normal => "vendor/fonts/Ubuntu-R.ttf",
+      :italic => "vendor/fonts/Ubuntu-RI.ttf",
+      :bold => "vendor/fonts/Ubuntu-B.ttf"
+      })
+    pdf.font "Ubuntu"
+    pdf.define_grid(:columns => 8, :rows => 7, :gutter => 5)
+    pdf.grid([0, 0], [0,1]).bounding_box do
+      pdf.text "#{application_number}", style: :bold, :size => 36
+    end
+    pdf.grid(0, 2).bounding_box do
+      pdf.text "Сумма", :size => 16
+    end
+    pdf.grid(0, 3).bounding_box do
+      pdf.text "ИД", :size => 16
+      pdf.move_down 6
+      pdf.text "#{'+' if achievements.count > 0}", :size => 16
+    end
+    case campaign.campaign_type_id
+    when 1
+      pdf.grid(0, 4).bounding_box do
+        pdf.text "Х", :size => 16, align: :center
       end
-      
-      title = "Титульный лист"
-      tempfile = "#{[Rails.root, 'storage', 'tmp', title].join("/")}.pdf"
-      pdf = Prawn::Document.new(page_size: "A4", :info => {
-        :Title => title,
-        :Author => "Vladimir Markovnin",
-        :Subject => "Прием ИвГМА",
-        :Creator => "ИвГМА",
-        :Producer => "Prawn",
-        :CreationDate => Time.now }
-        )
-      pdf.font_families.update("Ubuntu" => {
-        :normal => "vendor/fonts/Ubuntu-R.ttf",
-        :italic => "vendor/fonts/Ubuntu-RI.ttf",
-        :bold => "vendor/fonts/Ubuntu-B.ttf"
-        })
-      pdf.font "Ubuntu"
-      pdf.define_grid(:columns => 8, :rows => 7, :gutter => 5)
-      pdf.grid([0, 0], [0,1]).bounding_box do
-        pdf.text "#{application_number}", style: :bold, :size => 36
+      pdf.grid(0, 5).bounding_box do
+        pdf.text "Б", :size => 16, align: :center
       end
-      pdf.grid(0, 2).bounding_box do
-        pdf.text "Сумма", :size => 16
+      pdf.grid(0, 6).bounding_box do
+        pdf.text "Р", :size => 16, align: :center
       end
-      pdf.grid(0, 3).bounding_box do
-        pdf.text "ИД", :size => 16
-        pdf.move_down 6
-        pdf.text "#{'+' if achievements.count > 0}", :size => 16
+    when 4
+      pdf.grid(0, 4).bounding_box do
+        pdf.text "Тест", :size => 16, align: :center
       end
-      case campaign.campaign_type_id
-      when 1
-        pdf.grid(0, 4).bounding_box do
-          pdf.text "Х", :size => 16, align: :center
-        end
-        pdf.grid(0, 5).bounding_box do
-          pdf.text "Б", :size => 16, align: :center
-        end
-        pdf.grid(0, 6).bounding_box do
-          pdf.text "Р", :size => 16, align: :center
-        end
-      when 4
-        pdf.grid(0, 4).bounding_box do
-          pdf.text "Тест", :size => 16, align: :center
-        end
+    end
+    pdf.grid([1, 0], [2, 7]).bounding_box do
+      competitive_groups.where(education_source_id: 14).order(direction_id: :desc).each do |competitive_group|
+        pdf.text "________  #{competitive_group.name}", :size => 14
+        pdf.move_down 14
       end
-      pdf.grid([1, 0], [2, 7]).bounding_box do
-        competitive_groups.where(education_source_id: 14).order(direction_id: :desc).each do |competitive_group|
-          pdf.text "________  #{competitive_group.name}", :size => 14
-          pdf.move_down 14
-        end
-        competitive_groups.where(education_source_id: 16).order(direction_id: :desc).each do |competitive_group|
-          pdf.text "________  #{competitive_group.name} - #{target_contracts.where(competitive_group_id: competitive_group.id).map{|tc|tc.target_organization.target_organization_name}.compact.join(', ')}", :size => 14
-          pdf.move_down 14
-        end
-        competitive_groups.where(education_source_id: 20).order(direction_id: :desc).each do |competitive_group|
-          pdf.text "________  #{competitive_group.name}", :size => 14
-          pdf.move_down 14
-        end
-        competitive_groups.where(education_source_id: 15).order(direction_id: :desc).each do |competitive_group|
-          pdf.text "________  #{competitive_group.name}", :size => 14
-          pdf.move_down 14
-        end
+      competitive_groups.where(education_source_id: 16).order(direction_id: :desc).each do |competitive_group|
+        pdf.text "________  #{competitive_group.name} - #{target_contracts.where(competitive_group_id: competitive_group.id).map{|tc|tc.target_organization.target_organization_name}.compact.join(', ')}", :size => 14
+        pdf.move_down 14
       end
-      pdf.grid([4, 0], [4, 7]).bounding_box do
-        pdf.text "#{fio}", :size => 32, align: :center
+      competitive_groups.where(education_source_id: 20).order(direction_id: :desc).each do |competitive_group|
+        pdf.text "________  #{competitive_group.name}", :size => 14
+        pdf.move_down 14
       end
-      pdf.grid([6, 0], [6, 7]).bounding_box do
-        pdf.text "Адрес: #{address}", :size => 12
-        pdf.move_down 4
-        pdf.text "Телефон: #{phone}", :size => 12
-        pdf.move_down 4
-        pdf.text "Email: #{email}", :size => 12
+      competitive_groups.where(education_source_id: 15).order(direction_id: :desc).each do |competitive_group|
+        pdf.text "________  #{competitive_group.name}", :size => 14
+        pdf.move_down 14
       end
-      
-      pdf.render_file tempfile
+    end
+    pdf.grid([4, 0], [4, 7]).bounding_box do
+      pdf.text "#{fio}", :size => 32, align: :center
+    end
+    pdf.grid([6, 0], [6, 7]).bounding_box do
+      pdf.text "Адрес: #{address}", :size => 12
+      pdf.move_down 4
+      pdf.text "Телефон: #{phone}", :size => 12
+      pdf.move_down 4
+      pdf.text "Email: #{email}", :size => 12
+    end
     
-      attachment = attachments.where(document_type: 'title_application', document_id: id, template: true).first || Attachment.new
-      attachment.entrant_application_id = id
-      attachment.document_type = 'title_application'
-      attachment.document_id = id
-      attachment.filename = "#{title}.pdf"
-      attachment.mime_type = 'application/pdf'
-      attachment.merged = false
-      attachment.template = true
-      md5 = ::Digest::MD5.file(tempfile).hexdigest
-      attachment.data_hash = md5
-      path = attachment.data_hash[0..2].split('').join('/')
-      if attachment.save
-        %x(mkdir -p #{Rails.root.join('storage', path)})
-        file_path = Rails.root.join('storage', path, attachment.data_hash)
-        %x(mv "#{tempfile}" "#{file_path}")
-        %x(touch "#{file_path}")
-      end
+    pdf.render_file tempfile
+  
+    attachment = attachments.where(document_type: 'title_application', document_id: id, template: true).first || Attachment.new
+    attachment.entrant_application_id = id
+    attachment.document_type = 'title_application'
+    attachment.document_id = id
+    attachment.filename = "#{title}.pdf"
+    attachment.mime_type = 'application/pdf'
+    attachment.merged = false
+    attachment.template = true
+    md5 = ::Digest::MD5.file(tempfile).hexdigest
+    attachment.data_hash = md5
+    path = attachment.data_hash[0..2].split('').join('/')
+    if attachment.save
+      %x(mkdir -p #{Rails.root.join('storage', path)})
+      file_path = Rails.root.join('storage', path, attachment.data_hash)
+      %x(mv "#{tempfile}" "#{file_path}")
+      %x(touch "#{file_path}")
+    end
   end
 end

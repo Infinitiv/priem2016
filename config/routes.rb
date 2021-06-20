@@ -13,6 +13,9 @@ Rails.application.routes.draw do
       member do
         put 'check_pin'
         put 'remove_pin'
+        put 'generate_entrant_application'
+        put 'generate_consent_applications'
+        put 'generate_withdraw_applications'
       end
     end
     resources :attachments, only: [:show, :create, :destroy]

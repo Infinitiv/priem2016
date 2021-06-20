@@ -1,7 +1,7 @@
 - case
   - when @entrant_application.status_id == 6
     - label_class = "label label-danger"
-  - when @entrant_application.education_document.original_received_date
+  - when @entrant_application.education_document && @entrant_application.education_document.original_received_date
     - label_class = "label label-success"
   - else
     - label_class = "label label-default"
@@ -56,9 +56,9 @@
     - 'https://isma.ivanovo.ru'
   = link_to 'Личный кабинет абитуриента', "#{[host_name, 'entrants', @entrant_application.data_hash].join('/')}", target: :blank, class: 'pull-right'
   - case true
-  - when @entrant_application.status_id == 2 && @entrant_application.application_number && @entrant_application.attachments.where(document_type: 'entrant_application', template: false).count > 0 && @entrant_application.status != 'внесены изменения'
+  - when @entrant_application.status_id == 2 && @entrant_application.application_number && @entrant_application.attachments.where(document_type: 'entrant_application', template: false).count > 0
     = link_to 'Допустить к участию в конкурсе', approve_entrant_application_path(@entrant_application), method: :put, class: 'pull-left'
-  - when @entrant_application.application_number.nil? && @entrant_application.status_id == 2 && @entrant_application.attachments.where(document_type: 'entrant_application', template: false).count == 0
+  - when @entrant_application.application_number.nil? && @entrant_application.status_id == 2
     = link_to 'Присвоить номер личного дела и сформировать набор шаблонов', generate_templates_entrant_application_path(@entrant_application), method: :put, class: 'pull-left'
   - when @entrant_application.application_number && (@entrant_application.status == 'внесены изменения' || @entrant_application.status == 'прошу проверить')
     = link_to 'Cформировать набор шаблонов', generate_templates_entrant_application_path(@entrant_application), method: :put, class: 'pull-left'
@@ -129,7 +129,7 @@
           td
             = form_for mark, method: :put do |f|
               .form-group.row
-                = f.label mark.value, class: 'col-sm-1 col-form-label'
+                = f.label (mark.value ? mark.value : 0), class: 'col-sm-1 col-form-label'
                 .col-sm-6
                   - case @entrant_application.campaign.campaign_type_id
                   - when 1
@@ -226,13 +226,13 @@
                 span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
     dt
       h3 Документ об образовании
-      - if @entrant_application.education_document.original_received_date
+      - if @entrant_application.education_document && @entrant_application.education_document.original_received_date
         - orininal_sign =  ' x'
         - original_class = 'label label-warning'
       - else
         - orininal_sign =  ' +'
         - original_class = 'label label-success'
-      - if @entrant_application.education_document.education_document_type
+      - if @entrant_application.education_document && @entrant_application.education_document.education_document_type
         - education_document_name = case @entrant_application.education_document.education_document_type
         - when 'HighEduDiplomaDocument'
           - 'Диплом о высшем профессиональном образовании'
@@ -242,12 +242,12 @@
           - 'Аттестат о среднем общем образовании'
         = education_document_name
     dd
-      = @entrant_application.education_document.education_document_data
+      = @entrant_application.education_document.education_document_data if @entrant_application.education_document
       sup= link_to'Редактировать', '#', data: {toggle: 'modal', target: '#educationDocument'}
       span &nbsp;
-      span.label.label-success= @entrant_application.education_document.original_received_date if @entrant_application.education_document.original_received_date
+      span.label.label-success= @entrant_application.education_document.original_received_date if @entrant_application.education_document && @entrant_application.education_document.original_received_date
       strong= link_to orininal_sign, toggle_original_entrant_application_path(@entrant_application), method: :put, class: original_class, title: 'Изменить оригинал'
-      p= @entrant_application.education_document.education_speciality_code
+      p= @entrant_application.education_document.education_speciality_code if @entrant_application.education_document
       - @entrant_application.attachments.each do |attachment|
         - if attachment.document_type == 'education_document' && attachment.document_id == @entrant_application.education_document.id
           dd
@@ -511,23 +511,24 @@
     .modal-content
       .modal-header
         h5.modal-title(id="educationDocumentLabel") Редактировать документ об образовании
-        = form_for @entrant_application.education_document, method: :put  do |f|
-          .modal-body 
-            .form-group.row
-              = f.label :education_document_number, 'Серия и номер', class: 'label-control col-sm-4'
-              .col-sm-4
-                = f.text_field :education_document_number, class: 'form-control'
-            .form-group.row
-              = f.label :education_document_issuer, 'Кто выдал', class: 'label-control col-sm-4'
-              .col-sm-4
-                = f.text_field :education_document_issuer, class: 'form-control'
-            .form-group.row
-              = f.label :education_document_date, 'Дата выдачи', class: 'label-control col-sm-4'
-              .col-sm-4
-                = f.date_field :education_document_date, class: 'form-control', placeholder: 'дд.мм.гггг'
-          .modal-footer
-            button.btn.btn-secondary(type="button" data-dismiss="modal") Закрыть
-            = f.submit 'Сохранить', class: 'btn btn-primary'
+        - if @entrant_application.education_document
+          = form_for @entrant_application.education_document, method: :put  do |f|
+            .modal-body 
+              .form-group.row
+                = f.label :education_document_number, 'Серия и номер', class: 'label-control col-sm-4'
+                .col-sm-4
+                  = f.text_field :education_document_number, class: 'form-control'
+              .form-group.row
+                = f.label :education_document_issuer, 'Кто выдал', class: 'label-control col-sm-4'
+                .col-sm-4
+                  = f.text_field :education_document_issuer, class: 'form-control'
+              .form-group.row
+                = f.label :education_document_date, 'Дата выдачи', class: 'label-control col-sm-4'
+                .col-sm-4
+                  = f.date_field :education_document_date, class: 'form-control', placeholder: 'дд.мм.гггг'
+            .modal-footer
+              button.btn.btn-secondary(type="button" data-dismiss="modal") Закрыть
+              = f.submit 'Сохранить', class: 'btn btn-primary'
 / Диплом победителя/призера олимпиады
 - @entrant_application.olympic_documents.each do |olympic_document|
   .modal.fade(id="olympicDocument#{olympic_document.id}" tabindex="-1" role="dialog" aria-labelledby="olympic_document_#{olympic_document.id}Label" aria-hidden="true")

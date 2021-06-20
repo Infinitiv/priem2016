@@ -35,8 +35,8 @@ class EntrantApplicationsController < ApplicationController
     @journal_entries = Journal.includes(:user).where(entrant_application_id: @entrant_application.id)
     @achievement = @entrant_application.achievements.new
     @dup = @entrant_application.campaign.identity_documents.where(identity_document_series: @entrant_application.identity_documents.map(&:identity_document_series), identity_document_number: @entrant_application.identity_documents.map(&:identity_document_number))
+    @dup_entrants = []
     if @dup.count > 1
-      @dup_entrants = []
       @dup.each do |identity_document|
         @dup_entrants << identity_document.entrant_application
       end
@@ -284,14 +284,14 @@ class EntrantApplicationsController < ApplicationController
       @entrant_application.application_number = last_application_number ?  last_application_number + 1 : 1
       @entrant_application.save
     end
-    @entrant_application.attachments.where(document_type: 'entrant_application', template: false).destroy_all
-    @entrant_application.generate_templates
+    @entrant_application.generate_recall_application
+    @entrant_application.generate_title_application
     value_name = 'status_update'
     old_value = @entrant_application.status
     new_value = 'проверено, замечаний нет'
     Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
     @entrant_application.update_attributes(request: nil, comment: nil, status: new_value)
-    Events.generate_templates(@entrant_application).deliver_later if Rails.env == 'production'
+    #Events.generate_templates(@entrant_application).deliver_later if Rails.env == 'production'
     redirect_to @entrant_application
   end
   
