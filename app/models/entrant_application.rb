@@ -222,7 +222,7 @@ class EntrantApplication < ActiveRecord::Base
     mark_forms = marks.map{|a, ms| {a => ms.map{|m| [m.subject_id => m.form].inject(:merge)}}}.inject(:merge)
     
     achievements = Achievement.joins(:entrant_application).where(entrant_applications: {id: entrant_applications.map(&:id)}).group_by(&:entrant_application_id)
-    achievement_values = achievements.map{|a, achs| {a => achs.sort_by(&:institution_achievement_id).map(&:value)}}.inject(:merge)
+    achievement_values = achievements.map{|a, achs| {a => achs.sort_by(&:institution_achievement_id).map(&:value)}}.inject(:merge) || []
     
     entrant_applications_hash = {}
     entrant_applications.each do |entrant_application|
@@ -957,9 +957,9 @@ class EntrantApplication < ActiveRecord::Base
     if marks.map(&:form).include?('ВИ')
       pdf.text "Ознакомлен с регламентом проведения вступительных испытаний, проводимых академией самостоятельно", size: 10
       pdf.move_down 4
+      pdf.text "Подпись ___________________", size: 10, align: :right
+      pdf.move_down 4
     end
-    pdf.text "Подпись ___________________", size: 10, align: :right
-    pdf.move_down 4
     pdf.text "Ознакомлен с информацией о необходимости указания в заявлении о приеме достоверных сведений и представления подлинных документов", size: 10
     pdf.move_down 4
     pdf.text "Подпись ___________________", size: 10, align: :right
@@ -1290,6 +1290,9 @@ class EntrantApplication < ActiveRecord::Base
     end
     pdf.grid([4, 0], [4, 7]).bounding_box do
       pdf.text "#{fio}", :size => 32, align: :center
+    end
+    pdf.grid([5, 0], [5, 2]).bounding_box do
+      pdf.text "Язык: #{language}", :size => 14, align: :center
     end
     pdf.grid([6, 0], [6, 7]).bounding_box do
       pdf.text "Адрес: #{address}", :size => 12
