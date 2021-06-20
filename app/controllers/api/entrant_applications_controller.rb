@@ -30,7 +30,7 @@ class Api::EntrantApplicationsController < ApplicationController
       entrant_application.pin = (1..9).to_a.sample(4).join().to_i
       if entrant_application.save
         entrant_application.campaign.entrance_test_items.uniq.each do |entrance_test_item|
-          entrant_application.marks.create(subject_id: entrance_test_item.subject_id)
+          entrant_application.marks.create(subject_id: entrance_test_item.subject_id, value: 0)
         end
         Events.check_pin(entrant_application).deliver_later if Rails.env == 'production'
         send_data({status: 'success', message: 'entrant application created', hash: entrant_application.data_hash, id: entrant_application.id}.to_json)
@@ -237,14 +237,14 @@ class Api::EntrantApplicationsController < ApplicationController
           response_data[:competitive_group] = {}
           @entrant_application.competitive_groups.delete_all
           @entrant_application.competitive_groups << CompetitiveGroup.where(id: params[:competitive_group])
-          response_data[:competitive_group][:ids]  = @entrant_application.competitive_groups.map(&:id)
+          response_data[:competitive_groups]  = @entrant_application.competitive_groups
         end
         if params[:achievement]
           response_data[:achievement] = {}
           params[:achievement].each do |institution_achievement_id|
             @entrant_application.achievements.create(institution_achievement_id: institution_achievement_id)
           end
-          response_data[:achievement][:ids]  = @entrant_application.achievements.map(&:institution_achievement_id)
+          response_data[:achievements]  = @entrant_application.achievements
         end
       response_data[:status] = 'success'
       response_data[:hash] = @entrant_application.data_hash
