@@ -3,7 +3,7 @@ class Api::EntrantApplicationsController < ApplicationController
   before_filter :set_entrant_application, only: [:show, :update, :check_pin, :remove_pin, :send_welcome_email]
   
   def show
-    @marks = @entrant_application.marks.order(:subject_id).includes(:subject)
+    @marks = @entrant_application.marks.order(subject_id: :desc).includes(:subject)
     @sum = @marks.pluck(:value).any? ? @marks.pluck(:value).sum : 0
     @achievements = @entrant_application.achievements.includes(:institution_achievement)
     @achievements_sum = @achievements.pluck(:value).sum

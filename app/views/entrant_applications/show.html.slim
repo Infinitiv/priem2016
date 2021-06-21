@@ -207,6 +207,16 @@
             - if can? :destroy, attachment
               span &nbsp;
               span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
+    dl
+      dt
+        h3 Согласия на обработку персональных данных
+        - @entrant_application.attachments.each do |attachment|
+          - if attachment.document_type == 'data_processing_consent' && attachment.document_id == @entrant_application.id
+            dd
+              = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
+              - if can? :destroy, attachment
+                span &nbsp;
+                span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
   dl
     dt
       h3 Документ, удостоверяющий личность
@@ -249,7 +259,7 @@
       strong= link_to orininal_sign, toggle_original_entrant_application_path(@entrant_application), method: :put, class: original_class, title: 'Изменить оригинал'
       p= @entrant_application.education_document.education_speciality_code if @entrant_application.education_document
       - @entrant_application.attachments.each do |attachment|
-        - if attachment.document_type == 'education_document' && attachment.document_id == @entrant_application.education_document.id
+        - if attachment.document_type == 'education_document' && attachment.document_id == @entrant_application.education_document.id || attachment.document_id == @entrant_application.id
           dd
             = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
             - if can? :destroy, attachment
