@@ -1246,37 +1246,37 @@ class EntrantApplication < ActiveRecord::Base
     pdf.grid([0, 0], [0,1]).bounding_box do
       pdf.text "#{application_number}", style: :bold, :size => 36
     end
-    pdf.grid(0, 2).bounding_box do
-      pdf.text "Сумма", :size => 16
+    pdf.grid(0, 6).bounding_box do
+      pdf.text "Сумма", :size => 16, align: :right
     end
-    pdf.grid(0, 3).bounding_box do
-      pdf.text "ИД", :size => 16
+    pdf.grid(0, 6).bounding_box do
+      pdf.text "ИД", :size => 16, valign: :center, align: :right
       pdf.move_down 6
       pdf.text "#{'+' if achievements.count > 0}", :size => 16
     end
     case campaign.campaign_type_id
     when 1
-      pdf.grid(0, 4).bounding_box do
-        pdf.text "Х", :size => 16, align: :center
+      pdf.grid(1, 6).bounding_box do
+        pdf.text "Х", :size => 16, align: :right
       end
-      pdf.grid(0, 5).bounding_box do
-        pdf.text "Б", :size => 16, align: :center
+      pdf.grid(1, 6).bounding_box do
+        pdf.text "Б", :size => 16, valign: :center, align: :right
       end
-      pdf.grid(0, 6).bounding_box do
-        pdf.text "Р", :size => 16, align: :center
+      pdf.grid(1, 6).bounding_box do
+        pdf.text "Р", :size => 16, valign: :bottom, align: :right
       end
     when 4
-      pdf.grid(0, 4).bounding_box do
-        pdf.text "Тест", :size => 16, align: :center
+      pdf.grid(1, 6).bounding_box do
+        pdf.text "Тест", :size => 16, align: :right
       end
     end
-    pdf.grid([1, 0], [2, 7]).bounding_box do
+    pdf.grid([1, 0], [3, 6]).bounding_box do
       competitive_groups.where(education_source_id: 14).order(direction_id: :desc).each do |competitive_group|
         pdf.text "________  #{competitive_group.name}", :size => 14
         pdf.move_down 14
       end
       competitive_groups.where(education_source_id: 16).order(direction_id: :desc).each do |competitive_group|
-        pdf.text "________  #{competitive_group.name} - #{target_contracts.where(competitive_group_id: competitive_group.id).map{|tc|tc.target_organization.target_organization_name}.compact.join(', ')}", :size => 14
+        pdf.text "________  #{competitive_group.name}", :size => 14
         pdf.move_down 14
       end
       competitive_groups.where(education_source_id: 20).order(direction_id: :desc).each do |competitive_group|
