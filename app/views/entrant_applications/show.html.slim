@@ -133,15 +133,22 @@
                 .col-sm-6
                   - case @entrant_application.campaign.campaign_type_id
                   - when 1
-                    = f.select :form, options_for_select(["ЕГЭ", "ВИ"], selected: mark.form), {}, {class: 'form-control'}
+                    - if mark.form.nil? || mark.form.empty?
+                      span не выбрано
+                    - else
+                      = f.select :form, options_for_select(["ЕГЭ", "ВИ"], selected: mark.form), {}, {class: 'form-control'}
                   - when 4
-                    = f.select :form, options_for_select(["Аккредитация", "Экзамен"], selected: mark.form), {}, {class: 'form-control'}
+                    - if mark.form.nil? || mark.form.empty?
+                      span не выбрано
+                    - else
+                      = f.select :form, options_for_select(["Аккредитация", "Экзамен"], selected: mark.form), {}, {class: 'form-control'}
                     = f.number_field :value, value: mark.value, max: 100, class: 'form-control'
                     = f.number_field :year, value: mark.year, min: Time.now.to_date.year - 1, max: Time.now.to_date.year, class: 'form-control'
                     = f.text_field :organization_uid, class: 'form-control'
-                    
+                
                 .col-sm-2
-                  = f.submit 'Сохранить', class: 'btn btn-primary'
+                  - unless mark.form.nil? || mark.form.empty?
+                    = f.submit 'Сохранить', class: 'btn btn-primary'
         td= @sum
         td= @full_sum
   dl
