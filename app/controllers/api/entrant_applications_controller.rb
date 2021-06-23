@@ -16,12 +16,12 @@ class Api::EntrantApplicationsController < ApplicationController
 
   def create
     campaign = Campaign.find(params[:campaign_id])
-    if campaign.entrant_applications.where(email: params[:email]).empty?
+    if campaign.entrant_applications.where(email: params[:email].downcase).empty?
       entrant_application = EntrantApplication.new
       current_registration_number = campaign.entrant_applications.select(:registration_number).map(&:registration_number).compact.max
       entrant_application.registration_number = current_registration_number ? current_registration_number + 1 : 1
       entrant_application.campaign_id = params[:campaign_id]
-      entrant_application.email = params[:email]
+      entrant_application.email = params[:email].downcase
       entrant_application.nationality_type_id = 1
       entrant_application.registration_date = Time.now.to_date
       entrant_application.data_hash = Digest::MD5.hexdigest [entrant_application.email, campaign.salt].compact.join()

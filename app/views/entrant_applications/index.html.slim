@@ -53,7 +53,7 @@ table.table.datatable
         td= entrant_application.created_at.strftime("%F %R")
         - case @campaign.campaign_type_id
           - when 1
-            td= entrant_application.marks.map(&:form).include?('Экзамен') ? 'Экзамен' : 'ЕГЭ'
+            td= entrant_application.marks.map(&:form).include?('ВИ') ? 'ВИ' : 'ЕГЭ'
           - when 4
             td= entrant_application.marks.map(&:form).include?('Экзамен') ? 'Экзамен' : 'Аккредитация'
         td= entrant_application.snils
