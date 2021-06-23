@@ -147,5 +147,6 @@ json.entrant_application do
     json.template attachment.template
     json.document_id attachment.document_id
     json.filename attachment.filename
+    json.created_at attachment.created_at
   end
 end
