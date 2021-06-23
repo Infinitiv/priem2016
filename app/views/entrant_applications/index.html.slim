@@ -36,7 +36,7 @@ table.table.datatable
         - if entrant_application.application_number
           td= link_to "%04d" % entrant_application.application_number, entrant_application, class: label_class
         - else
-          td= link_to '-', entrant_application, class: label_class
+          td= link_to '0000', entrant_application, class: label_class
         - title = case entrant_application.status
         - when 'проверено, есть замечания'
           - entrant_application.comment
