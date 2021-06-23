@@ -15,9 +15,9 @@ table.table.datatable
     th Номер заявления
     th Ф.И.О.
     th Статус заявления
-    th Запрошены изменения
     th Дата заполнения анкеты
     th Форма вступительного испытания
+    th Электронная почта
     th СНИЛС
     - if can? :destroy, EntrantApplication
       th Удалить заявление
@@ -47,15 +47,13 @@ table.table.datatable
         td= link_to entrant_application.fio, "#{[host_name, 'entrants', entrant_application.data_hash].join('/')}", target: :blank, title: title
         td
           .label.label-info= entrant_application.status
-        td
-          - if entrant_application.request
-            .label.label-success зеленая точка
         td= entrant_application.created_at.strftime("%F %R")
         - case @campaign.campaign_type_id
           - when 1
             td= entrant_application.marks.map(&:form).include?('ВИ') ? 'ВИ' : 'ЕГЭ'
           - when 4
             td= entrant_application.marks.map(&:form).include?('Экзамен') ? 'Экзамен' : 'Аккредитация'
+        td= entrant_application.email
         td= entrant_application.snils
         - if can? :destroy, entrant_application
           - if entrant_application.status_id == 4
