@@ -241,7 +241,7 @@ class Api::EntrantApplicationsController < ApplicationController
         if params[:achievement]
           response_data[:achievement] = {}
           params[:achievement].each do |institution_achievement_id|
-            @entrant_application.achievements.create(institution_achievement_id: institution_achievement_id)
+            @entrant_application.achievements.create(institution_achievement_id: institution_achievement_id) unless @entrant_application.achievements.map(&:id).include?(institution_achievement_id)
           end
           response_data[:achievements]  = @entrant_application.achievements
         end
