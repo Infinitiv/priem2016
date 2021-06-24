@@ -3,8 +3,8 @@ class Api::AttachmentsController < ApplicationController
   before_filter :set_attachment, only: [:show]
   
   def show
+    %x(ls "#{Rails.root.join('storage', @attachment.data_hash[0..2].split('').join('/'))}")
     path = Rails.root.join('storage', @attachment.data_hash[0..2].split('').join('/'), @attachment.data_hash)
-    %x(touch "#{path}")
     send_file path, :filename => 'file_name', :type => @attachment.mime_type, :disposition => "attachment"
   end
   
