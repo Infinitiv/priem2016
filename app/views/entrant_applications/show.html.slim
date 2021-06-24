@@ -169,12 +169,14 @@
                   span= link_to 'x', achievement, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление достижения необратимо. Все равно удалить?'}
             .row
               .col-sm-12
-                - @entrant_application.attachments.each do |attachment|
-                  - if attachment.document_type == 'achievement' && attachment.document_id == achievement.institution_achievement.id
-                      = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
-                      - if can? :destroy, attachment
-                        span &nbsp;
-                        span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
+                ul
+                  - @entrant_application.attachments.each do |attachment|
+                    - if attachment.document_type == 'achievement' && attachment.document_id == achievement.institution_achievement.id
+                        li.no-bullet
+                          = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
+                          - if can? :destroy, attachment
+                            span &nbsp;
+                            span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
   - if can? :create, @achievement
     = form_for @achievement do |f|
       = f.number_field :entrant_application_id, value: @entrant_application.id, class: 'hide'
