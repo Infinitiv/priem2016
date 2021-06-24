@@ -496,6 +496,10 @@
               .col-sm-4
                 = f.select :language, options_for_select = (['', 'Английский', 'Французский', 'Немецкий', 'tlhl']), {}, class: 'form-control'
             .form-group.row
+              = f.label :source, 'Способ подачи документов', class: 'label-control col-sm-4'
+              .col-sm-4
+                = f.select :source, options_for_select = (['', 'через ЕПГУ', 'через ИС', 'лично']), {}, class: 'form-control'
+            .form-group.row
               .col-sm-12
                 = f.label :need_hostel, '', class: 'checkbox-inline'
                   = f.check_box :need_hostel

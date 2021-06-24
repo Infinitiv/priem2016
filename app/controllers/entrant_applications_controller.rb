@@ -282,6 +282,7 @@ class EntrantApplicationsController < ApplicationController
     unless @entrant_application.application_number
       last_application_number = @entrant_application.campaign.entrant_applications.select(:id, :application_number).map(&:application_number).compact.max
       @entrant_application.application_number = last_application_number ?  last_application_number + 1 : 1
+      @entrant_application.registration_date = Time.now.to_date
       @entrant_application.save
     end
     @entrant_application.generate_recall_application
@@ -300,7 +301,7 @@ class EntrantApplicationsController < ApplicationController
     old_value = @entrant_application.status
     new_value = 'принято'
     Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
-    @entrant_application.update_attributes(status_id: 4, comment: nil, status: new_value, registration_date: Time.now.to_date)
+    @entrant_application.update_attributes(status_id: 4, comment: nil, status: new_value)
     redirect_to :back
   end
   
@@ -356,7 +357,7 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def entrant_application_params
-    params.require(:entrant_application).permit(:campaign_id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :gender_id, :birth_date, :region_id, :registration_date, :status_id, :nationality_type_id, :need_hostel, :special_entrant, :olympionic, :benefit, :checked, :email, :phone, :snils, :address, :snils_absent, :language)
+    params.require(:entrant_application).permit(:campaign_id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :gender_id, :birth_date, :region_id, :registration_date, :status_id, :nationality_type_id, :need_hostel, :special_entrant, :olympionic, :benefit, :checked, :email, :phone, :snils, :address, :snils_absent, :language, :source)
   end
 
   def set_campaign

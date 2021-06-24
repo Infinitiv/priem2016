@@ -1243,8 +1243,11 @@ class EntrantApplication < ActiveRecord::Base
       })
     pdf.font "Ubuntu"
     pdf.define_grid(:columns => 8, :rows => 7, :gutter => 5)
-    pdf.grid([0, 0], [0,1]).bounding_box do
+    pdf.grid([0, 0], [0, 1]).bounding_box do
       pdf.text "#{application_number}", style: :bold, :size => 36
+    end
+    pdf.grid([0, 1], [0, 5]).bounding_box do
+      pdf.text "Дата регистрации #{registration_date}", style: :bold, :size => 14, align: :center
     end
     pdf.grid(0, 6).bounding_box do
       pdf.text "Сумма", :size => 16, align: :right
