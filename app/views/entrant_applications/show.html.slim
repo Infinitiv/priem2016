@@ -213,6 +213,8 @@
     dd= @entrant_application.phone
     dt СНИЛС
     dd= @entrant_application.snils
+    dt Язык
+    dd= @entrant_application.language
   h2 Документы
   - if @entrant_application.attachments.select{|attachment| attachment.document_type =~ /_application/ && !attachment.template}.length > 0
     dl
@@ -489,6 +491,10 @@
               = f.label :snils, 'СНИЛС', class: 'label-control col-sm-4'
               .col-sm-4
                 = f.text_field :snils, class: 'form-control'
+            .form-group.row
+              = f.label :language, 'Язык', class: 'label-control col-sm-4'
+              .col-sm-4
+                = f.select :language, options_for_select = (['', 'Английский', 'Французский', 'Немецкий', 'tlhl']), {}, class: 'form-control'
             .form-group.row
               .col-sm-12
                 = f.label :need_hostel, '', class: 'checkbox-inline'

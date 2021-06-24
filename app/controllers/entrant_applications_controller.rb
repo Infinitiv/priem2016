@@ -300,7 +300,7 @@ class EntrantApplicationsController < ApplicationController
     old_value = @entrant_application.status
     new_value = 'принято'
     Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
-    @entrant_application.update_attributes(status_id: 4, comment: nil, status: new_value)
+    @entrant_application.update_attributes(status_id: 4, comment: nil, status: new_value, registration_date: Time.now.to_date)
     redirect_to :back
   end
   
@@ -356,7 +356,7 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def entrant_application_params
-    params.require(:entrant_application).permit(:campaign_id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :gender_id, :birth_date, :region_id, :registration_date, :status_id, :nationality_type_id, :need_hostel, :special_entrant, :olympionic, :benefit, :checked, :email, :phone, :snils, :address, :snils_absent)
+    params.require(:entrant_application).permit(:campaign_id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :gender_id, :birth_date, :region_id, :registration_date, :status_id, :nationality_type_id, :need_hostel, :special_entrant, :olympionic, :benefit, :checked, :email, :phone, :snils, :address, :snils_absent, :language)
   end
 
   def set_campaign

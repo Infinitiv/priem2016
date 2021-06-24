@@ -34,6 +34,8 @@ json.entrant_application do
   json.snils @entrant_application.snils
   json.snils_absent @entrant_application.snils_absent
   json.language @entrant_application.language
+  json.source @entrant_application.source
+  json.clerk @entrant_application.clerk
   json.identity_documents @entrant_application.identity_documents.order(identity_document_date: :desc) do |identity_document|
     json.id identity_document.id
     json.identity_document_type identity_document.identity_document_type

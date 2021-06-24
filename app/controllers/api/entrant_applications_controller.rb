@@ -23,16 +23,23 @@ class Api::EntrantApplicationsController < ApplicationController
       entrant_application.campaign_id = params[:campaign_id]
       entrant_application.email = params[:email].downcase
       entrant_application.nationality_type_id = 1
-      entrant_application.registration_date = Time.now.to_date
       entrant_application.data_hash = Digest::MD5.hexdigest [entrant_application.email, campaign.salt].compact.join()
       entrant_application.status = 'новое'
       entrant_application.status_id = 0
       entrant_application.pin = (1..9).to_a.sample(4).join().to_i
+      unless params[:clerk].empty?
+        entrant_application.clerk = params[:clerk]
+        entrant_application.source = 'лично'
+      else
+        entrant_application.source = 'через ИС'
+      end
       if entrant_application.save
         entrant_application.campaign.entrance_test_items.uniq.each do |entrance_test_item|
           entrant_application.marks.create(subject_id: entrance_test_item.subject_id, value: 0)
         end
-        Events.check_pin(entrant_application).deliver_later if Rails.env == 'production'
+        unless entrant_application.clerk
+          Events.check_pin(entrant_application).deliver_later if Rails.env == 'production'
+        end
         send_data({status: 'success', message: 'entrant application created', hash: entrant_application.data_hash, id: entrant_application.id}.to_json)
       end
     else
