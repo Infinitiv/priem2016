@@ -351,6 +351,7 @@ end
               e.FirstName item.entrant_first_name
               e.MiddleName item.entrant_middle_name if item.entrant_middle_name
               e.GenderID item.gender_id
+              e.SNILS item.snils if item.snils
               e.EmailOrMailAddress do |eoma|
                 eoma.Email item.email
               end
@@ -474,6 +475,12 @@ end
                 id.DocumentNumber identity_document.identity_document_number
                 id.DocumentDate identity_document.identity_document_date
                 id.IdentityDocumentTypeID identity_document.identity_document_type
+                if item.nationality_type_id == 1
+                  id.ReleaseCountryID 1
+                else
+                  id.ReleaseCountryID item.nationality_type_id
+                end
+                id.ReleasePlace  identity_document.identity_document_issuer
                 id.NationalityTypeID  item.nationality_type_id
                 id.BirthDate item.birth_date
               end
