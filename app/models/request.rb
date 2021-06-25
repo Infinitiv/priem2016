@@ -558,7 +558,7 @@ end
                         when 8
                           cd.UID ["ach", campaign.year_start, item.application_number, postfix, 'gto'].join('-')
                           cd.DocumentName "Удоствоверение о награждении золотым значком ГТО"
-                          cd.DocumentDate '2020-04-20'
+                          cd.DocumentDate "#{campaign.year_start}-04-20"
                           cd.DocumentOrganization 'Министерство спорта Российской Федерации'
                         when 9
                           cd.UID ["ach", campaign.year_start, item.education_document.id].join('-')
@@ -601,7 +601,7 @@ end
                     case true
                     when sub_item.form == "ЕГЭ"
                       etr.ResultSourceTypeID 1
-                    when sub_item.form == "Экзамен"
+                    when sub_item.form == "ВИ"
                       etr.ResultSourceTypeID 2
                     when sub_item.form == "Аккредитация"
                       etr.ResultSourceTypeID 2
@@ -619,17 +619,17 @@ end
                         rd.InstitutionDocument do |id|
                           case sub_item.subject.subject_id
                           when 11
-                            id.DocumentNumber "2020-1"
-                            id.DocumentDate "2020-08-04"
+                            id.DocumentNumber "#{campaign.year_start}-1"
+                            id.DocumentDate "#{campaign.year_start}-07-16"
                           when 4
-                            id.DocumentNumber "2020-2"
-                            id.DocumentDate "2020-08-10"
+                            id.DocumentNumber "#{campaign.year_start}-2"
+                            id.DocumentDate "#{campaign.year_start}-07-19"
                           when 1
-                            id.DocumentNumber "2020-3"
-                            id.DocumentDate "2020-08-13"
+                            id.DocumentNumber "#{campaign.year_start}-3"
+                            id.DocumentDate "#{campaign.year_start}-07-21"
                           else
-                            id.DocumentNumber "2020-1"
-                            id.DocumentDate "2020-08-06"
+                            id.DocumentNumber "#{campaign.year_start}-1"
+                            id.DocumentDate "#{campaign.year_start}-08-06"
                           end
                           id.DocumentTypeID 1
                         end
