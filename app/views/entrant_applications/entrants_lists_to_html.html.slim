@@ -33,7 +33,7 @@ p Обращаем Ваше внимание, что до 18 августа во
                   td= "%04d" % application.application_number
                   td= application.fio
                   td Олимпиада школьников
-                  td= values[:achievements_sum] if values[:achievements_sum] > 0
+                  td= values[:achievements_sum].to_i if values[:achievements_sum] > 0
                   td.text-center= "+" if application.benefit
           h3 Общий конкурс
           p
@@ -68,7 +68,7 @@ p Обращаем Ваше внимание, что до 18 августа во
                       sup= values[:mark_forms][index]
                     - else
                       span= values[:mark_forms][index]
-                td= values[:summa] if values[:mark_values].select{|m| m > 41}.count == 3
-                td= values[:achievements_sum] if values[:achievements_sum] > 0
+                td= values[:summa].to_i if values[:mark_values].select{|m| m > 41}.count == 3
+                td= values[:achievements_sum].to_i if values[:achievements_sum] > 0
                 td.text-center= "+" if application.benefit
                 td= application.target_contracts.where(competitive_group_id: competitive_group).map{|target_contract| target_contract.target_organization.target_organization_name}.join(', ') if competitive_group.education_source_id == 16
