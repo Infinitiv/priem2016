@@ -204,9 +204,9 @@
     dt Страна
     dd= @citizenship
     dt Регион
-    dd= @entrant_application.region_id
+    dd= @entrant_application.region_with_type
     dt Почтовый адрес
-    dd= @entrant_application.address
+    dd= @entrant_application.verified_address ? @entrant_application.verified_address : @entrant_application.address
     dt Адрес электронной почты
     dd= mail_to @entrant_application.email, @entrant_application.email
     dt Телефон
