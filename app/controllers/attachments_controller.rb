@@ -5,7 +5,7 @@ class AttachmentsController < ApplicationController
   def show
     %x(ls "#{Rails.root.join('storage', @attachment.data_hash[0..2].split('').join('/'))}")
     path = Rails.root.join('storage', @attachment.data_hash[0..2].split('').join('/'), @attachment.data_hash)
-    send_file path, :filename => @attachment.filename, :type => @attachment.mime_type
+    send_file path, filename: @attachment.filename, type: @attachment.mime_type, disposition: :inline
   end
     
   def destroy
