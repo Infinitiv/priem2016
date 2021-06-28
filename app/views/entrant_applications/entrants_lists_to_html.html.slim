@@ -59,7 +59,7 @@ p Обращаем Ваше внимание, что до 18 августа во
                 td= "%04d" % application.application_number
                 td= application.fio
                 td.text-center= "+" if [application.budget_agr, application.paid_agr].include?(competitive_group.id)
-                td= values[:full_summa] if values[:mark_values].select{|m| m > 41}.count == 3
+                td= values[:full_summa].to_i if values[:mark_values].select{|m| m > 41}.count == 3
                 - values[:mark_values].each_with_index do |mark_value, index|
                   - label_class = "bg-danger" if mark_value < 42 && mark_value > 0
                   td(class = label_class)
