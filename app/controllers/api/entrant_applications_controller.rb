@@ -154,9 +154,9 @@ class Api::EntrantApplicationsController < ApplicationController
         end
         if params[:status_id]
           @entrant_application.status_id = 2
-          @entrant_application.status = 'на расмотрении'
+          @entrant_application.status = 'на рассмотрении'
           response_data[:status_id] = 2
-          response_data[:status] = 'на расмотрении'
+          response_data[:status] = 'на рассмотрении'
         end
         @entrant_application.save
         if params[:education_document]
