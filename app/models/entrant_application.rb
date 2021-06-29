@@ -143,15 +143,15 @@ class EntrantApplication < ActiveRecord::Base
   end
   
   def self.find_empty_marks(applications)
-    applications.joins(:marks).where(status_id: 4, marks: {value: 0, form: 'ЕГЭ'}).uniq
+    applications.joins(:marks).where(status_id: 4, marks: {value: 0, form: 'ЕГЭ'})
   end
   
   def self.find_elders(applications)
-    applications.select{|a| Time.now.to_date > a.birth_date + 20.years}.select{|a| a.identity_documents.count == 1 && a.marks.map(&:form).count('Экзамен') != 3}
+    applications.select{|a| Time.now.to_date > a.birth_date + 20.years}.select{|a| a.identity_documents.count == 1 && a.marks.map(&:form).count('ВИ') != 3}
   end
   
   def self.find_empty_achievements(applications)
-    applications.joins(:achievements).where(status_id: 4, achievements: {value: 0}).uniq
+    applications.joins(:achievements).where(status_id: 4, achievements: {value: 0})
   end
   
   def self.find_dups_numbers(applications)
