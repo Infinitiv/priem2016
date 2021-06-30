@@ -19,7 +19,8 @@ class Api::StatsController < ApplicationController
       :enrolled_date,
       :exeptioned,
       :exeptioned_date,
-      :return_documents_date
+      :return_documents_date,
+      :source
     )
     .includes(
       :competitive_groups,
