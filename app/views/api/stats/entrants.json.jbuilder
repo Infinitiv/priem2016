@@ -9,6 +9,7 @@ json.array! @entrants do |entrant|
   json.region_with_type entrant.region_with_type
   json.status_id entrant.status_id
   json.source entrant.source
+  json.agreement entrant.budget_agr ? entrant.competitive_groups.find(entrant.budget_agr).name : nil
   json.competitive_groups entrant.competitive_groups.map(&:name).join(',')
   json.education_document_type entrant.education_document.education_document_type
   json.education_document_issuer entrant.education_document.education_document_issuer

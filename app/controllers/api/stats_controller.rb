@@ -20,7 +20,8 @@ class Api::StatsController < ApplicationController
       :exeptioned,
       :exeptioned_date,
       :return_documents_date,
-      :source
+      :source,
+      :budget_agr
     )
     .includes(
       :competitive_groups,
