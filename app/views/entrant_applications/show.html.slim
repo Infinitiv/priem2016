@@ -249,7 +249,7 @@
         - @entrant_application.attachments.each do |attachment|
           - if attachment.document_type == 'identity_document' && attachment.document_id == identity_document.id
             dd
-              = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+              = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
               - if can? :destroy, attachment
                 span &nbsp;
                 span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
@@ -280,7 +280,7 @@
       - @entrant_application.attachments.each do |attachment|
         - if (attachment.document_type == 'education_document' && attachment.document_id == @entrant_application.education_document.id) || (attachment.document_type == 'education_document' && attachment.document_id == @entrant_application.id)
           dd
-            = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+            = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
             - if can? :destroy, attachment
               span &nbsp;
               span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
@@ -312,14 +312,14 @@
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'target_contract' && attachment.document_id == target_contract.id
               dd
-                = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+                = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
                 - if can? :destroy, attachment
                   span &nbsp;
                   span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
         - @entrant_application.attachments.each do |attachment|
           - if attachment.document_type == 'target_contract' && attachment.document_id == nil
             dd
-              = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+              = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
               - if can? :destroy, attachment
                 span &nbsp;
                 span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
@@ -341,7 +341,7 @@
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'benefit_document' && attachment.document_id == benefit_document.id
               dd
-                = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+                = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
                 - if can? :destroy, attachment
                   span &nbsp;
                   span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
@@ -357,7 +357,7 @@
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'olympic_document' && attachment.document_id == olympic_document.id
               dd
-                = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+                = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
                 - if can? :destroy, attachment
                   span &nbsp;
                   span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
@@ -369,7 +369,7 @@
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'other_document' && attachment.document_id == other_document.id
               dd
-                = link_to attachment.filename, "#{attachment_path(attachment)}", target: :blank
+                = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
                 - if can? :destroy, attachment
                   span &nbsp;
                   span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
