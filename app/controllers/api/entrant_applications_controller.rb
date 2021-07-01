@@ -72,7 +72,10 @@ class Api::EntrantApplicationsController < ApplicationController
         response_data[:competitive_group] = {}
         @entrant_application.competitive_groups.delete_all
         @entrant_application.competitive_groups << CompetitiveGroup.where(id: params[:competitive_group])
-        @entrant_application.update_attributes(status_id: 2, status: 'добавлен конкурс') unless @entrant_application.status_id == 0
+        unless @entrant_application.status_id == 0
+          @entrant_application.update_attributes(status_id: 2, status: 'добавлен конкурс')
+          @entrant_application.generate_title_application
+        end
         response_data[:competitive_groups]  = @entrant_application.competitive_groups
         response_data[:status_id]  = @entrant_application.status_id
         response_data[:status] = @entrant_application.status
