@@ -16,36 +16,31 @@ class Api::EntrantApplicationsController < ApplicationController
 
   def create
     campaign = Campaign.find(params[:campaign_id])
-    if campaign.entrant_applications.where(email: params[:email].downcase).empty?
-      entrant_application = EntrantApplication.new
-      current_registration_number = campaign.entrant_applications.select(:registration_number).map(&:registration_number).compact.max
-      entrant_application.registration_number = current_registration_number ? current_registration_number + 1 : 1
-      entrant_application.campaign_id = params[:campaign_id]
-      entrant_application.email = params[:email].downcase
-      entrant_application.nationality_type_id = 1
-      entrant_application.data_hash = Digest::MD5.hexdigest [entrant_application.email, campaign.salt].compact.join()
-      entrant_application.status = 'новое'
-      entrant_application.status_id = 0
-      entrant_application.pin = (1..9).to_a.sample(4).join().to_i
-      unless params[:clerk].empty?
-        entrant_application.clerk = params[:clerk]
-        entrant_application.source = 'лично'
-      else
-        entrant_application.source = 'через ИС'
-      end
-      if entrant_application.save
-        entrant_application.campaign.entrance_test_items.uniq.each do |entrance_test_item|
-          entrant_application.marks.create(subject_id: entrance_test_item.subject_id, value: 0)
-        end
-        unless entrant_application.clerk
-          Events.check_pin(entrant_application).deliver_later if Rails.env == 'production'
-        end
-        send_data({status: 'success', message: 'entrant application created', hash: entrant_application.data_hash, id: entrant_application.id}.to_json)
-      end
+    entrant_application = EntrantApplication.new
+    current_registration_number = campaign.entrant_applications.select(:registration_number).map(&:registration_number).compact.max
+    entrant_application.registration_number = current_registration_number ? current_registration_number + 1 : 1
+    entrant_application.campaign_id = params[:campaign_id]
+    entrant_application.email = params[:email].downcase
+    entrant_application.nationality_type_id = 1
+    entrant_application.data_hash = Digest::MD5.hexdigest [entrant_application.email, campaign.salt].compact.join()
+    entrant_application.status = 'новое'
+    entrant_application.status_id = 0
+    entrant_application.pin = (1..9).to_a.sample(4).join().to_i
+    unless params[:clerk].empty?
+      entrant_application.clerk = params[:clerk]
+      entrant_application.source = 'лично'
     else
-      send_data({status: 'faild', message: 'email is not uniq'}.to_json)
+      entrant_application.source = 'через ИС'
     end
-
+    if entrant_application.save
+      entrant_application.campaign.entrance_test_items.uniq.each do |entrance_test_item|
+        entrant_application.marks.create(subject_id: entrance_test_item.subject_id, value: 0)
+      end
+      unless entrant_application.clerk
+        Events.check_pin(entrant_application).deliver_later if Rails.env == 'production'
+      end
+      send_data({status: 'success', message: 'entrant application created', hash: entrant_application.data_hash, id: entrant_application.id}.to_json)
+    end
   end
 
   def update
@@ -266,6 +261,15 @@ class Api::EntrantApplicationsController < ApplicationController
       send_data(response_data.to_json)
     else
       send_data({status: 'faild', message: 'Редактирование невозможно'}.to_json)
+    end
+  end
+  
+  def check_email
+    campaign = Campaign.find(params[:campaign_id])
+    if campaign.entrant_applications.where(email: params[:email].downcase).empty?
+      send_data({status: 'success', message: 'email is uniq'}.to_json)
+    else
+      send_data({status: 'faild', message: 'email is not uniq'}.to_json)
     end
   end
 

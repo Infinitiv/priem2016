@@ -10,6 +10,9 @@ Rails.application.routes.draw do
   
   namespace :api, defaults: {format: 'json'}, path: '/api' do
     resources :entrant_applications, only: [:show, :create, :update] do
+      collection do
+        post 'check_email'
+      end
       member do
         put 'check_pin'
         put 'remove_pin'
