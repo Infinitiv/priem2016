@@ -90,23 +90,10 @@ class EntrantApplicationsController < ApplicationController
       unless @entrant_application.enrolled.nil?
         enrolled_recall
       end
-      old_value = @entrant_application.budget_agr || @entrant_application.paid_agr
-      if @entrant_application.budget_agr == @competitive_group.id || @entrant_application.paid_agr == @competitive_group.id
-        value_name = ('budget_arg' if @entrant_application.budget_agr) || ('paid_agr' if @entrant_application.paid_agr)
-        @entrant_application.budget_agr = nil
-        @entrant_application.paid_agr = nil
-      else
-        @entrant_application.budget_agr = nil
-        @entrant_application.paid_agr = nil
-        if @competitive_group.name =~ /Внебюджет/ 
-          @entrant_application.paid_agr = @competitive_group.id
-          value_name = 'paid_agr'
-        else
-          @entrant_application.budget_agr = @competitive_group.id
-          value_name = 'budget_arg'
-        end
-      end
-      new_value = @entrant_application.budget_agr || @entrant_application.paid_agr
+      value_name = 'budget_arg'
+      old_value = @entrant_application.budget_agr
+      @entrant_application.budget_agr == @competitive_group.id ? @entrant_application.budget_agr = nil : @entrant_application.budget_agr = @competitive_group.id
+      new_value = @entrant_application.budget_agr
       Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
     end
     if @entrant_application.save!
