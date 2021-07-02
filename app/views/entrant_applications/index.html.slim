@@ -9,6 +9,27 @@ h1 = "Список заявлений #{@campaign.name} #{@campaign.year_start}"
   - 'http://isma.me'
 - when 'production'
   - 'https://isma.ivanovo.ru'
+- unless @tickets.empty?
+  table.table.datatable
+    thead
+      th Номер заявления
+      th Ф.И.О.
+      th Дата и время
+      th Сообщение
+      - if can? :solve, Ticket
+        th Пометить, как решенное
+    tbody
+      - @tickets.where(parent_ticket: nil).each do |ticket|
+        tr
+          - if ticket.entrant_application.application_number
+            td= link_to "%04d" % ticket.entrant_application.application_number, ticket.entrant_application, class: 'label label-default'
+          - else
+            td= link_to '0000', ticket.entrant_application, class: 'label label-warning'
+          td= link_to ticket.entrant_application.fio, "#{[host_name, 'entrants', ticket.entrant_application.data_hash].join('/')}", target: :blank
+          td= ticket.created_at.strftime("%F %R")
+          td= link_to ticket.message.truncate(50, separator: ' ', omission: '...'), '#', data: {toggle: 'modal', target: "#ticket_#{ticket.id}"}
+          td= link_to 'Решить', solve_ticket_url(ticket), class: 'label label-success', data: {confirm: 'Не хотят решать по хорошему, решим по плохому, да?'}
+
 h5= @entrant_applications.map(&:status).uniq.map{|status| "#{status} - (#{@entrant_applications.where(status: status).length})"}.join('; ')
 table.table.datatable
   thead
@@ -60,3 +81,20 @@ table.table.datatable
               td= link_to 'Отозвать', entrant_application_recall_entrant_application_path(entrant_application), method: :put, class: 'label label-warning', title: 'Отозвать документы'
           - else
               td= link_to 'Удалить', entrant_application, method: :delete, class: 'label label-danger', data: {confirm: 'Вот тот механизм, который так ждали. Применить?'}
+- @tickets.where(parent_ticket: nil).each do |ticket|
+  .modal.fade(id="ticket_#{ticket.id}" tabindex="-1" role="dialog" aria-labelledby="ticket_#{ticket.id}Label" aria-hidden="true")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          h5.bg-info.modal-title(id="ticket{ticket.id}Label")= ticket.message
+          = form_tag tickets_path, method: :post
+            .modal-body
+              - @tickets.where(parent_ticket: ticket.id).each do |sub_ticket|
+                - color = sub_ticket.user_id ? 'bg-success' : 'bg-warning'
+                p class = color
+                  = sub_ticket.message
+              .form-group
+                = text_area_tag :sub_ticket, nil, class: 'form-control', size: '20x5'
+            .modal-footer
+              button.btn.btn-secondary(type="button" data-dismiss="modal") Закрыть
+              = submit_tag 'Ответить', class: 'btn btn-primary'

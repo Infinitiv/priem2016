@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210624091302) do
+ActiveRecord::Schema.define(version: 20210701181731) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -452,6 +452,19 @@ ActiveRecord::Schema.define(version: 20210624091302) do
     t.integer  "region_id"
   end
 
+  create_table "tickets", force: :cascade do |t|
+    t.integer  "entrant_application_id"
+    t.integer  "user_id"
+    t.integer  "parent_ticket"
+    t.text     "message"
+    t.boolean  "solved",                 default: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+  end
+
+  add_index "tickets", ["entrant_application_id"], name: "index_tickets_on_entrant_application_id", using: :btree
+  add_index "tickets", ["user_id"], name: "index_tickets_on_user_id", using: :btree
+
   create_table "users", force: :cascade do |t|
     t.string   "login",              default: "", null: false
     t.string   "encrypted_password", default: "", null: false
@@ -486,4 +499,6 @@ ActiveRecord::Schema.define(version: 20210624091302) do
   add_foreign_key "target_contracts", "target_organizations"
   add_foreign_key "target_numbers", "competitive_groups"
   add_foreign_key "target_numbers", "target_organizations"
+  add_foreign_key "tickets", "entrant_applications"
+  add_foreign_key "tickets", "users"
 end

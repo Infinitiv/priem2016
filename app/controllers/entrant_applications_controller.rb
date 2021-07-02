@@ -8,6 +8,7 @@ class EntrantApplicationsController < ApplicationController
   
   def index
     @entrant_applications = EntrantApplication.includes(:education_document, :marks).select(:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :status_id, :campaign_id, :data_hash, :registration_date, :status, :comment, :email, :snils, :created_at).where(campaign_id: @campaign).order(created_at: :desc)
+    @tickets = Ticket.joins(:entrant_application).where(solved: false, entrant_applications: {id: @entrant_applications.map(&:id)}).order(:created_at)
   end
   
   def show
