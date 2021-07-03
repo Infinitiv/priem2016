@@ -833,7 +833,6 @@ class EntrantApplication < ActiveRecord::Base
       })
     pdf.font "Ubuntu"
     pdf.text title, style: :bold, :size => 14, align: :center
-    pdf.move_down 4
     pdf.text "И. о. ректора ФГБОУ ВО ИвГМА Минздрава России", size: 10, align: :right
     pdf.move_down 4
     pdf.text "д.м.н., проф. Е. В. Борзову", size: 10, align: :right
@@ -1012,6 +1011,15 @@ class EntrantApplication < ActiveRecord::Base
       pdf.move_down 6  
       pdf.text "Подпись ___________________", size: 10, align: :right
     end
+    
+    pdf.move_down 4
+    pdf.text "Ссылка на личный кабинет"
+    %x(mkdir -p "#{Rails.root.join('storage', 'qr')}")
+    path = Rails.root.join('storage', 'qr', data_hash)
+    %x(qrencode -o "#{path}" "https://isma.ivanovo.ru/entrants/#{data_hash}")
+    %x(ls "#{Rails.root.join('storage', 'qr')}")
+    pdf.image "#{path}"
+    %x(rm "#{path}")
 
     pdf.render_file tempfile
     
