@@ -836,16 +836,14 @@ class EntrantApplication < ActiveRecord::Base
     pdf.text "И. о. ректора ФГБОУ ВО ИвГМА Минздрава России", size: 10, align: :right
     pdf.move_down 4
     pdf.text "д.м.н., проф. Е. В. Борзову", size: 10, align: :right
-    pdf.move_down 4
-    pdf.move_down 4
+    pdf.move_down 6
     case campaign.campaign_type_id
     when 1
       pdf.text "Я, #{fio}, прошу допустить меня к участию в конкурсе в ФГБОУ ВО ИвГМА Минздрава России на программы специалитета", size: 10
     when 4
       pdf.text "Я, #{fio}, прошу допустить меня к участию в конкурсе в ФГБОУ ВО ИвГМА Минздрава России на программы ординатуры", size: 10
     end
-    pdf.move_down 4
-    pdf.move_down 4
+    pdf.move_down 6
     pdf.text "Персональные данные", size: 12
     pdf.move_down 4
     pdf.text "Дата рождения: #{birth_date.strftime("%d.%m.%Y")}", size: 10 if birth_date
@@ -865,8 +863,7 @@ class EntrantApplication < ActiveRecord::Base
     pdf.move_down 4
     identity_document = identity_documents.order(identity_document_date: :asc).last
     pdf.text "#{identity_documents_list.select{|item| item['id'] == identity_document.identity_document_type}[0]['name']}: #{identity_document.identity_document_data}", size: 10 if identity_document
-    pdf.move_down 4
-    pdf.move_down 4
+    pdf.move_down 6
     pdf.text "Документ об образовании", size: 12
     pdf.move_down 4
     pdf.text "#{education_document.education_document_data}", size: 10 if education_document
@@ -875,13 +872,11 @@ class EntrantApplication < ActiveRecord::Base
     if campaign.campaign_type_id == 4
       other_documents.where(name: 'Свидетельство об аккредитации специалиста').each do |other_document|
         pdf.text "#{other_document.other_document_data}", size: 12
-        pdf.move_down 4
-        pdf.move_down 4
+        pdf.move_down 6
       end
       other_documents.where(name: 'Выписка из итогового протокола заседания аккредитационной комиссии').each do |other_document|
         pdf.text "#{other_document.other_document_data}", size: 12
-        pdf.move_down 4
-        pdf.move_down 4
+        pdf.move_down 6
       end
     end
     unless snils.empty?
@@ -891,14 +886,12 @@ class EntrantApplication < ActiveRecord::Base
       pdf.move_down 4
       pdf.text "Подпись ___________________", size: 10, align: :right
     end
-    pdf.move_down 4
-    pdf.move_down 4
+    pdf.move_down 6
     pdf.text "Прошу рассмотреть мои документы для участия в следующих конкурсах:", size: 12
     pdf.move_down 4
     competitive_groups.each do |competitive_group|
       pdf.text "- #{competitive_group.name}", size: 10
-      pdf.move_down 4
-      pdf.move_down 4
+      pdf.move_down 6
     end
     if olympionic || benefit
       pdf.text "Имею особые права:", size: 12
@@ -928,16 +921,14 @@ class EntrantApplication < ActiveRecord::Base
       pdf.text "Нуждаюсь в необходимости создания особых условиях при проведении вступительных испытаний в связи с ограниченными возможностями здоровья, а именно:", size: 10
       pdf.move_down 4
       pdf.text "#{special_conditions}", size: 10
-      pdf.move_down 4
-      pdf.move_down 4
+      pdf.move_down 6
     end
     unless achievements.empty?
       pdf.text "Имею следующие индивидуальные достижения", size: 12
       pdf.move_down 4
       achievements.each do |achievement|
         pdf.text "- #{achievement.institution_achievement.name}", size: 10
-        pdf.move_down 4
-        pdf.move_down 4
+        pdf.move_down 6
       end
     end
     if need_hostel
@@ -1005,9 +996,7 @@ class EntrantApplication < ActiveRecord::Base
       pdf.move_down 6
       pdf.text "д.м.н., проф. Е. В. Борзову", align: :right, size: 10
       pdf.move_down 6
-      pdf.move_down 6
       pdf.text "Я, #{fio}, прошу учесть в качестве вступительного испытания результаты тестирования в рамках процедуры аккредитации, пройденной в ______ году на базе __________________________________________, по специальности ________________________", size: 10
-      pdf.move_down 6  
       pdf.move_down 6  
       pdf.text "Подпись ___________________", size: 10, align: :right
     end
