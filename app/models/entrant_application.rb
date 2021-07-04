@@ -1069,9 +1069,10 @@ class EntrantApplication < ActiveRecord::Base
       pdf.move_down 6
       case campaign.campaign_type_id
       when 1
-        pdf.text "Я, #{fio} (№ личного дела #{application_number}), прошу зачислить меня на обучение по образовательной программе специалитета в рамках конкурса #{competitive_group.name}"
+        pdf.text "Я, #{fio}, прошу зачислить меня на обучение по образовательной программе специалитета в рамках конкурса #{competitive_group.name}"
+        pdf.text "Я, #{fio}, прошу зачислить меня на обучение по образовательной программе специалитета в рамках конкурса #{competitive_group.name}"
       when 4
-        pdf.text "Я, #{fio} (№ личного дела #{application_number}), прошу зачислить меня на обучение по образовательной программе ординатуры в рамках конкурса #{competitive_group.name}"
+        pdf.text "Я, #{fio}, прошу зачислить меня на обучение по образовательной программе ординатуры в рамках конкурса #{competitive_group.name}"
       end
       pdf.move_down 6
       pdf.text "Обязуюсь:"
