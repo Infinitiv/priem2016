@@ -808,6 +808,9 @@ class EntrantApplication < ActiveRecord::Base
   end
   
   def generate_entrant_application
+    %x(mkdir -p "#{Rails.root.join('storage', 'qr')}")
+    path = Rails.root.join('storage', 'qr', data_hash)
+    %x(qrencode -o "#{path}" "https://isma.ivanovo.ru/entrants/#{data_hash}")
     countries = Dictionary.find_by_name('Страна').items
     identity_documents_list = Dictionary.find_by_name('Тип документа, удостоверяющего личность').items
     benefit_types = Dictionary.find_by_name('Вид льготы').items
@@ -1003,12 +1006,8 @@ class EntrantApplication < ActiveRecord::Base
     
     pdf.move_down 4
     pdf.text "Ссылка на личный кабинет"
-    %x(mkdir -p "#{Rails.root.join('storage', 'qr')}")
-    path = Rails.root.join('storage', 'qr', data_hash)
-    %x(qrencode -o "#{path}" "https://isma.ivanovo.ru/entrants/#{data_hash}")
     %x(ls "#{Rails.root.join('storage', 'qr')}")
     pdf.image "#{path}"
-    %x(rm "#{path}")
 
     pdf.render_file tempfile
     
@@ -1022,6 +1021,7 @@ class EntrantApplication < ActiveRecord::Base
     attachment.template = true
     md5 = ::Digest::MD5.file(tempfile).hexdigest
     attachment.data_hash = md5
+    %x(rm "#{path}")
     path = attachment.data_hash[0..2].split('').join('/')
     if attachment.save
       %x(mkdir -p #{Rails.root.join('storage', path)})
