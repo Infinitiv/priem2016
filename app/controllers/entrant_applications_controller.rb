@@ -140,12 +140,13 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def entrant_application_recall
-    old_value = @entrant_application.status_id
+    old_value = @entrant_application.status
     @entrant_application.status_id = 6
+    @entrant_application.status = 'заявление отозвано'
     @entrant_application.return_documents_date = Time.now.to_date
     value_name = 'entrant_application_recall'
-    new_value = @entrant_application.status_id
     if @entrant_application.save!
+      new_value = @entrant_application.status
       Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
       redirect_to @entrant_application
     end
