@@ -136,7 +136,7 @@
                     - if mark.form.nil? || mark.form.empty?
                       span не выбрано
                     - else
-                      = f.select :form, options_for_select(["ЕГЭ", "ВИ", "ЦТ"], selected: mark.form), {}, {class: 'form-control'}
+                      = f.select :form, options_for_select(["ЕГЭ", "ВИ", "ЦТ", "Олимпиада"], selected: mark.form), {}, {class: 'form-control'}
                   - when 4
                     - if mark.form.nil? || mark.form.empty?
                       span не выбрано

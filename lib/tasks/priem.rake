@@ -86,7 +86,7 @@ namespace :priem do
           if application.olympionic
             application.olympic_documents.each do |olympic_document|
               if olympic_document.benefit_type_id == 3 && olympic_document.ege_subject_id == mark.at_css('SubjectID').text.to_i
-                application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').update_all(value: 100, checked: Time.now.to_date) if mark.at_css('SubjectMark').text.to_i > 74
+                application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').update_all(form: 'Олимпиада', value: 100, checked: Time.now.to_date) if mark.at_css('SubjectMark').text.to_i > 74
                 puts "добавлена оценка за олимпиаду по #{mark.at_css('SubjectName').text}"
               end
             end
