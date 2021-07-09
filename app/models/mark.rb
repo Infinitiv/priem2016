@@ -28,6 +28,7 @@ class Mark < ActiveRecord::Base
       test_result.value = row['test_result'].to_i
       test_result.form = row['test_form'] if row['test_form']
       test_result.organization_uid = row['organization_uid'] if row['organization_uid']
+      test_result.checked = Time.now
       test_result.save!
     end
   end
