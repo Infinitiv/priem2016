@@ -75,6 +75,34 @@ class Api::EntrantApplicationsController < ApplicationController
         response_data[:status_id]  = @entrant_application.status_id
         response_data[:status] = @entrant_application.status
       end
+      if params[:ticket]
+        response_data[:tickets] = {}
+        tmp_hash = {}
+        params[:ticket].each{|k, v| tmp_hash[k] = v}
+        response_data[:ticket] = {}
+        keys = Ticket.new.attributes.keys
+        tmp_hash.slice! *keys
+        if params[:ticket][:id]
+          ticket = @entrant_application.tickets.find(params[:ticket][:id])
+          ticket.attributes = tmp_hash
+        else
+          ticket = @entrant_application.tickets.new(tmp_hash)
+        end
+        ticket.save!
+        tickets_array = []
+        tickets = @entrant_application.tickets.order([:created_at, :parent_ticket])
+        tickets.where(parent_ticket: nil).each do |ticket|
+          ticket_hash = {}
+          ticket_hash = ticket.attributes
+          ticket_hash[:children] = []
+          tickets.where(parent_ticket: ticket.id).each do |child|
+            ticket_hash[:children].push child.attributes
+          end
+          ticket_hash[:children].push Ticket.new.attributes
+          tickets_array.push ticket_hash
+        end
+        response_data[:tickets] = tickets_array
+      end
       if @entrant_application.status_id == 0
         if params[:personal]
           response_data[:personal] = {}

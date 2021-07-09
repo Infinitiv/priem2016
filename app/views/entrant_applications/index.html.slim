@@ -28,7 +28,7 @@ h1 = "Список заявлений #{@campaign.name} #{@campaign.year_start}"
           td= link_to ticket.entrant_application.fio, "#{[host_name, 'entrants', ticket.entrant_application.data_hash].join('/')}", target: :blank
           td= ticket.created_at.strftime("%F %R")
           td= link_to ticket.message.truncate(50, separator: ' ', omission: '...'), '#', data: {toggle: 'modal', target: "#ticket_#{ticket.id}"}
-          td= link_to 'Решить', solve_ticket_url(ticket), class: 'label label-success', data: {confirm: 'Не хотят решать по хорошему, решим по плохому, да?'}
+          td= link_to 'Решить', solve_ticket_url(ticket), class: 'label label-success', method: :put, data: {confirm: 'Не хотят решать по хорошему, решим по плохому, да?'}
 
 h5= @entrant_applications.map(&:status).uniq.map{|status| "#{status} - (#{@entrant_applications.where(status: status).length})"}.join('; ')
 table.table.datatable
@@ -94,7 +94,10 @@ table.table.datatable
                 p class = color
                   = sub_ticket.message
               .form-group
-                = text_area_tag :sub_ticket, nil, class: 'form-control', size: '20x5'
+                = text_area_tag :message, nil, class: 'form-control', size: '20x5'
+                = text_field_tag :parent_ticket, ticket.id, class: 'hide'
+                = text_field_tag :entrant_application_id, ticket.entrant_application_id, class: 'hide'
+                = text_field_tag :user_id, current_user.id, class: 'hide'
             .modal-footer
               button.btn.btn-secondary(type="button" data-dismiss="modal") Закрыть
               = submit_tag 'Ответить', class: 'btn btn-primary'

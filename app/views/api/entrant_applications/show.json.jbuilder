@@ -139,13 +139,22 @@ json.entrant_application do
     json.competitive_group_name contract.competitive_group.name
     json.status contract.status
   end
-  json.tickets @entrant_application.tickets do |ticket|
+  tickets = @entrant_application.tickets.order([:created_at, :parent_ticket])
+  json.tickets tickets.where(parent_ticket: nil) do |ticket|
     json.id ticket.id
     json.entrant_application_id ticket.entrant_application_id
-    json.parent_id ticket.parent_id
+    json.parent_ticket ticket.parent_ticket
     json.message ticket.message
     json.solved ticket.solved
     json.created_at ticket.created_at
+    json.children tickets.where(parent_ticket: ticket.id) do |clild|
+      json.id clild.id
+      json.entrant_application_id clild.entrant_application_id
+      json.parent_ticket clild.parent_ticket
+      json.message clild.message
+      json.solved clild.solved
+      json.created_at clild.created_at
+    end
   end
   json.attachments @entrant_application.attachments do |attachment|
     json.id attachment.id
