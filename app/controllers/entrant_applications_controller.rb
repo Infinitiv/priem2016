@@ -7,7 +7,8 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export, :ord_access_request, :target_report, :entrants_lists_to_html, :entrants_lists_ord_to_html]
   
   def index
-    @entrant_applications = EntrantApplication.includes(:education_document, :marks).select(:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :status_id, :campaign_id, :data_hash, :registration_date, :status, :comment, :email, :snils, :created_at).where(campaign_id: @campaign).order(created_at: :desc)
+    @entrant_application_statuses = EntrantApplication.select(:campaign_id, :status).where(campaign_id: params[:campaign_id]).map(&:status)
+    @entrant_applications = EntrantApplication.includes(:education_document, :marks).select(:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :status_id, :campaign_id, :data_hash, :registration_date, :status, :comment, :email, :snils, :created_at, :status).where(params.permit(:campaign_id, :status)).order(created_at: :desc)
     @tickets = Ticket.joins(:entrant_application).where(solved: false, entrant_applications: {id: @entrant_applications.map(&:id)}).order(:created_at)
   end
   

@@ -1,9 +1,8 @@
+.row
+  .col-md-4= link_to "все заявления - #{@entrant_application_statuses.count}", entrant_applications_path + "?campaign_id=#{@campaign.id}"
+  - @entrant_application_statuses.uniq.sort.each do |status|
+    .col-md-4= link_to "#{status} - #{@entrant_application_statuses.count(status)}", entrant_applications_path + "?campaign_id=#{@campaign.id}&status=#{status}"
 h1 = "Список заявлений #{@campaign.name} #{@campaign.year_start}"
-- if can? :import, EntrantApplication
-  = form_tag import_entrant_applications_path + "?campaign_id=#{@campaign.id}", multipart: true do
-    = file_field_tag :file
-    br
-    = submit_tag "Загрузить заявления", class: "btn btn-primary"
 - host_name = case Rails.env
 - when 'development'
   - 'http://isma.me'
@@ -29,8 +28,8 @@ h1 = "Список заявлений #{@campaign.name} #{@campaign.year_start}"
           td= ticket.created_at.strftime("%F %R")
           td= link_to ticket.message.truncate(50, separator: ' ', omission: '...'), '#', data: {toggle: 'modal', target: "#ticket_#{ticket.id}"}
           td= link_to 'Решить', solve_ticket_url(ticket), class: 'label label-success', method: :put, data: {confirm: 'Не хотят решать по хорошему, решим по плохому, да?'}
-
-h5= @entrant_applications.map(&:status).uniq.map{|status| "#{status} - (#{@entrant_applications.where(status: status).length})"}.join('; ')
+.row
+  br
 table.table.datatable
   thead
     th Номер заявления
@@ -81,6 +80,11 @@ table.table.datatable
               td= link_to 'Отозвать', entrant_application_recall_entrant_application_path(entrant_application), method: :put, class: 'label label-warning', title: 'Отозвать документы'
           - else
               td= link_to 'Удалить', entrant_application, method: :delete, class: 'label label-danger', data: {confirm: 'Вот тот механизм, который так ждали. Применить?'}
+- if can? :import, EntrantApplication
+  = form_tag import_entrant_applications_path + "?campaign_id=#{@campaign.id}", multipart: true do
+    = file_field_tag :file
+    br
+    = submit_tag "Загрузить заявления", class: "btn btn-primary"
 - @tickets.where(parent_ticket: nil).each do |ticket|
   .modal.fade(id="ticket_#{ticket.id}" tabindex="-1" role="dialog" aria-labelledby="ticket_#{ticket.id}Label" aria-hidden="true")
     .modal-dialog(role="document")
