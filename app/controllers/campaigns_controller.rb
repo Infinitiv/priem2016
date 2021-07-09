@@ -6,7 +6,7 @@ class CampaignsController < ApplicationController
   before_action :import_params, only: [:import_admission_volume, :import_institution_achievements]
   
   def index
-    @campaigns = Campaign.order(:name)
+    @campaigns = Campaign.order(:name, year_start: :desc)
   end
   
   def new

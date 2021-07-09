@@ -1,10 +1,18 @@
 h1 Приемные кампании
 = link_to 'Добавить', new_campaign_path, class: 'btn btn-primary' if can? :manage, Campaign
-ul
-  - @campaigns.each do |campaign|
-    li
-      = link_to "#{campaign.name} (#{campaign.year_start})", campaign
-      -  if can? :manage, Campaign
-        = link_to 'Удалить', campaign, method: 'delete', class: 'pull-right'
-        span.pull-right &nbsp;|&nbsp;
-        = link_to 'Редактировать', edit_campaign_path(campaign), class: 'pull-right'
+table.table
+  thead
+    tr
+      th Название
+      th Заявления
+      th Действия
+  tbody
+    - @campaigns.each do |campaign|
+      tr
+        td= link_to "#{campaign.name} (#{campaign.year_start})", campaign
+        td= link_to "Заявления", entrant_applications_path + "?campaign_id=#{campaign.id}"
+        td
+          -  if can? :manage, Campaign
+            = link_to 'Удалить', campaign, method: 'delete', class: 'pull-right'
+            span.pull-right &nbsp;|&nbsp;
+            = link_to 'Редактировать', edit_campaign_path(campaign), class: 'pull-right'
