@@ -84,8 +84,6 @@ body
             ul.dropdown-menu
               - @campaigns.each do |campaign|
                 li= link_to "Мониторинг приемной кампании #{campaign.name} #{campaign.year_start}", reports_mon_path + "?campaign_id=#{campaign.id}"
-        - if can? :manage, Journal
-          li= link_to 'Журнал изменений', journals_path
       ul.nav.navbar-nav.pull-right
         li= user_signed_in? ? (link_to 'Выйти', destroy_user_session_path, method: 'delete') : (link_to 'Войти', new_user_session_path)
     - if notice || alert
