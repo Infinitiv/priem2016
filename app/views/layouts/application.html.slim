@@ -26,7 +26,7 @@ body
               span Заявления
               span.caret
             ul.dropdown-menu
-              - @campaigns.each do |campaign|
+              - @campaigns.where(status_id: 1).each do |campaign|
                 li= link_to "Заявления #{campaign.name} #{campaign.year_start}", entrant_applications_path + "?campaign_id=#{campaign.id}"
         - if can?(:read, AdmissionVolume) || can?(:read, DistributedAdmissionVolume) || can?(:read, CompetitiveGroup) || can?(:read, EntranceTestItem)
           li.dropdown
