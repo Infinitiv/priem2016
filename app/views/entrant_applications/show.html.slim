@@ -142,7 +142,7 @@
                       span не выбрано
                     - else
                       = f.select :form, options_for_select(["Аккредитация", "ВИ"], selected: mark.form), {}, {class: 'form-control'}
-                    = f.number_field :value, value: mark.value, max: 100, class: 'form-control'
+                    = f.label :value, mark.value, class: 'form-control'
                     = f.number_field :year, value: mark.year, min: Time.now.to_date.year - 1, max: Time.now.to_date.year, class: 'form-control'
                     = f.text_field :organization_uid, class: 'form-control'
                 
