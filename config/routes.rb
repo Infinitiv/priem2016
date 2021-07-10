@@ -44,7 +44,7 @@ Rails.application.routes.draw do
       put 'convert_to_other_document'
     end
   end
-  resources :tickets, only: [:create] do
+  resources :tickets, only: [:index, :create] do
     member do
       put 'solve'
     end

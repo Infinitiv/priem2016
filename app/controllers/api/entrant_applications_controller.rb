@@ -90,15 +90,14 @@ class Api::EntrantApplicationsController < ApplicationController
         end
         ticket.save!
         tickets_array = []
-        tickets = @entrant_application.tickets.order([:created_at, :parent_ticket])
-        tickets.where(parent_ticket: nil).each do |ticket|
+        tickets = @entrant_application.tickets.order(created_at: :desc)
+        ([tickets.new] + tickets.where(parent_ticket: nil)).each do |ticket|
           ticket_hash = {}
           ticket_hash = ticket.attributes
           ticket_hash[:children] = []
-          tickets.where(parent_ticket: ticket.id).each do |child|
+          tickets.where(parent_ticket: ticket.id).where.not(parent_ticket: nil).sort_by(&:created_at).push(tickets.new(parent_ticket: ticket.id)).each do |child|
             ticket_hash[:children].push child.attributes
           end
-          ticket_hash[:children].push Ticket.new.attributes
           tickets_array.push ticket_hash
         end
         response_data[:tickets] = tickets_array
