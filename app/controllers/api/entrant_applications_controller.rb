@@ -89,6 +89,7 @@ class Api::EntrantApplicationsController < ApplicationController
           ticket = @entrant_application.tickets.new(tmp_hash)
         end
         ticket.save!
+        Events.ticket_question(ticket).deliver_later if Rails.env == 'production'
         tickets_array = []
         tickets = @entrant_application.tickets.order(created_at: :desc)
         ([tickets.new] + tickets.where(parent_ticket: nil)).each do |ticket|

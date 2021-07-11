@@ -10,6 +10,7 @@ class TicketsController < ApplicationController
   
   def create
     @ticket = Ticket.create(set_ticket_params)
+    Events.ticket_answer(ticket).deliver_later if Rails.env == 'production'
     redirect_to :back
   end
   
