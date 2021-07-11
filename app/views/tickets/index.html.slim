@@ -23,7 +23,7 @@ h1 = "Список тикетов #{@campaign.name} #{@campaign.year_start}"
           td= link_to ticket.entrant_application.fio, "#{[host_name, 'entrants', ticket.entrant_application.data_hash].join('/')}", target: :blank
           td= ticket.created_at.strftime("%F %R")
           td= link_to ticket.message.truncate(50, separator: ' ', omission: '...'), '#', data: {toggle: 'modal', target: "#ticket_#{ticket.id}"}
-          td= link_to 'Решить', solve_ticket_url(ticket), class: 'label label-success', method: :put, data: {confirm: 'Все бы проблемы так решались...'}
+          td= link_to 'Решить', solve_ticket_path(ticket), class: 'label label-success', method: :put, data: {confirm: 'Все бы проблемы так решались...'}
 - @tickets.where(parent_ticket: nil).each do |ticket|
   .modal.fade(id="ticket_#{ticket.id}" tabindex="-1" role="dialog" aria-labelledby="ticket_#{ticket.id}Label" aria-hidden="true")
     .modal-dialog(role="document")
