@@ -5,7 +5,7 @@ class TicketsController < ApplicationController
   before_action :set_ticket_params, only: [:create]
   
   def index
-    @tickets = Ticket.joins(:entrant_application).where(solved: false, entrant_applications: {campaign_id: @campaign.id}).order(:created_at)
+    @tickets = Ticket.joins(:entrant_application).where(entrant_applications: {campaign_id: @campaign.id}).order(:solved, :created_at)
   end
   
   def create
