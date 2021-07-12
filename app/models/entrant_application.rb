@@ -283,7 +283,7 @@ class EntrantApplication < ActiveRecord::Base
             application.entrant_first_name.strip,
             application.entrant_middle_name.strip,
             oid,
-            3,
+            4,
             application.birth_date.strftime("%d.%m.%Y"),
             citizenship,
             competitive_group.edu_programs.last.code,
