@@ -103,6 +103,11 @@ class Api::EntrantApplicationsController < ApplicationController
         end
         response_data[:tickets] = tickets_array
       end
+      if params[:status]
+        @entrant_application.status = params[:status]
+        response_data[:status] = params[:status]
+        @entrant_application.save
+      end
       if @entrant_application.status_id == 0
         if params[:personal]
           response_data[:personal] = {}
@@ -183,6 +188,10 @@ class Api::EntrantApplicationsController < ApplicationController
           @entrant_application.status = 'на рассмотрении'
           response_data[:status_id] = 2
           response_data[:status] = 'на рассмотрении'
+        end
+        if params[:status]
+          @entrant_application.status = params[:status]
+          response_data[:status] = params[:status]
         end
         @entrant_application.save
         if params[:education_document]
