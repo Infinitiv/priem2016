@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210701181731) do
+ActiveRecord::Schema.define(version: 20210713092557) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -167,6 +167,25 @@ ActiveRecord::Schema.define(version: 20210701181731) do
   add_index "contracts", ["attachment_id"], name: "index_contracts_on_attachment_id", using: :btree
   add_index "contracts", ["competitive_group_id"], name: "index_contracts_on_competitive_group_id", using: :btree
   add_index "contracts", ["entrant_application_id"], name: "index_contracts_on_entrant_application_id", using: :btree
+
+  create_table "contragents", force: :cascade do |t|
+    t.integer  "entrant_application_id"
+    t.string   "last_name"
+    t.string   "first_name"
+    t.string   "middle_name"
+    t.date     "birth_date"
+    t.string   "address"
+    t.string   "identity_document_number"
+    t.string   "identity_document_serie"
+    t.date     "identity_document_date"
+    t.string   "identity_document_issuer"
+    t.string   "email"
+    t.string   "phone"
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "contragents", ["entrant_application_id"], name: "index_contragents_on_entrant_application_id", using: :btree
 
   create_table "dictionaries", force: :cascade do |t|
     t.string   "name"
@@ -483,6 +502,7 @@ ActiveRecord::Schema.define(version: 20210701181731) do
   add_foreign_key "contracts", "attachments"
   add_foreign_key "contracts", "competitive_groups"
   add_foreign_key "contracts", "entrant_applications"
+  add_foreign_key "contragents", "entrant_applications"
   add_foreign_key "education_documents", "attachments"
   add_foreign_key "entrant_applications", "attachments"
   add_foreign_key "identity_documents", "attachments"

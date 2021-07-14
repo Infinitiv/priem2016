@@ -63,6 +63,22 @@ class Api::EntrantApplicationsController < ApplicationController
           response_data[:target_contract][:id]  = target_contract.id
         end
       end
+      if params[:contragent]
+        tmp_hash = {}
+        params[:contragent].each{|k, v| tmp_hash[k] = v}
+        response_data[:contragent] = {}
+        keys = Contragent.new.attributes.keys
+        tmp_hash.slice! *keys
+        if params[:contragent][:id]
+          contragent = @entrant_application.contragent
+          contragent.attributes = tmp_hash
+        else
+          contragent = Contragent.new(tmp_hash)
+          contragent.entrant_application_id = @entrant_application.id
+        end
+        contragent.save!
+        response_data[:contragent][:id]  = contragent.id
+      end
       if params[:competitive_group]
         response_data[:competitive_group] = {}
         @entrant_application.competitive_groups.delete_all
@@ -360,9 +376,18 @@ class Api::EntrantApplicationsController < ApplicationController
     end
   end
   
+  def generate_contracts
+    entrant_application = EntrantApplication.find_by_data_hash(params[:id])
+    if entrant_application.generate_contracts
+      send_data({status: 'success', message: 'Бланки договоров успешно созданы', attachments: entrant_application.attachments}.to_json)
+    else
+      send_data({status: 'faild', message: 'Что-то пошло не так'}.to_json)
+    end
+  end
+  
   private
   
   def set_entrant_application
-    @entrant_application = EntrantApplication.includes(:identity_documents, :education_document, :marks, :achievements, :olympic_documents, :benefit_documents, :other_documents, :competitive_groups, :target_contracts, :contracts, :attachments, :tickets).find_by_data_hash(params[:id])
+    @entrant_application = EntrantApplication.includes(:identity_documents, :education_document, :marks, :achievements, :olympic_documents, :benefit_documents, :other_documents, :competitive_groups, :target_contracts, :contracts, :attachments, :tickets, :contragent).find_by_data_hash(params[:id])
   end
 end

@@ -134,6 +134,24 @@ json.entrant_application do
     json.target_organization_name target_contract.target_organization.target_organization_name
     json.status target_contract.status
   end
+  if @entrant_application.contragent
+    json.contragent do
+      json.last_name @entrant_application.contragent.last_name
+      json.first_name @entrant_application.contragent.first_name
+      json.middle_name @entrant_application.contragent.middle_name
+      json.birth_date @entrant_application.contragent.birth_date
+      json.identity_document_serie @entrant_application.contragent.identity_document_serie
+      json.identity_document_number @entrant_application.contragent.identity_document_number
+      json.identity_document_date @entrant_application.contragent.identity_document_date
+      json.identity_document_issuer @entrant_application.contragent.identity_document_issuer
+      json.identity_document_data @entrant_application.contragent.identity_document_data
+      json.email @entrant_application.contragent.email
+      json.phone @entrant_application.contragent.phone
+      json.address @entrant_application.contragent.address
+    end
+  else
+    json.contragent nil
+  end
   json.contracts @entrant_application.contracts do |contract|
     json.competitive_group_id contract.competitive_group_id
     json.competitive_group_name contract.competitive_group.name
