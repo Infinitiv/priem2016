@@ -378,7 +378,7 @@ class Api::EntrantApplicationsController < ApplicationController
   
   def generate_contracts
     entrant_application = EntrantApplication.find_by_data_hash(params[:id])
-    if entrant_application.generate_contracts
+    if entrant_application.generate_contracts(params[:competitive_group_id])
       send_data({status: 'success', message: 'Бланки договоров успешно созданы', attachments: entrant_application.attachments}.to_json)
     else
       send_data({status: 'faild', message: 'Что-то пошло не так'}.to_json)
