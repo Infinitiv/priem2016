@@ -1,6 +1,6 @@
 class EntrantApplicationsController < ApplicationController
   load_and_authorize_resource
-  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_contract, :generate_templates, :approve, :add_comment, :delete_comment, :toggle_competitive_group, :delete_request, :add_document]
+  before_action :set_entrant_application, only: [:show, :edit, :update, :destroy, :touch, :toggle_agreement, :toggle_original, :entrant_application_recall, :toggle_ignore, :toggle_contract, :generate_templates, :approve, :add_comment, :delete_comment, :toggle_competitive_group, :delete_request, :add_document]
   before_action :set_competitive_group, only: [:toggle_agreement, :toggle_contract, :toggle_competitive_group]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update, :show]
@@ -145,6 +145,21 @@ class EntrantApplicationsController < ApplicationController
     @entrant_application.status = 'заявление отозвано'
     @entrant_application.return_documents_date = Time.now.to_date
     value_name = 'entrant_application_recall'
+    if @entrant_application.save!
+      new_value = @entrant_application.status
+      Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)
+      redirect_to @entrant_application
+    end
+  end
+  
+  def toggle_ignore
+    value_name = 'entrant_application_ignore'
+    old_value = @entrant_application.status
+    if @entrant_application.status == 'игнорировать'
+      @entrant_application.status = 'на рассмотрении'
+    else
+      @entrant_application.status = 'игнорировать'
+    end
     if @entrant_application.save!
       new_value = @entrant_application.status
       Journal.create(user_id: current_user.id, entrant_application_id: @entrant_application.id, method: __method__.to_s, value_name: value_name, old_value: old_value, new_value: new_value)

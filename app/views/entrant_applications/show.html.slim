@@ -25,10 +25,19 @@
       = @entrant_application.application_number ? "#{"%04d" % @entrant_application.application_number}" : "на рассмотрении"
   - if @entrant_application.status_id == 4
     h3.pull-right
-      = link_to 'x', entrant_application_recall_entrant_application_path(@entrant_application), method: :put, class: 'label label-warning', title: 'Отозвать документы', data: { confirm: 'Пока, пока, Мустафа?'}
+      = link_to entrant_application_recall_entrant_application_path(@entrant_application), method: :put, class: 'label label-warning', title: 'Отозвать документы', data: { confirm: 'Пока, пока, Мустафа?'} do
+        span.glyphicon.glyphicon-remove(aria-hidden="true")
   - else
     h3.pull-right
-      = link_to 'x', @entrant_application, method: :delete, class: 'label label-danger', title: 'Удалить заявление', data: { confirm: 'Вот тот механизм, который так ждали. Применить?'}
+      = link_to @entrant_application, method: :delete, class: 'label label-danger', title: 'Удалить заявление', data: { confirm: 'Вот тот механизм, который так ждали. Применить?'} do
+        span.glyphicon.glyphicon-remove(aria-hidden="true")
+  h3.pull-right
+    - if @entrant_application.status == 'игнорировать'
+      = link_to toggle_ignore_entrant_application_path(@entrant_application), method: :put, class: 'label label-info', title: 'Вернуть из забвения', data: { confirm: 'Перестать игнорировать навсегда?'} do
+        span.glyphicon.glyphicon-thumbs-up(aria-hidden="true")
+    - else
+      = link_to toggle_ignore_entrant_application_path(@entrant_application), method: :put, class: 'label label-info', title: 'Забыть', data: { confirm: 'Игнорировать навсегда?'} do
+        span.glyphicon.glyphicon-thumbs-down(aria-hidden="true")
 .row
   .pull-left
     - @entrant_application.attachments.where(document_type: 'title_application', template: true).each do |attachment|
@@ -219,8 +228,17 @@
   - if @entrant_application.attachments.select{|attachment| attachment.document_type =~ /_application/ && !attachment.template}.length > 0
     dl
       dt
-        h3 Заявления
+        h3 Заявления поступающего
         - @entrant_application.attachments.select{|attachment| attachment.document_type =~ /_application/ && !attachment.template}.each do |attachment|
+          dd
+            = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
+            - if can? :destroy, attachment
+              span &nbsp;
+              span= link_to 'x', attachment, method: :delete, class: 'label label-danger', title: 'Удалить', data: { confirm: 'Удаление вложения необратимо. Все равно удалить?'}
+    dl
+      dt
+        h3 Договоры на обучение
+        - @entrant_application.attachments.select{|attachment| attachment.document_type == 'contract' && !attachment.template}.each do |attachment|
           dd
             = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
             - if can? :destroy, attachment

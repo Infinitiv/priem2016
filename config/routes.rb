@@ -113,6 +113,7 @@ Rails.application.routes.draw do
       get 'touch'
       put 'toggle_original'
       put 'entrant_application_recall'
+      put 'toggle_ignore'
       put 'generate_templates'
       put 'approve'
       put 'add_comment'
