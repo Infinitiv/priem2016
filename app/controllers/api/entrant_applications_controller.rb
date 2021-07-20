@@ -69,7 +69,7 @@ class Api::EntrantApplicationsController < ApplicationController
         response_data[:contragent] = {}
         keys = Contragent.new.attributes.keys
         tmp_hash.slice! *keys
-        if params[:contragent][:id]
+        if @entrant_application.contragent
           contragent = @entrant_application.contragent
           contragent.attributes = tmp_hash
         else

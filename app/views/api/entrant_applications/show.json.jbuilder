@@ -136,6 +136,7 @@ json.entrant_application do
   end
   if @entrant_application.contragent
     json.contragent do
+      json.id @entrant_application.contragent.id
       json.last_name @entrant_application.contragent.last_name
       json.first_name @entrant_application.contragent.first_name
       json.middle_name @entrant_application.contragent.middle_name
