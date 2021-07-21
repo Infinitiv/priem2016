@@ -383,7 +383,11 @@
       dt
         h3 Прочие документы
         - @entrant_application.other_documents.each do |other_document|
-          dd= other_document.other_document_data
+          dd
+            = other_document.other_document_data
+            - if can? :destroy, OtherDocument
+              span &nbsp;
+              strong= link_to 'x', other_document_path(other_document), class: 'label label-warning', method: :delete
           - @entrant_application.attachments.each do |attachment|
             - if attachment.document_type == 'other_document' && attachment.document_id == other_document.id
               dd
