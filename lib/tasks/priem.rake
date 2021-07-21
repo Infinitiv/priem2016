@@ -78,10 +78,17 @@ namespace :priem do
       xml.css('Mark').each do |mark|
         if Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i)
           new_value = mark.at_css('SubjectMark').text.to_i
-          old_value = application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').map(&:value).max.to_i
+          old_value_ege = application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').map(&:value).max.to_i
+          old_value_exam = application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ВИ').map(&:value).max.to_i
           application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ЕГЭ').each do |m|
-            m.update_attributes(value: mark.at_css('SubjectMark').text.to_i, checked: Time.now.to_date)
-            puts "оценка по предмету #{mark.at_css('SubjectName').text} обновлена с #{old_value} на #{new_value}"
+            m.update_attributes(value: new_value, checked: Time.now.to_date)
+            puts "оценка по предмету #{mark.at_css('SubjectName').text} обновлена с #{old_value_ege} на #{new_value}"
+          end
+          application.marks.where(subject_id: Subject.find_by_subject_id(mark.at_css('SubjectID').text.to_i).id, form: 'ВИ').each do |m|
+            if new_value > old_value_exam
+              m.update_attributes(value: new_value, form: 'ЕГЭ', checked: Time.now.to_date)
+              puts "оценка по предмету #{mark.at_css('SubjectName').text} обновлена с #{old_value_exam} на #{new_value}, форма экзамена изменена на ЕГЭ"
+            end
           end
           if application.olympionic
             application.olympic_documents.each do |olympic_document|
