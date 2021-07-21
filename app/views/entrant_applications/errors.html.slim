@@ -53,8 +53,14 @@ h2= @campaign.name
     - @errors[:not_original_target_entrants].each do |application|
       li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
 
-- unless @errors[:not_agreed_target_entrants].nil? || @errors[:not_agreed_target_entrants].empty?
-  h2= "Целевики без согласия" 
+- unless @errors[:not_target_target_contract_entrants].nil? || @errors[:not_target_target_contract_entrants].empty?
+  h2= "Целевые договоры без целевых конкурсов" 
   ul
-    - @errors[:not_agreed_target_entrants].each do |application|
-  li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
+    - @errors[:not_target_target_contract_entrants].each do |application|
+      li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
+      
+- unless @errors[:consent_without_contract_entrants].nil? || @errors[:consent_without_contract_entrants].empty?
+  h2= "Платники с согласием но без договора" 
+  ul
+    - @errors[:consent_without_contract_entrants].each do |application|
+      li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)

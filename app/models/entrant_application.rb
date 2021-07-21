@@ -136,8 +136,9 @@ class EntrantApplication < ActiveRecord::Base
     errors[:dups_entrants] = find_dups_entrants(applications)
 #     target_competition_entrants_array = applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).uniq
 #     errors[:empty_target_entrants] = find_empty_target_entrants(target_competition_entrants_array, applications.joins(:target_organizations))
-#     errors[:not_original_target_entrants] = find_not_original_target_entrants(target_competition_entrants_array, applications.joins(:education_document).where.not(education_documents: {original_received_date: nil}))
-#     errors[:not_agreed_target_entrants] = find_not_agreed_entrants(applications)
+    errors[:consent_without_contract_entrants] = find_consent_without_contract_entrants(applications, campaign)
+    errors[:not_target_target_contract_entrants] = find_not_target_target_contract_entrants(applications)
+    errors[:not_target_contract_target_entrants] = find_not_target_contract_target_entrants(applications)
     errors[:expired_passports] = find_expired_passports(applications.where.not(birth_date: nil))
     errors[:empty_achievements] = find_empty_achievements(applications)
     errors[:elders] = find_elders(applications)
@@ -179,12 +180,17 @@ class EntrantApplication < ActiveRecord::Base
     (target_competition_entrants_array - target_organizations_array).sort
   end
                                                                                          
-  def self.find_not_original_target_entrants(target_competition_entrants_array, original_received_array)
-    (target_competition_entrants_array - original_received_array).sort
+  def self.find_consent_without_contract_entrants(applications, campaign)
+    competitive_groups = campaign.competitive_groups.where(education_source_id: 15)
+    applications.joins(:competitive_groups).where(competitive_groups: {id: competitive_groups}, budget_agr: [competitive_groups.map(&:id)]).select{|a| a.contracts.where(competitive_group_id: a.budget_agr).empty?}.uniq.sort_by(&:application_number)
   end
   
-  def self.find_not_agreed_entrants(applications)
-   applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).select{|a| a.competitive_groups.find_by_education_source_id(16).id != a.budget_agr}.uniq.sort_by(&:application_number)
+  def self.find_not_target_target_contract_entrants(applications)
+   applications.joins(:target_contracts).select{|a| a.competitive_groups.where(education_source_id: 16).empty?}.sort_by(&:application_number)
+  end
+  
+  def self.find_not_target_contract_target_entrants(applications)
+   applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).select{|a| a.target_contracts.empty?}.sort_by(&:application_number)
   end
 
   def self.find_expired_passports(applications)
