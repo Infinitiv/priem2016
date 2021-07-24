@@ -13,7 +13,7 @@ class Ability
     can [:update, :convert_to_other_document], BenefitDocument
     can [:show], Attachment
     can [:update], Mark
-    can [:solve], Ticket
+    can [:manage], Ticket
     return unless user.super?
     can [:manage], Achievement
     can [:manage], TargetContract
