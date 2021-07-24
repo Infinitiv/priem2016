@@ -250,6 +250,7 @@ class EntrantApplication < ActiveRecord::Base
       achievements_sum = entrant_applications_hash[entrant_application][:achievements] ? entrant_applications_hash[entrant_application][:achievements].sum : 0
       achievements_limit = 10.to_f if campaign.education_levels.include?(5)
       entrant_applications_hash[entrant_application][:achievements_sum] = achievements_limit ? (achievements_sum > achievements_limit ? achievements_limit : achievements_sum) : achievements_sum
+      entrant_applications_hash[entrant_application][:achievements_sum_abs] = achievements_sum
       entrant_applications_hash[entrant_application][:summa] > 0 ? entrant_applications_hash[entrant_application][:full_summa] = [entrant_applications_hash[entrant_application][:summa], entrant_applications_hash[entrant_application][:achievements_sum]].sum : entrant_applications_hash[entrant_application][:full_summa] = 0
       entrant_applications_hash[entrant_application][:original_received] = true if entrant_application.education_document.original_received_date
       entrant_applications_hash[entrant_application][:benefit] = entrant_application.benefit ? 1 : 0
