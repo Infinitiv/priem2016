@@ -363,7 +363,7 @@ end
             end
             a.RegistrationDate item.registration_date.to_datetime.to_s.gsub('+00', '+03')
             a.NeedHostel item.need_hostel
-            a.StatusID item.status_id
+            a.StatusID params[:new_applications] ? 2 : item.status_id
             if item.status_id == 6
               a.ReturnDocumentsDate item.return_documents_date.to_datetime.to_s.gsub('+00', '+03')
               a.ReturnDocumentsTypeId 1
