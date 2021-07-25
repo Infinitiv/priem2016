@@ -58,10 +58,8 @@ h2= "Конкурсные списки по состоянию на #{(Time.now.
               th Наличие преимущественного права на зачисление
               th= "Зачислен по другому конкурсу"
           tbody
-            - n = 0
             - applications.each do |application, values|
-              - unless application.enrolled == competitive_group.id || application.exeptioned == competitive_group.id
-                - n += 1
+              - unless application.enrolled == competitive_group.id || application.exeptioned == competitive_group.id || @benefit_competitive_group_ids.include?(application.enrolled)
                 - label_class = ['tr-hide'].compact.join(' ') unless application.budget_agr == competitive_group.id
                 tr class=label_class
                   td
