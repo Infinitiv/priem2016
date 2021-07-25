@@ -153,11 +153,11 @@ class EntrantApplication < ActiveRecord::Base
   end
   
   def self.find_new_contracts(applications)
-    applications.joins(:attachments).includes(:contracts).where(attachments: {document_type: 'contract', template: false}).select{|a| a.contracts.map(&:competitive_group_id).uniq.sort != a.attachments.where(document_type: 'contract').map(&:document_id).uniq.sort}.uniq
+    applications.joins(:attachments).includes(:contracts).where(attachments: {document_type: 'contract', template: false}).select{|a| a.contracts.map(&:competitive_group_id).uniq.sort != a.attachments.where(document_type: 'contract', template: false).map(&:document_id).uniq.sort}.uniq
   end
   
   def self.find_consent_without_agr(applications)
-    applications.joins(:attachments).where(attachments: {document_type: ['consent_application', 'withdraw_application'], template: false}, budget_agr: nil).select{|a| a.attachments.where(document_type: 'consent_application').map(&:document_id).uniq.include?(a.budget_agr) && a.attachments.where(document_type: 'consent_application').map(&:document_id).uniq.sort != a.attachments.where(document_type: 'withdraw_application').map(&:document_id).uniq.sort}.uniq
+    applications.joins(:attachments).where(attachments: {document_type: ['consent_application', 'withdraw_application'], template: false}, budget_agr: nil).select{|a| a.attachments.where(document_type: 'consent_application', template: false).map(&:document_id).uniq.sort != a.attachments.where(document_type: 'withdraw_application', template: false).map(&:document_id).uniq.sort}.uniq
   end
   
   def self.find_elders(applications)
