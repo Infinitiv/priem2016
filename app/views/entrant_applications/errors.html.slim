@@ -64,3 +64,15 @@ h2= @campaign.name
   ul
     - @errors[:consent_without_contract_entrants].each do |application|
       li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
+      
+- unless @errors[:new_contracts].nil? || @errors[:new_contracts].empty?
+  h2= "Новые договоры" 
+  ul
+    - @errors[:new_contracts].each do |application|
+      li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)
+      
+- unless @errors[:consent_without_agr].nil? || @errors[:consent_without_agr].empty?
+  h2= "Неотмеченные заявления о согласии" 
+  ul
+    - @errors[:consent_without_agr].each do |application|
+      li= link_to "#{"%04d" % application.application_number} #{application.fio}", entrant_application_path(application)

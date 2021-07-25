@@ -143,11 +143,21 @@ class EntrantApplication < ActiveRecord::Base
     errors[:empty_achievements] = find_empty_achievements(applications)
     errors[:elders] = find_elders(applications)
     errors[:empty_marks] = find_empty_marks(applications)
+    errors[:new_contracts] = find_new_contracts(applications)
+    errors[:consent_without_agr] = find_consent_without_agr(applications)
     errors
   end
   
   def self.find_empty_marks(applications)
     applications.joins(:marks).where(status_id: 4, marks: {value: 0, form: 'ЕГЭ'})
+  end
+  
+  def self.find_new_contracts(applications)
+    applications.joins(:attachments).includes(:contracts).where(attachments: {document_type: 'contract', template: false}).select{|a| a.contracts.map(&:competitive_group_id).uniq.sort != a.attachments.where(document_type: 'contract').map(&:document_id).uniq.sort}.uniq
+  end
+  
+  def self.find_consent_without_agr(applications)
+    applications.joins(:attachments).where(attachments: {document_type: ['consent_application', 'withdraw_application'], template: false}, budget_agr: nil).select{|a| a.attachments.where(document_type: 'consent_application').map(&:document_id).uniq.include?(a.budget_agr) && a.attachments.where(document_type: 'consent_application').map(&:document_id).uniq.sort != a.attachments.where(document_type: 'withdraw_application').map(&:document_id).uniq.sort}.uniq
   end
   
   def self.find_elders(applications)
@@ -186,11 +196,11 @@ class EntrantApplication < ActiveRecord::Base
   end
   
   def self.find_not_target_target_contract_entrants(applications)
-   applications.joins(:target_contracts).select{|a| a.competitive_groups.where(education_source_id: 16).empty?}.sort_by(&:application_number)
+   applications.joins(:target_contracts).includes(:competitive_groups).select{|a| a.competitive_groups.where(education_source_id: 16).empty?}.sort_by(&:application_number)
   end
   
   def self.find_not_target_contract_target_entrants(applications)
-   applications.joins(:competitive_groups).where(competitive_groups: {education_source_id: 16}).select{|a| a.target_contracts.empty?}.sort_by(&:application_number)
+   applications.joins(:competitive_groups).includes(:target_contracts).where(competitive_groups: {education_source_id: 16}).select{|a| a.target_contracts.empty?}.sort_by(&:application_number)
   end
 
   def self.find_expired_passports(applications)
