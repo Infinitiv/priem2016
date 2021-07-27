@@ -9,6 +9,11 @@ class AttachmentsController < ApplicationController
   end
     
   def destroy
+    if @attachment.document_type == 'contract' && !@attachment.template
+      entrant_application_id = @attachment.entrant_application_id
+      document_id = @attachment.document_id
+      Attachment.where(document_type: 'contract', document_id: document_id, entrant_application_id: entrant_application_id, template: true).destroy_all
+    end
     @attachment.destroy
     redirect_to :back
   end
