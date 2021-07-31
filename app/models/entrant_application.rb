@@ -64,7 +64,9 @@ class EntrantApplication < ActiveRecord::Base
               competitive_group_applications_list.Changed Time.now.to_datetime.to_s.gsub('+00', '+03')
               competitive_group_applications_list.Applications do |applications|
                 n = 0
-                entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && v[:summa] > 0 && k.status_id == 4 && v[:mark_values].select{|m| m > 41}.count == entrance_test_items_size}.sort_by{|k, v| [v[:full_summa].to_f, v[:summa].to_f, v[:mark_values], v[:benefit], v[:achievements_sum_abs]]}.reverse.each do |k, v|
+                entrant_applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && v[:summa] > 0 && k.status_id == 4 && v[:mark_values].select{|m| m > 41}.count == entrance_test_items_size}.sort_by{|k, v| [v[:full_summa].to_f, v[:summa].to_f, v[:mark_values], v[:benefit], v[:achievements_sum_abs]]}.reverse
+                examless_applications = entrant_applications.select{|k, v| v[:examless] && competitive_group.education_source_id != 15}
+                examless_applications.each do |k, v|
                   n += 1
                   applications.Application do |application|
                     application.IDApplicationChoice do |id_application_choice|
@@ -75,8 +77,29 @@ class EntrantApplication < ActiveRecord::Base
                       end
                     end
                     application.Rating n
-                    application.WithoutTests v[:examless] && competitive_group.education_source_id != 15 ? true : false
-                    application.ReasonWithoutTests ('Олимпиада школьников' if v[:examless] && competitive_group.education_source_id != 15)
+                    application.WithoutTests true
+                    application.ReasonWithoutTests 'Олимпиада школьников'
+                    application.Mark v[:achievements_sum].to_i
+                    application.Benefit k.benefit
+                    application.ReasonBenefit ('Документ, подтверждающий наличие особого права' if k.benefit)
+                    application.Agreed k.budget_agr == competitive_group.id ? true : false
+                    application.Original false
+                    application.Enlisted k.enrolled ? 1 : 5
+                  end
+                end
+                (entrant_applications - examless_applications).each do |k, v|
+                  n += 1
+                  applications.Application do |application|
+                    application.IDApplicationChoice do |id_application_choice|
+                      if epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?
+                        id_application_choice.UID k.snils
+                      else
+                        id_application_choice.UIDEpgu epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.first.values.first
+                      end
+                    end
+                    application.Rating n
+                    application.WithoutTests false
+                    application.ReasonWithoutTests 
                     application.EntranceTest1 'Химия'
                     application.Result1 v[:mark_values][0]
                     application.EntranceTest2 'Биология'
