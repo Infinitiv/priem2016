@@ -37,6 +37,76 @@ class EntrantApplication < ActiveRecord::Base
     end
   end
   
+  def self.import_to_epgu(file, campaign)
+    %x(mkdir -p "#{Rails.root.join('storage', 'epgu')}")
+    entrance_test_items = campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
+    entrance_test_items_size = entrance_test_items.size
+    admission_volume_hash = admission_volume_hash(campaign)
+    entrant_applications_hash = entrant_applications_hash(campaign)
+    epgu_entrants = {}
+    spreadsheet = open_spreadsheet(file)
+    header = spreadsheet.row(1)
+    (2..spreadsheet.last_row).to_a.each do |i|
+      row = Hash[[header, spreadsheet.row(i)].transpose]
+      epgu_entrants[row['competitive_group_name']] ||= []
+      epgu_entrants[row['competitive_group_name']].push Hash[row['snils'] => row['uidepgu']]
+    end
+    admission_volume_hash.each do |direction_id, competitive_groups|
+      competitive_groups.sort_by{|competitive_group, numbers| competitive_group.name}.select{|competitive_group, numbers| competitive_group.order_end_date > Time.now.to_date}.each do |competitive_group, numbers|
+        if epgu_entrants[competitive_group.name]
+          xml = ::Builder::XmlMarkup.new
+          xml.PackageData do |package_data|
+            package_data.CompetitiveGroupApplicationsList do |competitive_group_applications_list|
+              competitive_group_applications_list.UIDCompetitiveGroup competitive_group.id
+              competitive_group_applications_list.AdmissionVolume numbers
+              competitive_group_applications_list.CountFirstStep numbers
+              competitive_group_applications_list.CountSecondStep 0
+              competitive_group_applications_list.Changed Time.now.to_datetime
+              competitive_group_applications_list.Applications do |applications|
+                n = 0
+                entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && v[:summa] > 0 && k.status_id == 4 && v[:mark_values].select{|m| m > 41}.count == entrance_test_items_size}.sort_by{|k, v| [v[:full_summa].to_f, v[:summa].to_f, v[:mark_values], v[:benefit], v[:achievements_sum_abs]]}.reverse.each do |k, v|
+                  n += 1
+                  applications.Application do |application|
+                    application.IDApplicationChoice do |id_application_choice|
+                      if epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?
+                        id_application_choice.UID k.snils
+                      else
+                        id_application_choice.UIDEpgu epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.first.values.first
+                      end
+                    end
+                    application.Rating n
+                    application.WithoutTests v[:examless] && competitive_group.education_source_id != 15 ? true : false
+                    application.ReasonWithoutTests ('Олимпиада школьников' if v[:examless] && competitive_group.education_source_id != 15)
+                    application.EntranceTest1 'Химия'
+                    application.Result1 v[:mark_values][0]
+                    application.EntranceTest2 'Биология'
+                    application.Result2 v[:mark_values][1]
+                    application.EntranceTest3 'Русский язык'
+                    application.Result3 v[:mark_values][2]
+                    application.Mark v[:achievements_sum].to_i
+                    application.Benefit k.benefit
+                    application.ReasonBenefit ('Документ, подтверждающий наличие особого права' if k.benefit)
+                    application.SumMark v[:full_summa].to_i
+                    application.Agreed k.budget_agr == competitive_group.id ? true : false
+                    application.Original false
+                    application.Addition 'Заявление отозвано' if k.return_documents_date && k.return_documents_date >= Date.new(2021, 8, 2)
+                    application.Enlisted k.enrolled ? 1 : 5
+                  end
+                end
+              end
+            end
+          end
+          tempfile = "#{[Rails.root, 'storage', 'epgu', competitive_group.id].join("/")}.xml"
+          File.open(tempfile, 'w').write(xml.target!)
+        end
+      end
+    end
+    FileUtils.cp(Rails.root.join('storage', 'epgu.zip'), Rails.root.join('storage', 'epgu.zip.bak'))
+    FileUtils.rm(Rails.root.join('storage', 'epgu.zip'))
+    FileUtils.cd([Rails.root, 'storage'].join("/"))
+    %x(zip -r epgu "./epgu")
+  end
+  
   def self.import(file, campaign)
     competitive_groups = campaign.competitive_groups
     accessible_attributes = column_names
@@ -231,7 +301,7 @@ class EntrantApplication < ActiveRecord::Base
   
 
   def self.entrant_applications_hash(campaign)
-    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :budget_agr, :paid_agr, :enrolled, :enrolled_date, :exeptioned, :snils, :birth_date, :registration_date, :gender_id, :nationality_type_id, :contracts]).order(:application_number).includes(:achievements, :education_document, :competitive_groups, :benefit_documents, :olympic_documents, :target_contracts).where(status_id: 4)
+    entrant_applications = campaign.entrant_applications.select([:id, :application_number, :entrant_last_name, :entrant_first_name, :entrant_middle_name, :campaign_id, :status_id, :benefit, :budget_agr, :paid_agr, :enrolled, :enrolled_date, :exeptioned, :snils, :birth_date, :registration_date, :gender_id, :nationality_type_id, :contracts, :return_documents_date]).order(:application_number).includes(:achievements, :education_document, :competitive_groups, :benefit_documents, :olympic_documents, :target_contracts).where(status_id: 4)
     
     entrance_test_items = campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     

@@ -96,6 +96,7 @@ Rails.application.routes.draw do
   resources :entrant_applications do 
     collection do
       post 'import'
+      post 'competition_lists_to_egpu'
       get 'errors'
       get 'ege_to_txt'
       get 'competition_lists'

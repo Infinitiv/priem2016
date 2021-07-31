@@ -4,7 +4,7 @@ class EntrantApplicationsController < ApplicationController
   before_action :set_competitive_group, only: [:toggle_agreement, :toggle_contract, :toggle_competitive_group]
   before_action :entrant_application_params, only: [:create, :update]
   before_action :set_selects, only: [:new, :edit, :create, :update, :show]
-  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export, :ord_access_request, :target_report, :entrants_lists_to_html, :entrants_lists_ord_to_html]
+  before_action :set_campaign, only: [:import, :index, :ege_to_txt, :errors, :competition_lists, :ord_export, :ord_marks_request, :competition_lists_to_html, :competition_lists_ord_to_html, :ord_return_export, :ord_result_export, :ord_access_request, :target_report, :entrants_lists_to_html, :entrants_lists_ord_to_html, :competition_lists_to_egpu]
   
   def index
     @entrant_application_statuses = EntrantApplication.select(:campaign_id, :status).where(campaign_id: params[:campaign_id]).map(&:status)
@@ -217,6 +217,11 @@ class EntrantApplicationsController < ApplicationController
     FileUtils.cp(Rails.root.join('public', 'competitions', 'current_competitions_spec.html'), Rails.root.join('public', 'competitions', 'current_competitions_spec.html.bak'))
     FileUtils.mv(Rails.root.join('public', 'competitions', filename), Rails.root.join('public', 'competitions', 'current_competitions_spec.html'))
     redirect_to :root
+  end
+  
+  def competition_lists_to_egpu
+    EntrantApplication.import_to_epgu(params[:file], @campaign)
+    send_file Rails.root.join('storage', 'epgu.zip'), filename: 'epgu.zip', type: 'application/x-zip'
   end
   
   def entrants_lists_to_html

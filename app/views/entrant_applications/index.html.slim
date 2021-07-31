@@ -63,3 +63,9 @@ table.table.datatable
     = file_field_tag :file
     br
     = submit_tag "Загрузить заявления", class: "btn btn-primary"
+br
+- if can? :import, EntrantApplication
+  = form_tag competition_lists_to_egpu_entrant_applications_path + "?campaign_id=#{@campaign.id}", multipart: true do
+    = file_field_tag :file
+    br
+    = submit_tag "Загрузить файл для ЕПГУ", class: "btn btn-primary"
