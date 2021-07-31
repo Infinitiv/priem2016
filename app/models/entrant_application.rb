@@ -61,7 +61,7 @@ class EntrantApplication < ActiveRecord::Base
               competitive_group_applications_list.AdmissionVolume numbers
               competitive_group_applications_list.CountFirstStep numbers
               competitive_group_applications_list.CountSecondStep 0
-              competitive_group_applications_list.Changed Time.now.to_datetime
+              competitive_group_applications_list.Changed Time.now.to_datetime.to_s.gsub('+00', '+03')
               competitive_group_applications_list.Applications do |applications|
                 n = 0
                 entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && v[:summa] > 0 && k.status_id == 4 && v[:mark_values].select{|m| m > 41}.count == entrance_test_items_size}.sort_by{|k, v| [v[:full_summa].to_f, v[:summa].to_f, v[:mark_values], v[:benefit], v[:achievements_sum_abs]]}.reverse.each do |k, v|
@@ -89,7 +89,6 @@ class EntrantApplication < ActiveRecord::Base
                     application.SumMark v[:full_summa].to_i
                     application.Agreed k.budget_agr == competitive_group.id ? true : false
                     application.Original false
-                    application.Addition 'Заявление отозвано' if k.return_documents_date && k.return_documents_date >= Date.new(2021, 8, 2)
                     application.Enlisted k.enrolled ? 1 : 5
                   end
                 end
