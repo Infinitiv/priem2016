@@ -10,7 +10,7 @@ css:
   }
 - content_for :title do
   = "Конкурсный список"
-h1= "Приемная кампания #{@campaign.name} #{@campaign.year_start}." 
+h1= "Приемная кампания #{@campaign.name} #{@campaign.year_start}" 
 h2= "Конкурсные списки по состоянию на #{(Time.now.to_datetime + 3.hours).strftime("%d.%m.%Y %T")}"
 .checkbox
   label
