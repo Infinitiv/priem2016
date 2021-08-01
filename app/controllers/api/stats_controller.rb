@@ -1,5 +1,5 @@
 class Api::StatsController < ApplicationController
-  before_filter :set_campaign, only: [:entrants, :competitive_groups]
+  before_filter :set_campaign, only: [:entrants, :competitive_groups, :registration_dates]
   before_filter :set_entrant_applications, only: [:entrants]
 
   def show
@@ -37,8 +37,13 @@ class Api::StatsController < ApplicationController
     @countries = Dictionary.find_by_code(7).items
   end
 
+  def registration_dates
+    registration_dates = @campaign.entrant_applications.select(:id, :status_id, :registration_date).where(status_id: [4, 6]).map(&:registration_date)
+    send_data registration_dates.to_json, type: 'text/json', disposition: 'inline'
+  end
+
   def campaigns
-    @campaigns = Campaign.select(:id, :name, :year_start)
+    @campaigns = Campaign.select(:id, :name, :year_start, :campaign_type_id).where(campaign_type_id: 1)
   end
   
   private

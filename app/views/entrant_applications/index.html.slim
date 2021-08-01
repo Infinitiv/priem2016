@@ -50,7 +50,7 @@ table.table.datatable
           - when 1
             td= entrant_application.marks.map(&:form).include?('ВИ') ? 'ВИ' : 'ЕГЭ'
           - when 4
-            td= entrant_application.marks.map(&:form).include?('Экзамен') ? 'Экзамен' : 'Аккредитация'
+            td= entrant_application.marks.map(&:form).include?('ВИ') ? 'ВИ' : 'Аккредитация'
         td= entrant_application.email
         td= entrant_application.snils
         - if can? :destroy, entrant_application
