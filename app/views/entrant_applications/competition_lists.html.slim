@@ -36,6 +36,7 @@ h2= "Конкурсные списки по состоянию на #{(Time.now.
                 th №№
                 th ФИО
                 th Код
+                th Наличие согласия на зачисление
                 th Основание приема без испытаний
                 th Баллы за индивидуальные достижения
                 th Наличие преимущественного права на зачисление
@@ -45,6 +46,9 @@ h2= "Конкурсные списки по состоянию на #{(Time.now.
                   td
                   td= application.fio
                   td= application.snils ? application.snils : "%011d" % application.registration_number
+                  td.text-center
+                    - if application.budget_agr == competitive_group.id
+                      span.glyphicon.glyphicon-plus(aria-hidden="true")
                   td Олимпиада школьников
                   - if values[:achievements_sum] > 0
                     td= values[:achievements_sum].to_i == values[:achievements_sum] ? values[:achievements_sum].to_i : values[:achievements_sum]
