@@ -432,7 +432,7 @@ class EntrantApplication < ActiveRecord::Base
           row = [
             application.snils,
             oid,
-            3,
+            4,
             application.birth_date.strftime("%d.%m.%Y"),
             competitive_group.edu_programs.last.code,
             (competitive_group.education_source_id == 15 ? 'договор' : 'бюджет'),
@@ -497,7 +497,7 @@ class EntrantApplication < ActiveRecord::Base
           oid,
           application.birth_date.strftime("%d.%m.%Y"),
           application.education_document.education_speciality_code,
-          Time.now.to_date == '2020-08-03'.to_date ? '06.08.2020' : '07.08.2020',
+          '06.08.2021',
           1
           ]
         csv << row

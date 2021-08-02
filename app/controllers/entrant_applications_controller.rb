@@ -279,7 +279,7 @@ class EntrantApplicationsController < ApplicationController
   end
   
   def ord_access_request
-    @entrant_applications = @campaign.entrant_applications.select(:id, :snils, :birth_date, :nationality_type_id).includes(:education_document).joins(:marks).where(nationality_type_id: 1, status_id: [2, 4], marks: {form: 'Экзамен', organization_uid: '1.2.643.5.1.13.13.12.4.37.21', year: 2020})
+    @entrant_applications = @campaign.entrant_applications.select(:id, :snils, :birth_date, :nationality_type_id).includes(:education_document).joins(:marks).where(nationality_type_id: 1, status_id: 4, marks: {form: 'ВИ', organization_uid: '1.2.643.5.1.13.13.12.4.37.21', year: 2021})
     send_data EntrantApplication.ord_access_request(@entrant_applications), filename: "entrant_ord_access_request-#{Date.today}.csv", type: 'text/csv', disposition: "attachment"
   end
   
