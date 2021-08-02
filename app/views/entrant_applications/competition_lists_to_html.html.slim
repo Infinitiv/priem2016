@@ -2,6 +2,7 @@
   = "Приемная кампания #{@campaign.name} #{@campaign.year_start}. Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%d.%m.%Y %T")}"
 h1= "Приемная кампания #{@campaign.name} #{@campaign.year_start}" 
 h2= "Конкурсные списки по состоянию на #{(Time.now.to_datetime + 3.hours).strftime("%d.%m.%Y %T")}"
+p Обращаем Ваше внимание, что до 18 августа возможны изменения в списках, связанные с добавлением абитуриентами внебюджетных конкурсов, отзывом документов, подачей или отзывом согласий на зачисление.
 .checkbox
   label
     = check_box_tag 'tr-hide', 'yes', false, id: 'tr-hide'
