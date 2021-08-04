@@ -1446,8 +1446,8 @@ class EntrantApplication < ActiveRecord::Base
     headers = {'Content-Type' => 'text/xml'}
     response = http.post(http_params[:uri_path] + method, request, headers)
     xml = Nokogiri::XML(response.body)
-    direction_name = xml.at("ID:contains('#{competitive_group.direction_id}')").parent.at_css("Name").text
-    direction_code = xml.at("ID:contains('#{competitive_group.direction_id}')").parent.at_css("NewCode").text
+    direction_name = xml.at("DirectionID:contains('#{competitive_group.direction_id}')").parent.at_css("Name").text
+    direction_code = xml.at("DirectionID:contains('#{competitive_group.direction_id}')").parent.at_css("NewCode").text
     if campaign.campaign_type_id == 1
       case direction_name
       when 'Лечебное дело'
