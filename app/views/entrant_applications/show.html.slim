@@ -229,8 +229,18 @@
     dl
       dt
         h3 Заявления поступающего
-        - @entrant_application.attachments.select{|attachment| attachment.document_type =~ /_application/ && !attachment.template}.each do |attachment|
+        - @entrant_application.attachments.order(:created_at).select{|attachment| attachment.document_type =~ /_application/ && !attachment.template}.each do |attachment|
           dd
+            - case attachment.document_type
+              - when 'entrant_application'
+                span Загружено в поле заявление о приеме
+              - when 'consent_application'
+                span Загружено в поле заявление о согласии на зачисление
+              - when 'withdraw_application'
+                span Загружено в поле заявление о отказ от согласия на зачисление
+              - when 'recall_application'
+                span Загружено в поле заявление об отзыве документов
+            br
             = link_to "#{attachment.filename} (загружено #{attachment.created_at.strftime("%d.%m.%Y %T")})", attachment_path(attachment), target: :blank
             - if can? :destroy, attachment
               span &nbsp;
