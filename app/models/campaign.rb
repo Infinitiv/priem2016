@@ -38,7 +38,12 @@ class Campaign < ActiveRecord::Base
       row = Hash[[header, file.row(i)].transpose]
       code = row["Код направления подготовки"]
       if xml.at("NewCode:contains('#{code}')")
-        direction_id = xml.at("NewCode:contains('#{code}')").parent.at_css("DirectionID").text
+        case Rails.env
+        when 'production'
+          direction_id = xml.at("NewCode:contains('#{code}')").parent.at_css("DirectionID").text
+        when 'development'
+          direction_id = xml.at("NewCode:contains('#{code}')").parent.at_css("ID").text
+        end
         admission_volumes[direction_id] ||= {}
         education_level_id = campaign.education_levels.include?(5) ? 5 : 18
         admission_volumes[direction_id][:education_level_id] = education_level_id
