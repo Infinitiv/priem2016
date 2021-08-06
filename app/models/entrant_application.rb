@@ -38,6 +38,7 @@ class EntrantApplication < ActiveRecord::Base
   end
   
   def self.import_to_epgu(file, campaign)
+    %x(rm -r "#{Rails.root.join('storage', 'epgu')}")
     %x(mkdir -p "#{Rails.root.join('storage', 'epgu')}")
     entrance_test_items = campaign.entrance_test_items.order(:entrance_test_priority).select(:subject_id, :min_score, :entrance_test_priority).uniq
     entrance_test_items_size = entrance_test_items.size
@@ -52,74 +53,161 @@ class EntrantApplication < ActiveRecord::Base
       epgu_entrants[row['competitive_group_name']].push Hash[row['snils'] => row['uidepgu']]
     end
     admission_volume_hash.each do |direction_id, competitive_groups|
-      competitive_groups.sort_by{|competitive_group, numbers| competitive_group.name}.select{|competitive_group, numbers| competitive_group.order_end_date > Time.now.to_date}.each do |competitive_group, numbers|
+      competitive_groups.sort_by{|competitive_group, numbers| competitive_group.name}.each do |competitive_group, numbers|
         if epgu_entrants[competitive_group.name]
           xml = ::Builder::XmlMarkup.new
-          xml.PackageData do |package_data|
-            package_data.CompetitiveGroupApplicationsList do |competitive_group_applications_list|
-              competitive_group_applications_list.UIDCompetitiveGroup competitive_group.id
-              competitive_group_applications_list.AdmissionVolume numbers
-              competitive_group_applications_list.CountFirstStep numbers
-              competitive_group_applications_list.CountSecondStep 0
-              competitive_group_applications_list.Changed Time.now.to_datetime.to_s.gsub('+00', '+03')
-              competitive_group_applications_list.Applications do |applications|
-                n = 0
-                entrant_applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && v[:summa] > 0 && k.status_id == 4 && v[:mark_values].select{|m| m > 41}.count == entrance_test_items_size}.sort_by{|k, v| [v[:full_summa].to_f, v[:summa].to_f, v[:mark_values], v[:benefit], v[:achievements_sum_abs]]}.reverse
-                examless_applications = entrant_applications.select{|k, v| v[:examless] && competitive_group.education_source_id != 15}
-                examless_applications.each do |k, v|
-                  n += 1
-                  applications.Application do |application|
-                    application.IDApplicationChoice do |id_application_choice|
-                      if epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?
-                        id_application_choice.UID k.snils
-                      else
-                        id_application_choice.UIDEpgu epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.first.values.first
+          if competitive_group.order_end_date > Time.now.to_date
+            xml.PackageData do |package_data|
+              package_data.CompetitiveGroupApplicationsList do |competitive_group_applications_list|
+                competitive_group_applications_list.UIDCompetitiveGroup competitive_group.id
+                competitive_group_applications_list.AdmissionVolume numbers
+                competitive_group_applications_list.CountFirstStep numbers
+                competitive_group_applications_list.CountSecondStep 0
+                competitive_group_applications_list.Changed Time.now.to_datetime.to_s.gsub('+00', '+03')
+                competitive_group_applications_list.Applications do |applications|
+                  n = 0
+                  entrant_applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && v[:summa] > 0 && k.status_id == 4 && v[:mark_values].select{|m| m > 41}.count == entrance_test_items_size}.sort_by{|k, v| [v[:full_summa].to_f, v[:summa].to_f, v[:mark_values], v[:benefit], v[:achievements_sum_abs]]}.reverse
+                  examless_applications = entrant_applications.select{|k, v| v[:examless] && competitive_group.education_source_id != 15}
+                  examless_applications.each do |k, v|
+                    n += 1
+                    applications.Application do |application|
+                      application.IDApplicationChoice do |id_application_choice|
+                        if epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?
+                          id_application_choice.UID k.snils
+                        else
+                          id_application_choice.UIDEpgu epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.first.values.first
+                        end
                       end
+                      application.Rating n
+                      application.WithoutTests true
+                      application.ReasonWithoutTests 'Олимпиада школьников'
+                      application.Mark v[:achievements_sum].to_i
+                      application.Benefit k.benefit
+                      application.ReasonBenefit ('Документ, подтверждающий наличие особого права' if k.benefit)
+                      application.Agreed k.budget_agr == competitive_group.id ? true : false
+                      application.Original false
+                      application.Enlisted k.enrolled ? 1 : 5
                     end
-                    application.Rating n
-                    application.WithoutTests true
-                    application.ReasonWithoutTests 'Олимпиада школьников'
-                    application.Mark v[:achievements_sum].to_i
-                    application.Benefit k.benefit
-                    application.ReasonBenefit ('Документ, подтверждающий наличие особого права' if k.benefit)
-                    application.Agreed k.budget_agr == competitive_group.id ? true : false
-                    application.Original false
-                    application.Enlisted k.enrolled ? 1 : 5
                   end
-                end
-                (entrant_applications - examless_applications).each do |k, v|
-                  n += 1
-                  applications.Application do |application|
-                    application.IDApplicationChoice do |id_application_choice|
-                      if epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?
-                        id_application_choice.UID k.snils
-                      else
-                        id_application_choice.UIDEpgu epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.first.values.first
+                  (entrant_applications - examless_applications).each do |k, v|
+                    n += 1
+                    applications.Application do |application|
+                      application.IDApplicationChoice do |id_application_choice|
+                        if epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?
+                          id_application_choice.UID k.snils
+                        else
+                          id_application_choice.UIDEpgu epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.first.values.first
+                        end
                       end
+                      application.Rating n
+                      application.WithoutTests false
+                      application.ReasonWithoutTests 
+                      application.EntranceTest1 'Химия'
+                      application.Result1 v[:mark_values][0]
+                      application.EntranceTest2 'Биология'
+                      application.Result2 v[:mark_values][1]
+                      application.EntranceTest3 'Русский язык'
+                      application.Result3 v[:mark_values][2]
+                      application.Mark v[:achievements_sum].to_i
+                      application.Benefit k.benefit
+                      application.ReasonBenefit ('Документ, подтверждающий наличие особого права' if k.benefit)
+                      application.SumMark v[:full_summa].to_i
+                      application.Agreed k.budget_agr == competitive_group.id ? true : false
+                      application.Original false
+                      application.Enlisted k.enrolled ? 1 : 5
                     end
-                    application.Rating n
-                    application.WithoutTests false
-                    application.ReasonWithoutTests 
-                    application.EntranceTest1 'Химия'
-                    application.Result1 v[:mark_values][0]
-                    application.EntranceTest2 'Биология'
-                    application.Result2 v[:mark_values][1]
-                    application.EntranceTest3 'Русский язык'
-                    application.Result3 v[:mark_values][2]
-                    application.Mark v[:achievements_sum].to_i
-                    application.Benefit k.benefit
-                    application.ReasonBenefit ('Документ, подтверждающий наличие особого права' if k.benefit)
-                    application.SumMark v[:full_summa].to_i
-                    application.Agreed k.budget_agr == competitive_group.id ? true : false
-                    application.Original false
-                    application.Enlisted k.enrolled ? 1 : 5
                   end
                 end
               end
             end
+            tempfile = "#{[Rails.root, 'storage', 'epgu', competitive_group.id].join("/")}.xml"
+            File.write(tempfile, xml.target!)
+          else
+            enrolled_applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled && !epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?}
+            exeptioned_applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.exeptioned && !epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?}
+            unless enrolled_applications.empty?
+              xml.PackageData do |package_data|
+                package_data.OrderAdmission do |order_admission|
+                  order_admission.UID "oa #{campaign.year_start}-#{competitive_group.id}-#{competitive_group.order_end_date}"
+                  order_admission.UIDCampaign campaign.id
+                  order_admission.IDEducationForm 1
+                  case competitive_group.education_source_id
+                  when 14
+                    order_admission.IDEducationSource 1
+                  when 16
+                    order_admission.IDEducationSource 4
+                  end
+                  order_admission.IDEducationLevel 3
+                  case competitive_group.education_source_id
+                  when 14
+                    order_admission.OrderName ''
+                  when 16
+                    order_admission.OrderName 'О зачислении на первый курс на обучение по программам высшего образования — программам специалитета лиц, имеющих особые права при приеме на обучение — право на прием без вступительных испытаний, право на прием на места в пределах особой квоты; лиц, поступающих на места в пределах целевой квоты с 1.09.2021 года'
+                  when 20
+                    order_admission.OrderName 'О зачислении на первый курс на обучение по программам высшего образования — программам специалитета лиц, имеющих особые права при приеме на обучение — право на прием без вступительных испытаний, право на прием на места в пределах особой квоты; лиц, поступающих на места в пределах целевой квоты с 1.09.2021 года'
+                  end
+                  order_admission.OrderDate competitive_group.order_end_date.to_datetime
+                  order_admission.Published Time.now.to_datetime.to_s.gsub('+00', '+03')
+                  order_admission.IDOrderAdmissionStatus 3
+                  order_admission.IDOrderAdmissionType 1
+                  order_admission.PreferentialOrder false
+                  order_admission.Foreigners false
+                  order_admission.AddApplications do |add_applications|
+                    enrolled_applications.each do |k, v|
+                      add_applications.Application do |application|
+                        application.IDApplicationChoice do |id_application_choice|
+                          id_application_choice.UIDEpgu epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.first.values.first
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            tempfile = "#{[Rails.root, 'storage', 'epgu', "oa-#{competitive_group.id}"].join("/")}.xml"
+            File.write(tempfile, xml.target!)
+            end
+            unless exeptioned_applications.empty?
+              xml.PackageData do |package_data|
+                package_data.OrderAdmission do |order_admission|
+                  order_admission.UID "ea #{campaign.year_start}-#{competitive_group.id}-#{competitive_group.order_end_date}"
+                  order_admission.UIDCampaign campaign.id
+                  order_admission.IDEducationForm 1
+                  case competitive_group.education_source_id
+                  when 14
+                    order_admission.IDEducationSource 1
+                  when 16
+                    order_admission.IDEducationSource 4
+                  end
+                  order_admission.IDEducationLevel 3
+                  case competitive_group.education_source_id
+                  when 14
+                    order_admission.OrderName ''
+                  when 16
+                    order_admission.OrderName 'О зачислении на первый курс на обучение по программам высшего образования — программам специалитета лиц, имеющих особые права при приеме на обучение — право на прием без вступительных испытаний, право на прием на места в пределах особой квоты; лиц, поступающих на места в пределах целевой квоты с 1.09.2021 года'
+                  when 20
+                    order_admission.OrderName 'О зачислении на первый курс на обучение по программам высшего образования — программам специалитета лиц, имеющих особые права при приеме на обучение — право на прием без вступительных испытаний, право на прием на места в пределах особой квоты; лиц, поступающих на места в пределах целевой квоты с 1.09.2021 года'
+                  end
+                  order_admission.OrderDate competitive_group.order_end_date.to_datetime
+                  order_admission.Published Time.now.to_datetime.to_s.gsub('+00', '+03')
+                  order_admission.IDOrderAdmissionStatus 3
+                  order_admission.IDOrderAdmissionType 2
+                  order_admission.PreferentialOrder false
+                  order_admission.Foreigners false
+                  order_admission.RemoveApplications do |remove_applications|
+                    exeptioned_applications.each do |k, v|
+                      remove_applications.Application do |application|
+                        application.IDApplicationChoice do |id_application_choice|
+                          id_application_choice.UIDEpgu epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.first.values.first
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            tempfile = "#{[Rails.root, 'storage', 'epgu', "ea-#{competitive_group.id}"].join("/")}.xml"
+            File.write(tempfile, xml.target!)
+            end
           end
-          tempfile = "#{[Rails.root, 'storage', 'epgu', competitive_group.id].join("/")}.xml"
-          File.open(tempfile, 'w').write(xml.target!)
         end
       end
     end
