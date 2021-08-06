@@ -56,8 +56,6 @@ h2= "Конкурсные списки по состоянию на #{Time.now.t
                 th Сумма конкурсных баллов
                 th Баллы за вступительное испытание
                 th Баллы за индивидуальные достижения
-                - if competitive_group.education_source_id == 16
-                  th= "Заказчик целевого приема"
                 - unless competitive_group.education_source_id == 16
                   th= "Зачислен по другому конкурсу"
             tbody
@@ -75,8 +73,6 @@ h2= "Конкурсные списки по состоянию на #{Time.now.t
                     td= values[:full_summa] if values[:mark_values].select{|m| m > 69}.count == 1
                     td= values[:summa]
                     td= values[:achievements_sum] if values[:achievements_sum] > 0
-                    - if competitive_group.education_source_id == 16
-                      td= application.target_contracts.where(competitive_group_id: competitive_group).map{|target_contract| target_contract.target_organization.target_organization_name}.join(', ') 
                     - unless competitive_group.education_source_id == 16
                       td.text-center
                         - if application.enrolled && application.enrolled != competitive_group.id
