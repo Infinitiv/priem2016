@@ -2,6 +2,7 @@
   = "Приемная кампания #{@campaign.name} #{@campaign.year_start}. Конкурсные списки по состоянию на #{Time.now.to_datetime.strftime("%d.%m.%Y %T")}"
 h1= "Приемная кампания #{@campaign.name} #{@campaign.year_start}." 
 h2= "Конкурсные списки по состоянию на #{(Time.now.to_datetime + 3.hours).strftime("%d.%m.%Y %T")}"
+p Обращаем внимание, что в списках возможны изменения, связанные с продолжающейся подачай документов на ряд направлений подготовки и с незавершенной процедурой вступительных испытаний для небольшого количества поступающих.
 - applications = @applications_hash.select{|k, v| k.status_id == 4 && v[:mark_values].select{|m| m > 69}.count == @entrance_test_items.size && k.nationality_type_id != 1}
 .panel-group(id="accordion" role="tablist" aria-multiselectable="true")
   .panel.panel-default
