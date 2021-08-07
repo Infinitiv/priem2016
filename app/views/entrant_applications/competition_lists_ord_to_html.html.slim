@@ -29,7 +29,7 @@ h2= "Конкурсные списки по состоянию на #{(Time.now.
             td= "%04d" % application.application_number
             td= application.fio
             td.text-center
-              - if application.paid_agr
+              - if application.budget_agr
                 span.glyphicon.glyphicon-plus(aria-hidden="true")
             td= values[:full_summa] if values[:mark_values].select{|m| m > 69}.count == 1
             td= values[:summa]
@@ -68,7 +68,7 @@ h2= "Конкурсные списки по состоянию на #{(Time.now.
                     td= "%04d" % application.application_number
                     td= application.fio
                     td.text-center
-                      - if application.paid_agr == competitive_group.id || application.budget_agr == competitive_group.id
+                      - if application.budget_agr == competitive_group.id
                         span.glyphicon.glyphicon-plus(aria-hidden="true")
                     td= values[:full_summa] if values[:mark_values].select{|m| m > 69}.count == 1
                     td= values[:summa]
