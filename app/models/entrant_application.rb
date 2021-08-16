@@ -1730,7 +1730,7 @@ class EntrantApplication < ActiveRecord::Base
     pdf.text 'VIII. АДРЕСА И РЕКВИЗИТЫ СТОРОН', style: :bold, size: 11, align: :center
     pdf.move_down 6
     pdf.define_grid(columns: 3, rows: 8)
-    pdf.grid([1, 0], [4, 0]).bounding_box do
+    pdf.grid([1, 0], [5, 0]).bounding_box do
       pdf.text 'Исполнитель', style: :bold, size: 11, align: :center
       pdf.text 'ФГБОУ ВО ИвГМА Минздрава России', style: :bold, size: 11, align: :center
       pdf.text 'Адрес: 153012 г. Иваново, пр.Шереметевский, 8', size: 11
@@ -1759,7 +1759,7 @@ class EntrantApplication < ActiveRecord::Base
       pdf.text 'М.П.', size: 11
       pdf.stroke_bounds
     end
-    pdf.grid([1, 1], [4, 1]).bounding_box do
+    pdf.grid([1, 1], [5, 1]).bounding_box do
       if selfcontragent 
         pdf.text 'Заказчик и Обучающийся', style: :bold, size: 11, align: :center
       else
@@ -1775,7 +1775,7 @@ class EntrantApplication < ActiveRecord::Base
       pdf.text 'Подпись _____________', size: 11
       pdf.stroke_bounds
     end
-    pdf.grid([1, 2], [4, 2]).bounding_box do
+    pdf.grid([1, 2], [5, 2]).bounding_box do
       unless selfcontragent
         pdf.text 'Обучающийся', style: :bold, size: 11, align: :center
         pdf.text "Ф.И.О. #{fio}", size: 11
