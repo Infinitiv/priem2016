@@ -140,11 +140,17 @@ class EntrantApplication < ActiveRecord::Base
                   order_admission.IDEducationLevel 3
                   case competitive_group.education_source_id
                   when 14
-                    order_admission.OrderName ''
+                    order_admission.OrderName 'О зачислении на первый курс на обучение по программам высшего образования — программам специалитета лиц, поступающих на основные места в рамках контрольных цифр приема, с 1.09.2021 года'
                   when 16
                     order_admission.OrderName 'О зачислении на первый курс на обучение по программам высшего образования — программам специалитета лиц, имеющих особые права при приеме на обучение — право на прием без вступительных испытаний, право на прием на места в пределах особой квоты; лиц, поступающих на места в пределах целевой квоты с 1.09.2021 года'
                   when 20
                     order_admission.OrderName 'О зачислении на первый курс на обучение по программам высшего образования — программам специалитета лиц, имеющих особые права при приеме на обучение — право на прием без вступительных испытаний, право на прием на места в пределах особой квоты; лиц, поступающих на места в пределах целевой квоты с 1.09.2021 года'
+                  end
+                  case competitive_group.education_source_id
+                  when 14
+                    order_admission.OrderNumber '199-уч'
+                  when 16
+                    order_admission.OrderNumber '193-уч'
                   end
                   order_admission.OrderDate competitive_group.order_end_date.to_datetime
                   order_admission.Published Time.now.to_datetime.to_s.gsub('+00', '+03')
