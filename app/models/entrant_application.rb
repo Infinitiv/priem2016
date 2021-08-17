@@ -55,8 +55,8 @@ class EntrantApplication < ActiveRecord::Base
     admission_volume_hash.each do |direction_id, competitive_groups|
       competitive_groups.sort_by{|competitive_group, numbers| competitive_group.name}.each do |competitive_group, numbers|
         if epgu_entrants[competitive_group.name]
-          xml = ::Builder::XmlMarkup.new
           if competitive_group.order_end_date > Time.now.to_date
+            xml = ::Builder::XmlMarkup.new
             xml.PackageData do |package_data|
               package_data.CompetitiveGroupApplicationsList do |competitive_group_applications_list|
                 competitive_group_applications_list.UIDCompetitiveGroup competitive_group.id
@@ -126,6 +126,7 @@ class EntrantApplication < ActiveRecord::Base
             enrolled_applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled && !epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?}
             exeptioned_applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.exeptioned && !epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?}
             unless enrolled_applications.empty?
+              xml = ::Builder::XmlMarkup.new
               xml.PackageData do |package_data|
                 package_data.OrderAdmission do |order_admission|
                   order_admission.UID "oa #{campaign.year_start}-#{competitive_group.id}-#{competitive_group.order_end_date}"
@@ -173,6 +174,7 @@ class EntrantApplication < ActiveRecord::Base
             File.write(tempfile, xml.target!)
             end
             unless exeptioned_applications.empty?
+              xml = ::Builder::XmlMarkup.new
               xml.PackageData do |package_data|
                 package_data.OrderAdmission do |order_admission|
                   order_admission.UID "ea #{campaign.year_start}-#{competitive_group.id}-#{competitive_group.order_end_date}"
@@ -187,11 +189,17 @@ class EntrantApplication < ActiveRecord::Base
                   order_admission.IDEducationLevel 3
                   case competitive_group.education_source_id
                   when 14
-                    order_admission.OrderName ''
+                    order_admission.OrderName 'Об исключении из списка зачисленных на первый курс на обучение по программам высшего образования — программам специалитета лиц, поступающих на основные места в рамках контрольных цифр приема, с 1.09.2021 года'
                   when 16
-                    order_admission.OrderName 'О зачислении на первый курс на обучение по программам высшего образования — программам специалитета лиц, имеющих особые права при приеме на обучение — право на прием без вступительных испытаний, право на прием на места в пределах особой квоты; лиц, поступающих на места в пределах целевой квоты с 1.09.2021 года'
+                    order_admission.OrderName 'Об исключении из списка зачисленных на первый курс на обучение по программам высшего образования — программам специалитета лиц, имеющих особые права при приеме на обучение — право на прием без вступительных испытаний, право на прием на места в пределах особой квоты; лиц, поступающих на места в пределах целевой квоты с 1.09.2021 года'
                   when 20
-                    order_admission.OrderName 'О зачислении на первый курс на обучение по программам высшего образования — программам специалитета лиц, имеющих особые права при приеме на обучение — право на прием без вступительных испытаний, право на прием на места в пределах особой квоты; лиц, поступающих на места в пределах целевой квоты с 1.09.2021 года'
+                    order_admission.OrderName 'Об исключении из списка зачисленных на первый курс на обучение по программам высшего образования — программам специалитета лиц, имеющих особые права при приеме на обучение — право на прием без вступительных испытаний, право на прием на места в пределах особой квоты; лиц, поступающих на места в пределах целевой квоты с 1.09.2021 года'
+                  end
+                  case competitive_group.education_source_id
+                  when 14
+                    order_admission.OrderNumber '-'
+                  when 16
+                    order_admission.OrderNumber '199-уч'
                   end
                   order_admission.OrderDate competitive_group.order_end_date.to_datetime
                   order_admission.Published Time.now.to_datetime.to_s.gsub('+00', '+03')
