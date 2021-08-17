@@ -123,8 +123,8 @@ class EntrantApplication < ActiveRecord::Base
             tempfile = "#{[Rails.root, 'storage', 'epgu', competitive_group.id].join("/")}.xml"
             File.write(tempfile, xml.target!)
           else
-            enrolled_applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled && !epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?}
-            exeptioned_applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.exeptioned && !epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?}
+            enrolled_applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.enrolled == competitive_group.id && !epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?}
+            exeptioned_applications = entrant_applications_hash.select{|k, v| v[:competitive_groups].include?(competitive_group.id) && k.exeptioned == competitive_group.id && !epgu_entrants[competitive_group.name].select{|item| item[k.snils]}.empty?}
             unless enrolled_applications.empty?
               xml = ::Builder::XmlMarkup.new
               xml.PackageData do |package_data|
