@@ -639,25 +639,25 @@ class EntrantApplication < ActiveRecord::Base
                       application.enrolled && application.enrolled == competitive_group.id ? 1 : 2
                     end
           order_number = case application.enrolled_date
-                          when Date.new(2020, 8, 12)
-                            '97-ипо'
-                          when Date.new(2020, 8, 14)
-                            '98-ипо'
-                          when Date.new(2020, 8, 17)
-                            '99-ипо'
+                          when Date.new(2021, 8, 11)
+                            '54-ипо'
+                          when Date.new(2021, 8, 13)
+                            '55-ипо'
+                          when Date.new(2021, 8, 17)
+                            '56-ипо'
                           end
                           
           achievements_array = []
           application.achievements.sort_by(&:institution_achievement_id).each do |achievement|
             if achievement.value > 0
               case achievement.institution_achievement_id
-              when 38
+              when 54
                 achievements_array << 'а'
-              when 39
+              when 55
                 achievements_array << 'б'
-              when 40
+              when 56
                 achievements_array << 'в'
-              when 41
+              when 57
                 case achievement.value
                 when 15
                   achievements_array << 'г1'
@@ -666,18 +666,18 @@ class EntrantApplication < ActiveRecord::Base
                 when 150
                   achievements_array << 'г3'
                 end
-              when 42
+              when 58
                 achievements_array << 'д'
-              when 43
+              when 59
                 achievements_array << 'е'
-              when 44
+              when 60
                 achievements_array << 'ж'
-              when 45
-                achievements_array << '21а'
-              when 46
-                achievements_array << '21б'
-              when 47
-                achievements_array << "з-#{achievement.value.round()}"
+              when 61
+                achievements_array << 'з'
+              when 62
+                achievements_array << 'и'
+              when 63
+                achievements_array << "к-#{achievement.value.round()}"
               end
             end
           end
@@ -688,7 +688,7 @@ class EntrantApplication < ActiveRecord::Base
           row = [
             application.snils,
             oid,
-            3,
+            4,
             application.birth_date.strftime("%d.%m.%Y"),
             competitive_group.edu_programs.last.code,
             (competitive_group.education_source_id == 15 ? 'договор' : 'бюджет'),
