@@ -75,7 +75,7 @@ class Campaign < ActiveRecord::Base
         competitive_groups[competitive_group_name][:code] = code
         competitive_groups[competitive_group_name][:direction_id] = direction_id
         competitive_groups[competitive_group_name][:education_source_id] = education_source_id
-          competitive_groups[competitive_group_name][:target_organization_id] = target_organization.id if education_source_id == 16
+        competitive_groups[competitive_group_name][:target_organization_id] = target_organization.id if education_source_id == 16
         competitive_groups[competitive_group_name][:number] = row['Количество мест'].to_i
         competitive_groups[competitive_group_name][:application_start_date] = row['Дата начала приема заявлений']
         competitive_groups[competitive_group_name][:application_end_exam_date] = row['Дата окончания приема заявлений для ВИ']
@@ -113,13 +113,16 @@ class Campaign < ActiveRecord::Base
           education_source_id: values[:education_source_id],
           education_form_id: campaign.education_forms.first,
           direction_id: values[:direction_id],
+        )
+        competitive_group.update_attributes(
           application_start_date: values[:application_start_date],
           application_end_exam_date: values[:application_end_exam_date],
           application_end_ege_date: values[:application_end_ege_date],
           order_end_date: values[:order_end_date]
         )
         if competitive_group.education_source_id == 16
-          target_number = competitive_group.target_numbers.find_by_target_organization_id(values[:target_organization_id]) || competitive_group.target_numbers.create(target_organization_id: values[:target_organization_id], number_target_o: values[:number])
+          target_number = competitive_group.target_numbers.find_by_target_organization_id(values[:target_organization_id]) || competitive_group.target_numbers.create(target_organization_id: values[:target_organization_id])
+          target_number.update_attributes(number_target_o: values[:number])
         end
         # добавляем элементы конкурсных групп
         attrib = {}
