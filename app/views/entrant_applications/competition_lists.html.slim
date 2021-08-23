@@ -25,7 +25,7 @@ h2= "Конкурсные списки по состоянию на #{(Time.now.
       .panel.panel-default
         .panel-heading(role="tab" id="heading#{competitive_group.id}")
           .panel-title
-            = link_to "#{competitive_group.name} (всего мест в конкурсе - #{numbers - examless_applications.select{|a, v| a.enrolled}.count - applications.select{|a, v| a.enrolled == competitive_group.id}.count})", "#collapse#{competitive_group.id}", data: {toggle: "collapse", parent: "#accordion"}, aria: {expanded: "false", controls: "#collapse#{competitive_group.id}"}
+            = link_to "#{competitive_group.name} (всего вакантных мест в конкурсе - #{numbers - examless_applications.select{|a, v| a.enrolled}.count - applications.select{|a, v| a.enrolled == competitive_group.id}.count})", "#collapse#{competitive_group.id}", data: {toggle: "collapse", parent: "#accordion"}, aria: {expanded: "false", controls: "#collapse#{competitive_group.id}"}
     .panel-collapse.collapse(id="collapse#{competitive_group.id}" role="tabpanel" aria-labelledby="heading#{competitive_group.id}")
       .panel-body
         - unless examless_applications.empty? 
