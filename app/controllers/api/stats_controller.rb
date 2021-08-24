@@ -8,6 +8,9 @@ class Api::StatsController < ApplicationController
     @entrants = @entrant_applications.select(
       :application_number,
       :campaign_id,
+      :entrant_last_name,
+      :entrant_first_name,
+      :entrant_middle_name,
       :gender_id,
       :birth_date,
       :region_id,
