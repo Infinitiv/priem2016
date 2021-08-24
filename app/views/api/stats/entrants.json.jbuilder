@@ -1,8 +1,10 @@
 json.array! @entrants do |entrant|
   json.year entrant.campaign.year_start
   json.application_number entrant.application_number
-  json.gender_id entrant.gender_id
+  json.fio entrant.fio
+  json.gender_id entrant.gender_id == 1 ? 'мужской' : 'женский'
   json.birth_date entrant.birth_date
+  json.snils entrant.snils
   json.region_id entrant.region_id
   json.registration_date entrant.registration_date
   json.nationality @countries.select{|country| country.key(entrant.nationality_type_id)}.first['name']
@@ -11,9 +13,15 @@ json.array! @entrants do |entrant|
   json.source entrant.source
   json.agreement entrant.budget_agr ? entrant.competitive_groups.find(entrant.budget_agr).name : nil
   json.competitive_groups entrant.competitive_groups.map(&:name).join(',')
-  json.education_document_type entrant.education_document.education_document_type
-  json.education_document_issuer entrant.education_document.education_document_issuer
-  json.education_document_date entrant.education_document.education_document_date
+  identity_document = entrant.identity_documents.order(identity_document_date: :desc).first
+  json.identity_document_type identity_document.identity_document_type
+  json.identity_document_series identity_document.identity_document_series
+  json.identity_document_number identity_document.identity_document_number
+  json.identity_document_issuer identity_document.identity_document_issuer
+  json.identity_document_date identity_document.identity_document_date
+  education_document = entrant.education_document
+  json.education_document_type education_document.education_document_type
+  json.education_document_date education_document.education_document_date
   json.return_documents_date entrant.return_documents_date
   json.direction entrant.enrolled ? @specialities.select{|speciality| speciality.key(entrant.competitive_groups.find(entrant.enrolled).direction_id)}.first['name'] : nil
   json.enrolled_name entrant.enrolled ? entrant.competitive_groups.find(entrant.enrolled).name : nil
@@ -23,7 +31,7 @@ json.array! @entrants do |entrant|
   json.exeptioned_date entrant.exeptioned_date
   olympics = entrant.olympic_documents
   unless olympics.empty?
-    olympic_type = olympics.map(&:benefit_type_id).include?(2) ? 'Без ВИ' : 'ЕГЭ 100'
+    olympic_type = olympics.map(&:benefit_type_id).include?(1) ? 'Без ВИ' : 'ЕГЭ 100'
   end
   json.olympic_type olympic_type ? olympic_type : nil
   marks = entrant.marks

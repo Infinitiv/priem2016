@@ -21,13 +21,15 @@ class Api::StatsController < ApplicationController
       :exeptioned_date,
       :return_documents_date,
       :source,
-      :budget_agr
+      :budget_agr,
+      :snils
     )
     .includes(
       :competitive_groups,
       :marks,
       :benefit_documents,
       :education_document,
+      :identity_documents,
       :achievements,
       :olympic_documents,
       :target_contracts,

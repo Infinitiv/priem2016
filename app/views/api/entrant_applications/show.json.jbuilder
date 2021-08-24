@@ -2,7 +2,6 @@ json.entrant_application do
   json.id @entrant_application.id
   json.application_number @entrant_application.application_number
   json.registration_number @entrant_application.registration_number
-  json.fio @entrant_application.fio
   json.campaign_id @entrant_application.campaign_id
   json.nationality_type_id @entrant_application.nationality_type_id
   json.personal do
