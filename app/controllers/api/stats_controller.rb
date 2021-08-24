@@ -25,7 +25,8 @@ class Api::StatsController < ApplicationController
       :return_documents_date,
       :source,
       :budget_agr,
-      :snils
+      :snils,
+      :language
     )
     .includes(
       :competitive_groups,
