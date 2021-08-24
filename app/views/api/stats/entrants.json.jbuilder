@@ -81,4 +81,5 @@ json.array! @entrants do |entrant|
     json.target_region = target_contract.target_organization.region_id
     json.target_organization_name = target_contract.target_organization.target_organization_name
   end
+  json.language entrant.language
 end
