@@ -9,6 +9,9 @@ json.array! @entrants do |entrant|
   json.registration_date entrant.registration_date
   json.nationality @countries.select{|country| country.key(entrant.nationality_type_id)}.first['name']
   json.region_with_type entrant.region_with_type
+  json.address entrant.verified_address ? entrant.verified_address : entrant.address
+  json.phone entrant.phone
+  json.email entrant.email
   json.status_id entrant.status_id
   json.source entrant.source
   json.agreement entrant.budget_agr ? entrant.competitive_groups.find(entrant.budget_agr).name : nil

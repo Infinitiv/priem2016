@@ -26,7 +26,11 @@ class Api::StatsController < ApplicationController
       :source,
       :budget_agr,
       :snils,
-      :language
+      :language,
+      :address, 
+      :verified_address,
+      :phone,
+      :email
     )
     .includes(
       :competitive_groups,
