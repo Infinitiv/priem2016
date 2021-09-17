@@ -38,14 +38,9 @@ json.array! @entrants do |entrant|
   end
   json.olympic_type olympic_type ? olympic_type : nil
   marks = entrant.marks
-  if olympic_type == 'ЕГЭ 100'
-    olympics.each do |olympic|
-      marks.where(subject_id: olympic.ege_subject_id).update_all(form: 'Олимпиада')
-    end
-  end
-  json.chemistry_form marks.where(subject_id: 11).first.form
-  json.biology_form marks.where(subject_id: 4).first.form
-  json.russian_form marks.where(subject_id: 1).first.form
+  json.chemistry_form marks.where(subject_id: 11) ? marks.where(subject_id: 11).first.form : nil
+  json.biology_form marks.where(subject_id: 4) ? marks.where(subject_id: 4).first.form : nil
+  json.russian_form marks.where(subject_id: 1) ? marks.where(subject_id: 1).first.form : nil
   json.chemistry_value marks.where(subject_id: 11).sum(&:value)
   json.biology_value marks.where(subject_id: 4).sum(&:value)
   json.russian_value marks.where(subject_id: 1).sum(&:value)
