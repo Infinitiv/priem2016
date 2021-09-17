@@ -41,9 +41,9 @@ json.array! @entrants do |entrant|
   json.chemistry_form (marks.where(subject_id: 11).empty? ? nil : marks.where(subject_id: 11).first.form)
   json.biology_form (marks.where(subject_id: 4).empty? ? nil : marks.where(subject_id: 4).first.form)
   json.russian_form (marks.where(subject_id: 1).empty? ? nil : marks.where(subject_id: 1).first.form)
-  json.chemistry_value marks.where(subject_id: 11).sum(&:value)
-  json.biology_value marks.where(subject_id: 4).sum(&:value)
-  json.russian_value marks.where(subject_id: 1).sum(&:value)
+  json.chemistry_value marks.where(subject_id: 11).sum(:value)
+  json.biology_value marks.where(subject_id: 4).sum(:value)
+  json.russian_value marks.where(subject_id: 1).sum(:value)
   ege_count = marks.map(&:form).count('ЕГЭ')
   json.ege_count ege_count
   json.sum marks.sum(:value)
