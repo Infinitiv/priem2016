@@ -9,9 +9,9 @@ json.array! @entrants do |entrant|
   json.registration_date entrant.registration_date
   json.nationality @countries.select{|country| country.key(entrant.nationality_type_id)}.first['name']
   json.region_with_type entrant.region_with_type
-  json.area_with_type entrant.verified_address ? entrant.area_with_type : nil
-  json.city_with_type entrant.verified_address ? entrant.city_with_type : nil
-  json.settlement_with_type entrant.verified_address ? entrant.settlement_with_type : nil
+  json.area_with_type entrant.verified_address ? entrant.address_suggestions.first['data']['area_with_type'] : nil
+  json.city_with_type entrant.verified_address ? entrant.address_suggestions.first['data']['city_with_type'] : nil
+  json.settlement_with_type entrant.verified_address ? entrant.address_suggestions.first['data']['settlement_with_type'] : nil
   json.address entrant.verified_address ? entrant.verified_address : entrant.address
   json.phone entrant.phone
   json.email entrant.email
