@@ -29,6 +29,7 @@ class Api::StatsController < ApplicationController
       :language,
       :address, 
       :verified_address,
+      :address_suggestions,
       :phone,
       :email
     )
