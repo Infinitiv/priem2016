@@ -242,7 +242,7 @@ namespace :priem do
     
     entrant_applications = EntrantApplication.where(enrolled: target_competitive_groups)
     entrant_applications.each do |entrant_application|
-      entrant_application_path = "storage/target/#{entrant_application.enrolled}/#{entrant_application.application_number}"
+      entrant_application_path = "storage/target/#{CompetitiveGroup.find(entrant_application.enrolled).name}/#{entrant_application.application_number}"
       %x(mkdir -p "#{entrant_application_path}")
       marks_ege = entrant_application.marks.where(form: 'ЕГЭ')
       marks_exam = entrant_application.marks.where.not(form: 'ЕГЭ')
