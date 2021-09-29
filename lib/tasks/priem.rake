@@ -236,9 +236,6 @@ namespace :priem do
   task target_export: :environment do
     %x(mkdir -p storage/target)
     target_competitive_groups = CompetitiveGroup.where(campaign_id: 9, education_source_id: 16).map(&:id)
-    target_competitive_groups.each do |target_competitive_group|
-      %x(mkdir -p "storage/target/#{target_competitive_group}")
-    end
     
     entrant_applications = EntrantApplication.where(enrolled: target_competitive_groups)
     entrant_applications.each do |entrant_application|
