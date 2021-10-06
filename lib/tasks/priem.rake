@@ -297,7 +297,7 @@ namespace :priem do
           response = http.post(http_params[:uri_path] + method, request, headers)
           xml = Nokogiri::XML(response.body)
           dictionary_items_list = []
-          xml.css('DictionaryItem').each{|i| dictionary_items_list.push({name: i.at('Name').text, id: i.at('ID').text.to_i}) if i.at('Name')}
+          xml.css('DictionaryItem').each{|i| dictionary_items_list.push({name: i.at('Name').text, id: i.at('DirectionID').text.to_i}) if i.at('Name')}
           unless dictionary_items_list.empty?
             message = dictionary.id ? "Обновляем справочник #{code} #{name}" : "Добавляем справочник #{code} #{name}"
             %x(echo "#{[Time.now, message].join(' - ')}" >> "#{log_path}")
