@@ -28,6 +28,7 @@ json.array! @entrants do |entrant|
   education_document = entrant.education_document
   json.education_document_type education_document.education_document_type
   json.education_document_date education_document.education_document_date
+  json.education_document_issuer education_document.education_document_issuer
   json.return_documents_date entrant.return_documents_date
   json.direction entrant.enrolled ? @specialities.select{|speciality| speciality.key(entrant.competitive_groups.find(entrant.enrolled).direction_id)}.first['name'] : nil
   json.enrolled_name entrant.enrolled ? entrant.competitive_groups.find(entrant.enrolled).name : nil
