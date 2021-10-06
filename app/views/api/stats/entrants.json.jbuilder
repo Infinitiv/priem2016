@@ -41,12 +41,17 @@ json.array! @entrants do |entrant|
   end
   json.olympic_type olympic_type ? olympic_type : nil
   marks = entrant.marks
-  json.chemistry_form marks.where(subject_id: 3).first.form
-  json.biology_form marks.where(subject_id: 2).first.form
-  json.russian_form marks.where(subject_id: 1).first.form
-  json.chemistry_value marks.where(subject_id: 3).sum(:value)
-  json.biology_value marks.where(subject_id: 2).sum(:value)
-  json.russian_value marks.where(subject_id: 1).sum(:value)
+  if @campaign.campaign_type_id == 1
+    json.chemistry_form marks.where(subject_id: 3).first.form
+    json.biology_form marks.where(subject_id: 2).first.form
+    json.russian_form marks.where(subject_id: 1).first.form
+    json.chemistry_value marks.where(subject_id: 3).sum(:value)
+    json.biology_value marks.where(subject_id: 2).sum(:value)
+    json.russian_value marks.where(subject_id: 1).sum(:value)
+  else
+    json.exam_form marks.where(subject_id: 4).first.form
+    json.exam_value marks.where(subject_id: 4).sum(:value)
+  end
   ege_count = marks.map(&:form).count('ЕГЭ')
   json.ege_count ege_count
   json.sum marks.sum(:value)
