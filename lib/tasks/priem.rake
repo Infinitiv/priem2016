@@ -263,6 +263,22 @@ namespace :priem do
     end
   end
   
+  desc 'passport export'
+  task passport_export: :environment do
+    %x(mkdir -p storage/passport)
+    campaign_id = gets.chomp!
+    entrant_applications = EntrantApplication.where(campaign_id: campaign_id.to_i).where.not(enrolled: nil)
+    entrant_applications.each do |entrant_application|
+      entrant_application_path = "storage/passport/#{entrant_application.application_number}#{entrant_application.fio}"
+      %x(mkdir -p "#{entrant_application_path}")
+      passport_attachments = entrant_application.attachments.where(document_type: 'identity_document', document_id: entrant_application.id)
+      passport_attachments.each do |passport_attachment|
+        path = passport_attachment.data_hash[0..2].split('').join('/')
+        %x(cp "#{Rails.root.join('storage', path, passport_attachment.data_hash)}" "#{entrant_application_path}/#{passport_attachment.filename}")
+      end
+    end
+  end
+  
   desc "Fill dictionaries"
   task fill_dictionaries: :environment do
     log_path = [Rails.root, 'log', 'rake.log'].join('/')
