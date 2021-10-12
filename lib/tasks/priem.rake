@@ -268,9 +268,9 @@ namespace :priem do
     %x(mkdir -p storage/passport)
     entrant_applications = EntrantApplication.where(campaign_id: 9).where.not(enrolled: nil)
     entrant_applications.each do |entrant_application|
-      entrant_application_path = "storage/passport/#{entrant_application.application_number}#{entrant_application.fio}"
+      entrant_application_path = "storage/passport/#{entrant_application.application_number}-#{entrant_application.fio}"
       %x(mkdir -p "#{entrant_application_path}")
-      passport_attachments = entrant_application.attachments.where(document_type: 'identity_document', document_id: entrant_application.id)
+      passport_attachments = entrant_application.attachments.where(document_type: 'identity_document')
       passport_attachments.each do |passport_attachment|
         path = passport_attachment.data_hash[0..2].split('').join('/')
         %x(cp "#{Rails.root.join('storage', path, passport_attachment.data_hash)}" "#{entrant_application_path}/#{passport_attachment.filename}")
