@@ -266,8 +266,7 @@ namespace :priem do
   desc 'passport export'
   task passport_export: :environment do
     %x(mkdir -p storage/passport)
-    campaign_id = gets.chomp!
-    entrant_applications = EntrantApplication.where(campaign_id: campaign_id.to_i).where.not(enrolled: nil)
+    entrant_applications = EntrantApplication.where(campaign_id: 9).where.not(enrolled: nil)
     entrant_applications.each do |entrant_application|
       entrant_application_path = "storage/passport/#{entrant_application.application_number}#{entrant_application.fio}"
       %x(mkdir -p "#{entrant_application_path}")
