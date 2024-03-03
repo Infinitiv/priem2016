@@ -48,8 +48,8 @@
     when 20
       json.education_source 'Особая квота'
     end
-    json.enrolled_date entrant_application.enrolled_date
-    json.exeptioned_date entrant_application.exeptioned_date
+    json.enrolled_date entrant_application.enrolled == competitive_group.id ? entrant_application.enrolled_date : nil
+    json.exeptioned_date entrant_application.exeptioned == competitive_group.id ? entrant_application.exeptioned_date : nil
     json.sum marks.sum
     json.achievements @institution_achievements.where(id: [achievement_types]).map(&:name).join('&')
     json.achievement_sum entrant_application.achievements.sum(:value) > 10 ? 10 : entrant_application.achievements.sum(:value)
