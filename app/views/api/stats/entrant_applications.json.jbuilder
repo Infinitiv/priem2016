@@ -10,12 +10,11 @@ json.array! @entrant_applications.each do |entrant_application|
     marks = []
     subjects = []
     entrant_actual_marks = @marks[entrant_application_id]
-    entrant_actual_marks.each_with_index do |actual_mark, index|
+    entrant_actual_marks.each do |actual_mark|
         entrance_tests.each do |priority, subject|
           if subject == actual_mark.subject_id
             test_types << actual_mark.form
             marks << actual_mark.value
-            puts index
             subjects << actual_mark.subject.subject_name
           end
         end
