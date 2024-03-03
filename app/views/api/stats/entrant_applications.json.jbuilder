@@ -1,7 +1,7 @@
-json.array! @entrant_applications.each do |entrant_application|
+@entrant_applications.each do |entrant_application|
   entrant_application_id = entrant_application.id
   education_document = entrant_application.education_document
-  entrant_application.competitive_groups.each do |competitive_group|
+  json.array! entrant_application.competitive_groups.each do |competitive_group|
     if @target_contracts[entrant_application_id]
       target_contract = @target_contracts[entrant_application_id].select{|tc| tc.competitive_group_id == competitive_group.id}.first
     end
