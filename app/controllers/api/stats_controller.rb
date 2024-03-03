@@ -1,5 +1,5 @@
 class Api::StatsController < ApplicationController
-  before_filter :set_campaign, only: [:entrants, :competitive_groups, :registration_dates]
+  before_filter :set_campaign, only: [:entrants, :competitive_groups, :registration_dates, :entrant_applications]
   before_filter :set_entrant_applications, only: [:entrants]
 
   def show
@@ -46,6 +46,16 @@ class Api::StatsController < ApplicationController
     ).where(status_id: [4, 6])
     @specialities = Dictionary.find_by_code(10).items
     @countries = Dictionary.find_by_code(7).items
+  end
+
+  def entrant_applications
+    @subjects = @campaign.entrance_test_items.order(:entrance_test_priority).map(&:subject_id).uniq
+    @entrant_applications = @campaign.entrant_applications.includes(:competitive_groups).where(status_id: [4, 6])
+    @marks = @campaign.marks.where(subject_id: @subjects).order(value: :desc).group_by(&:entrant_application_id)
+    @achievements = @campaign.achievements.where("value > ?", 0).group_by(&:entrant_application_id)
+    @benefit_documents = @campaign.benefit_documents.group_by(&:entrant_application_id)
+    @target_contracts = @campaign.target_contracts.group_by(&:entrant_application_id)
+    @institution_achievements = @campaign.institution_achievements
   end
 
   def registration_dates

@@ -27,6 +27,7 @@ Rails.application.routes.draw do
     resources 'stats', only: [:show] do
       member do
         get 'entrants'
+        get 'entrant_applications'
 	get 'registration_dates'
         get 'competitive_groups'
       end

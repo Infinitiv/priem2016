@@ -12,6 +12,8 @@ class Campaign < ActiveRecord::Base
   has_many :target_organizations, through: :competitive_groups
   has_many :subjects, through: :entrance_test_items
   has_many :identity_documents, through: :entrant_applications
+  has_many :benefit_documents, through: :entrant_applications
+  has_many :target_contracts, through: :entrant_applications
   
   validates :name, :year_start, :year_end, :status_id, :campaign_type_id, :education_forms, :education_levels, presence: true
   validates :year_start, :year_end, numericality: { only_integer: true }
