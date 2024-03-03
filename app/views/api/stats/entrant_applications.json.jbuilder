@@ -38,7 +38,16 @@ json.array! @entrant_applications.each do |entrant_application|
     json.stage entrant_application.status_id
     json.source entrant_application.source
     json.competitive_group_name competitive_group.name
-    json.education_source competitive_group.education_source_id
+    case competitive_group.education_source_id
+    when 14
+      json.education_source 'Основные места в рамках КЦП'
+    when 15
+      json.education_source 'По договору об оказании платных образовательных услуг'
+    when 16
+      json.education_source 'Целевая квота'
+    when 20
+      json.education_source 'Особая квота'
+    end
     json.enrolled_date entrant_application.enrolled_date
     json.exeptioned_date entrant_application.exeptioned_date
     json.sum marks.sum
